@@ -1,4 +1,6 @@
 import { ShieldCheck } from 'lucide-react';
+// @ts-expect-error - image asset
+import satisfiedTravellerImg from '../assets/images/satisfied_traveller_1780042943028.png';
 
 interface ClairePanelProps {
   compact?: boolean;
@@ -11,7 +13,7 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
       {/* Passenger Image Block */}
       <div className={`relative ${compact ? 'aspect-[16/9]' : 'aspect-[4/3]'} bg-slate-100 border-b border-rose-100`}>
         <img 
-          src="/src/assets/images/satisfied_traveller_1780042943028.png" 
+          src={satisfiedTravellerImg} 
           alt="Satisfied British train passenger holding standard orange ticket smiling next to scenic countryside view" 
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"

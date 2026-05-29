@@ -10,6 +10,8 @@ import DidYouKnow from './components/DidYouKnow';
 import ClairePanel from './components/ClairePanel';
 // @ts-expect-error - image asset
 import ticketImg from './assets/images/ticket.png';
+// @ts-expect-error - image asset
+import heroImg from './assets/images/british_rail_history_hero_1780041941158.png';
 import { 
   Train, ArrowRight, ArrowUpDown, Calendar, HelpCircle, ShieldCheck, 
   Clock, Info, Layout, Sliders, Type, Landmark, ExternalLink, Sparkles 
@@ -295,7 +297,7 @@ export default function App() {
                     <div className="lg:col-span-5 flex justify-center">
                       <div className="relative rounded-2xl overflow-hidden border-4 border-white/15 shadow-2xl shadow-slate-950/50 aspect-[16/9] w-full max-w-md">
                         <img 
-                          src="/src/assets/images/british_rail_history_hero_1780041941158.png" 
+                          src={heroImg} 
                           alt="Iconic InterCity 125 train in its classic yellow and blue modernization era livery traveling through the British countryside" 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
