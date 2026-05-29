@@ -1,0 +1,6 @@
+{
+  "name": "British Rail Portal & Archive",
+  "description": "An independent travel ticket portal and design archive showcasing the mid-century corporate visual identity of British Rail.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
