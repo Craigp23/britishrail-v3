@@ -30,6 +30,23 @@ export default function InteractiveTimeline() {
     }
   };
 
+  // 4-Aspect Signal light dynamic states (Red, Yellow 1, Green, Yellow 2)
+  let isRedOn = false;
+  let isYellow1On = false;
+  let isGreenOn = false;
+  let isYellow2On = false;
+
+  if (activeIndex === 0 || activeIndex === 5) {
+    isRedOn = true;
+  } else if (activeIndex === 1) {
+    isYellow1On = true;
+  } else if (activeIndex === 2) {
+    isYellow1On = true;
+    isYellow2On = true;
+  } else if (activeIndex === 3 || activeIndex === 4) {
+    isGreenOn = true;
+  }
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 max-w-4xl mx-auto my-4 transition-all">
       
@@ -41,62 +58,96 @@ export default function InteractiveTimeline() {
             <span>Interactive Timeline</span>
           </h3>
           <p className="text-xs text-slate-500 font-sans mt-0.5">
-            Step through critical periods of UK railways using our interactive signal track console.
+            Browse highlights in UK railway history using our interactive timeline.
           </p>
         </div>
         
         {/* Signal state lights indicator */}
-        <div className="flex items-center space-x-2.5 bg-slate-950 px-4 py-2 rounded-full border border-slate-800 shadow-inner">
-          <span className="text-[10px] font-mono text-slate-400 mr-2 font-bold uppercase tracking-wider">Signals:</span>
-          <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" title="Danger Red Stop" />
-          <span className="h-3 w-3 rounded-full bg-amber-400" title="Caution Amber Prepare" />
-          <span className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" title="Clear Green Proceed" />
+        <div className="flex items-center space-x-2 bg-slate-950 px-4 py-2 rounded-full border border-slate-800 shadow-inner">
+          <span 
+            className={`h-3 w-3 rounded-full transition-all duration-300 ${
+              isRedOn 
+                ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)] animate-pulse' 
+                : 'bg-red-950/60'
+            }`} 
+            title="Danger Red Stop" 
+          />
+          <span 
+            className={`h-3 w-3 rounded-full transition-all duration-300 ${
+              isYellow1On 
+                ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.9)] animate-pulse' 
+                : 'bg-amber-950/60'
+            }`} 
+            title="Preliminary Caution Yellow" 
+          />
+          <span 
+            className={`h-3 w-3 rounded-full transition-all duration-300 ${
+              isGreenOn 
+                ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)] animate-pulse' 
+                : 'bg-emerald-950/60'
+            }`} 
+            title="Clear Green Proceed" 
+          />
+          <span 
+            className={`h-3 w-3 rounded-full transition-all duration-300 ${
+              isYellow2On 
+                ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.9)] animate-pulse' 
+                : 'bg-amber-950/60'
+            }`} 
+            title="Caution Yellow" 
+          />
         </div>
       </div>
 
       {/* 1. COMPACT HORIZONTAL RAILWAY TRACK STEPPER */}
       <div className="relative mb-8 pt-4">
-        {/* The Track Line */}
-        <div className="absolute top-[38px] left-8 right-8 h-1 bg-slate-200 rounded-full" />
+        {/* The Track Line perfectly centered at nodes height */}
+        <div className="absolute top-[44px] left-10 right-10 h-1 bg-slate-200 rounded-full" />
         
-        {/* Active Train Indicator Track overlay */}
+        {/* Active Train Indicator Track overlay aligned perfectly */}
         <div 
-          className="absolute top-[38px] left-8 h-1 bg-rail-red rounded-full transition-all duration-300"
-          style={{ width: `${(activeIndex / (TIMELINE_EVENTS.length - 1)) * 88}%` }}
+          className="absolute top-[44px] left-10 h-1 bg-rail-red rounded-full transition-all duration-300"
+          style={{ width: `calc(${(activeIndex / (TIMELINE_EVENTS.length - 1))} * (100% - 5rem))` }}
         />
 
         {/* Track Stops (Buttons) */}
-        <div className="flex justify-between items-center relative z-10 px-2">
+        <div className="flex justify-between items-start relative z-10 px-0">
           {TIMELINE_EVENTS.map((evt, idx) => {
             const isActive = idx === activeIndex;
             return (
               <button
                 key={evt.year}
                 onClick={() => setActiveIndex(idx)}
-                className="flex flex-col items-center focus:outline-none group cursor-pointer"
+                className="flex flex-col items-center focus:outline-none group cursor-pointer w-full max-w-[120px]"
               >
-                {/* Year Label above node */}
-                <span className={`text-[12px] font-mono font-bold transition-all duration-200 mb-3 block ${
-                  isActive ? 'text-[#a8081b] scale-110 text-sm font-black' : 'text-slate-400 group-hover:text-slate-600'
-                }`}>
-                  {evt.year}
-                </span>
-
-                {/* Circular Node / Railway Signal Bulb */}
-                <div className={`w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all duration-200 shadow-md ${
-                  isActive 
-                    ? 'bg-[#a8081b] border-white ring-2 ring-red-500 scale-117' 
-                    : 'bg-white border-slate-300 hover:border-slate-400 group-hover:scale-105'
-                }`}>
-                  {isActive && <Circle className="w-1.5 h-1.5 fill-white text-white" />}
+                {/* Year Label in fixed-height block to guarantee perfect horizontal alignment across nodes */}
+                <div className="h-6 flex items-end justify-center mb-1">
+                  <span className={`text-xs sm:text-sm font-mono font-bold transition-all duration-200 ${
+                    isActive ? 'text-[#a8081b] scale-110 font-black' : 'text-slate-400 group-hover:text-slate-600'
+                  }`}>
+                    {evt.year}
+                  </span>
                 </div>
 
-                {/* Brief Title on desktop (compacted) */}
-                <span className={`hidden md:block text-[9px] font-sans font-medium max-w-[70px] text-center mt-1.5 leading-tight transition-opacity duration-200 ${
-                  isActive ? 'text-slate-800 font-semibold' : 'text-slate-400 opacity-60'
-                }`}>
-                  {evt.title.split(' ')[0]} {evt.title.split(' ')[1] || ''}
-                </span>
+                {/* Circular Node / Railway Signal Bulb in fixed vertical alignment containing container */}
+                <div className="h-8 flex items-center justify-center relative">
+                  <div className={`w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all duration-200 shadow-md ${
+                    isActive 
+                      ? 'bg-[#a8081b] border-white ring-2 ring-red-500 scale-117' 
+                      : 'bg-white border-slate-300 hover:border-slate-400 group-hover:scale-105'
+                  }`}>
+                    {isActive && <Circle className="w-1.5 h-1.5 fill-white text-white" />}
+                  </div>
+                </div>
+
+                {/* Event text wrapped fully without truncation inside a stable layout container */}
+                <div className="h-16 flex items-start justify-center px-1 overflow-visible">
+                  <span className={`text-[10px] sm:text-[11px] font-sans font-semibold text-center mt-2 leading-snug transition-all max-w-[90px] sm:max-w-[110px] ${
+                    isActive ? 'text-slate-800 font-bold' : 'text-slate-400 opacity-85 group-hover:text-slate-600'
+                  }`}>
+                    {evt.title}
+                  </span>
+                </div>
               </button>
             );
           })}
@@ -167,7 +218,7 @@ export default function InteractiveTimeline() {
           <span>Previous Era</span>
         </button>
 
-        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest hidden sm:inline-block">
           Consolidation Track Selector
         </span>
 

@@ -87,16 +87,16 @@ export default function App() {
 
                     {/* Right Interactive Ticket graphic - Authentic image asset from original site, cleaned up */}
                     <div className="lg:col-span-5 flex justify-center max-lg:order-4 max-lg:w-full">
-                      <div className="relative transform hover:rotate-1 hover:scale-105 transition-all duration-300 max-w-sm w-full group">
-                        
-                        <div className="relative overflow-hidden rounded-xl shadow-2xl shadow-black/50 bg-white">
-                          <img 
-                            src={ticketImg} 
-                            alt="Prinstine clean-edged vintage British Rail ticket asset" 
-                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.03] bg-white"
-                            referrerPolicy="no-referrer"
-                          />
-                        </div>
+                      <div className="relative max-w-sm w-full">
+                        <img 
+                          src={ticketImg} 
+                          alt="Prinstine clean-edged vintage British Rail ticket asset" 
+                          className="w-full h-auto object-contain bg-transparent"
+                          style={{ 
+                            filter: 'drop-shadow(-12px 16px 20px rgba(15, 23, 42, 0.42))' 
+                          }}
+                          referrerPolicy="no-referrer"
+                        />
                       </div>
                     </div>
 
@@ -565,14 +565,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
             <div>
-              <div className="flex items-center space-x-2 justify-center md:justify-start">
-                <div className="w-8 h-5 text-rail-red flex-shrink-0">
-                  <svg viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="square">
-                    <path d="M 40 12 L 15 12 L 35 27 L 85 27" />
-                    <path d="M 60 48 L 85 48 L 65 33 L 15 33" />
-                    <path d="M 35 27 L 15 12 M 65 33 L 85 48" />
-                  </svg>
-                </div>
+              <div className="flex items-center justify-center md:justify-start">
                 <span className="font-display font-extrabold text-[#a8081b] uppercase tracking-wider text-sm">
                   BRITISH RAIL DESIGN ARCHIVE
                 </span>

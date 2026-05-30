@@ -64,18 +64,28 @@ export default function DoubleArrowGeometry() {
       
       {/* Title block styled with grid to align with controls section below */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start lg:items-center mb-6">
-        <div className="lg:col-span-8">
-          <h3 className="text-lg font-display font-bold text-rail-blue tracking-tight">
-            Geometry of the double arrow icon (Gerry Barney, 1965)
-          </h3>
-          <p className="text-xs text-slate-500 font-sans mt-0.5">
-            Understand how mathematical symmetry and grid lines forged an iconic railway symbol.
-          </p>
+        <div className="lg:col-span-8 flex justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 className="text-lg font-display font-bold text-rail-blue tracking-tight">
+              Geometry of the double arrow icon (Gerry Barney, 1965)
+            </h3>
+            <p className="text-xs text-slate-500 font-sans mt-0.5">
+              Understand how mathematical symmetry and grid lines forged an iconic railway symbol.
+            </p>
+          </div>
+          <button
+            onClick={handleReset}
+            className="text-slate-500 hover:text-rail-blue p-2 hover:bg-slate-100 rounded-full transition cursor-pointer flex-shrink-0 animate-fade-in self-center"
+            title="Reset Geometry"
+            id="btn-reset-geometry"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
-        <div className="lg:col-span-4 flex items-center justify-between space-x-3 w-full pr-1">
+        <div className="lg:col-span-4 w-full">
           {/* Colour collision warning (preserves layout and aligns perfectly with the controls below) */}
           <div 
-            className={`p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-800 font-sans transition-all duration-200 text-center flex-grow ${
+            className={`p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-800 font-sans transition-all duration-200 text-center w-full ${
               foregroundColourIndex === backgroundColourIndex 
                 ? 'opacity-100 scale-100' 
                 : 'opacity-0 scale-95 pointer-events-none'
@@ -84,14 +94,6 @@ export default function DoubleArrowGeometry() {
           >
             Foreground and background colours match.
           </div>
-          <button
-            onClick={handleReset}
-            className="text-slate-500 hover:text-rail-blue p-2 hover:bg-slate-100 rounded-full transition cursor-pointer flex-shrink-0 animate-fade-in"
-            title="Reset Geometry"
-            id="btn-reset-geometry"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
       </div>
 

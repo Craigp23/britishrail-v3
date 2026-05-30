@@ -55,7 +55,7 @@ export default function DidYouKnow() {
       badge: 'Heritage Fact',
       badgeColor: 'text-purple-600 bg-purple-50 border-purple-100',
       title: 'The Famous "Toothpaste" Trains',
-      text: 'Network SouthEast’s bright original liveries (red, white, and blue) were initially mocked by classic rail enthusiasts and dubbed the "Toothpaste" style. Despite the criticism, the colorful sector design completely revitalized commuter numbers and turned a deficit into a profit.'
+      text: 'Network SouthEast’s bright original liveries (red, white, and blue) were initially mocked by classic rail enthusiasts and dubbed the "Toothpaste" style. Despite the criticism, the colourful sector design completely revitalised commuter numbers and turned a deficit into a profit.'
     },
     {
       id: 'longest-platform',

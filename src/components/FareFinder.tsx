@@ -268,7 +268,7 @@ export default function FareFinder() {
           ) : (
             <>
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Analyze Splitting & Fares</span>
+              <span>Analyse Splitting & Fares</span>
             </>
           )}
         </button>

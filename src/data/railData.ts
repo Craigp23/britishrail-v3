@@ -30,7 +30,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     year: 1955,
     title: 'The Modernisation Plan',
     subtitle: 'Transition from Steam to Diesel and Electric',
-    description: 'A massive government commitment (£1.2 billion) is approved to phase out steam locomotion in favor of modern diesel and electric train units, standardizing rolling stock. Track signaling and services undergo rapid modernization.',
+    description: 'A massive government commitment (£1.2 billion) is approved to phase out steam locomotion in favour of modern diesel and electric train units, standardizing rolling stock. Track signalling and services undergo rapid modernization.',
     category: 'engineering'
   },
   {
@@ -44,7 +44,7 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     year: 1976,
     title: 'Launch of the InterCity 125',
     subtitle: 'The World\'s Fastest Diesel Train (HST)',
-    description: 'The world-famous High Speed Train (class 43 locomotive) debuts, running at 125 mph (200 km/h). Boasting Kenneth Grange\'s legendary aerodynamic design and iconic dual-front yellow nose, it revolutionized long-distance travel.',
+    description: 'The world-famous High Speed Train (class 43 locomotive) debuts, running at 125 mph (200 km/h). Boasting Kenneth Grange\'s legendary aerodynamic design and iconic dual-front yellow nose, it revolutionised long-distance travel.',
     category: 'engineering'
   },
   {
@@ -77,7 +77,7 @@ export const DESIGN_ELEMENTS: DesignElement[] = [
     number: '02',
     title: 'Rail Alphabet',
     description: 'A bespoke, highly legible sans-serif typeface created by Jock Kinneir and Margaret Calvert to instantly cut through visual noise across stations nationwide.',
-    longerDescription: 'Developed in 1965 (and revised as Rail Alphabet 2 in recent years), this elegant typeface was designed to be easily read by travelers from moving transit vehicles or at a distance in visually complex station halls. Available in light and dark weights (for negative text on dark signboards vs positive text on white boards), it forms the basis of all modern highway signage systems across the UK and many international regions.',
+    longerDescription: 'Developed in 1965 (and revised as Rail Alphabet 2 in recent years), this elegant typeface was designed to be easily read by travellers from moving transit vehicles or at a distance in visually complex station halls. Available in light and dark weights (for negative text on dark signboards vs positive text on white boards), it forms the basis of all modern highway signage systems across the UK and many international regions.',
     iconName: 'Type'
   },
   {

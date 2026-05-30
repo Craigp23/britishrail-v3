@@ -41,7 +41,7 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
           <h5 className="font-display font-extrabold text-[#002F6C] text-sm uppercase tracking-tight">
             Claire from Cheltenham Spa
           </h5>
-          <p className="text-xs text-slate-500 font-mono -mt-0.5">Frequent traveler on the Great Western route</p>
+          <p className="text-xs text-slate-500 font-mono -mt-0.5">Frequent traveller on the Great Western route</p>
         </div>
 
         <p className="text-xs text-slate-600 leading-relaxed font-sans">

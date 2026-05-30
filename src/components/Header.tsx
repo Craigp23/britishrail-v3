@@ -40,7 +40,8 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
             <img 
               src={logoImg} 
               alt="britishrail.co.uk Logo" 
-              className="h-10 md:h-11 w-auto object-contain hover:opacity-95 transition-all duration-200 pr-0 mr-0"
+              className="h-[56px] w-auto object-contain hover:opacity-95 transition-all duration-200 pr-0 mr-0"
+              style={{ height: '56px' }}
               referrerPolicy="no-referrer"
             />
           </div>
@@ -78,6 +79,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
               Smart Travel Guide
             </button>
           </nav>
+
 
           {/* Right badge - Non-affiliated Notice */}
           <div className="hidden lg:flex items-center space-x-2 bg-slate-100/80 px-3 py-1.5 rounded-full border border-slate-200">
@@ -137,6 +139,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
             Smart Travel Guide
           </button>
           
+
           <div className="pt-3 border-t border-slate-100 flex items-center space-x-2 px-4 justify-between">
             <span className="text-[11px] font-mono text-slate-400">Independent Historical Portal</span>
             <span className="bg-emerald-100 text-emerald-800 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full">
