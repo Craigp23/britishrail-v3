@@ -32,7 +32,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans select-none antialiased">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans antialiased">
       
       {/* Global Brand Header with custom Double Arrow logo */}
       <Header currentTab={currentTab} setTab={setTab} />
@@ -264,20 +264,20 @@ export default function App() {
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                  <div className="flex flex-col gap-4 lg:grid lg:grid-cols-12 lg:gap-10 lg:items-center max-lg:items-center max-lg:text-center">
                     
                     {/* Left text column */}
-                    <div className="lg:col-span-7 space-y-6">
+                    <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
                       
-                      <h1 className="text-3xl sm:text-5xl lg:text-5xl font-display font-extrabold tracking-tight text-white leading-tight">
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
                         The Design Legacy of <span className="text-[#a8081b]">British Rail</span>
                       </h1>
                       
-                      <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl">
+                      <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
                         Explore how a bold 1960s identity project transformed Britain's public railway system into an enduring icon of graphic design history.
                       </p>
 
-                      <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                      <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
                         <a 
                           href="#exhibit"
                           className="px-6 py-3 bg-[#a8081b] hover:bg-opacity-95 text-white rounded-xl font-bold text-center text-sm shadow-md transition-all cursor-pointer"
@@ -294,7 +294,7 @@ export default function App() {
                     </div>
 
                     {/* Right Image column - Drops in appropriate, attractive Hero image generated */}
-                    <div className="lg:col-span-5 flex justify-center">
+                    <div className="lg:col-span-5 flex justify-center max-lg:order-4 max-lg:w-full">
                       <div className="relative rounded-2xl overflow-hidden border-4 border-white/15 shadow-2xl shadow-slate-950/50 aspect-[16/9] w-full max-w-md">
                         <img 
                           src={heroImg} 
@@ -389,24 +389,24 @@ export default function App() {
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                  <div className="flex flex-col gap-4 lg:grid lg:grid-cols-12 lg:gap-10 lg:items-center max-lg:items-center max-lg:text-center">
                     
                     {/* Left text column */}
-                    <div className="lg:col-span-7 space-y-6">
-                      <div className="inline-flex items-center space-x-2 bg-rose-950/40 border border-[#a8081b]/50 px-3 py-1 rounded-full text-xs text-red-200">
+                    <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
+                      <div className="inline-flex items-center space-x-2 bg-rose-950/40 border border-[#a8081b]/50 px-3 py-1 rounded-full text-xs text-red-200 max-lg:order-1">
                         <Clock className="w-3.5 h-3.5 text-[#a8081b]" />
                         <span className="font-mono tracking-wide">Advance Fare Hacks</span>
                       </div>
                       
-                      <h1 className="text-4xl sm:text-5xl lg:text-5xl font-display font-extrabold tracking-tight text-white leading-tight">
+                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
                         Smart Travel Guide & <span className="text-[#a8081b]">Fare Secrets</span>
                       </h1>
                       
-                      <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl">
+                      <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
                         Are you systematically overpaying for normal train tickets in the UK? Learn core strategies to book advance windows and maximize discounts.
                       </p>
 
-                      <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                      <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
                         <a 
                           href="https://www.thetrainline.com/trains/great-britain/split-tickets"
                           target="_blank"
@@ -425,7 +425,7 @@ export default function App() {
                     </div>
 
                     {/* Right Dynamic visual column */}
-                    <div className="lg:col-span-5 flex justify-center">
+                    <div className="lg:col-span-5 flex justify-center max-lg:order-4 max-lg:w-full">
                       <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full shadow-xl relative overflow-hidden text-slate-300">
                         <div className="flex items-center space-x-2 text-rose-500 mb-3 border-b border-slate-800 pb-2">
                           <ShieldCheck className="w-5 h-5" />

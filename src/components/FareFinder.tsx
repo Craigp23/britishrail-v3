@@ -369,7 +369,7 @@ export default function FareFinder() {
               </div>
 
               {/* Classic UK Cardboard Train Ticket Render */}
-              <div className="bg-amber-100 border-2 border-amber-300 rounded-lg p-4 font-mono text-amber-900 shadow-sm relative overflow-hidden select-none">
+              <div className="bg-amber-100 border-2 border-amber-300 rounded-lg p-4 font-mono text-amber-900 shadow-sm relative overflow-hidden">
                 
                 {/* Magnetic Stripe representation on top */}
                 <div className="absolute top-0 left-0 w-full h-3 bg-neutral-800" />
