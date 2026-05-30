@@ -61,7 +61,7 @@ export default function App() {
                     {/* Left text column */}
                     <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
                       
-                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
+                      <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
                         Travel Smarter on <span className="text-[#a8081b]">UK Rail</span>
                       </h1>
                       
@@ -269,7 +269,7 @@ export default function App() {
                     {/* Left text column */}
                     <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
                       
-                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
+                      <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
                         The Design Legacy of <span className="text-[#a8081b]">British Rail</span>
                       </h1>
                       
@@ -398,7 +398,7 @@ export default function App() {
                         <span className="font-mono tracking-wide">Advance Fare Hacks</span>
                       </div>
                       
-                      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
+                      <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
                         Smart Travel Guide & <span className="text-[#a8081b]">Fare Secrets</span>
                       </h1>
                       
