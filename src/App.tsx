@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Page, Station } from './types';
 import Header from './components/Header';
 import FareFinder from './components/FareFinder';
@@ -21,6 +21,37 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [currentTab, setTab] = useState<Page>('home');
+
+  // Bilateral synchronization between URL hash and application state
+  useEffect(() => {
+    const getTabFromHash = (): Page => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'home' || hash === 'history' || hash === 'guide') {
+        return hash as Page;
+      }
+      return 'home';
+    };
+
+    // Initialize on mount
+    setTab(getTabFromHash());
+
+    const handleHashChange = () => {
+      setTab(getTabFromHash());
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
+
+  // Update hash when local tab shifts
+  useEffect(() => {
+    const currentHash = window.location.hash.replace('#', '');
+    if (currentHash !== currentTab) {
+      window.location.hash = currentTab;
+    }
+  }, [currentTab]);
 
   // Precision custom inline SVG representing the double arrow logo
   const doubleArrowLogo = (
@@ -62,11 +93,11 @@ export default function App() {
                     <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
                       
                       <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
-                        Travel Smarter on <span className="text-[#a8081b]">UK Rail</span>
+                        Travel Smarter on UK Rail
                       </h1>
                       
                       <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
-                        Looking for cheap fares, mastering split-ticketing, and exploring the glorious design history of British railways? Welcome to your independent modern guide.
+                        Find cheap fares, master split-ticketing, and explore the glorious design history of British railways.
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
@@ -200,14 +231,14 @@ export default function App() {
                         <div className="text-xl mb-3">🏛️</div>
                         <h4 className="font-display font-bold text-slate-800">Historic Graphic Legacy</h4>
                         <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Discover Gerry Barney's mathematical grid logo design and Jock Kinneir's legendary Rail Alphabet typesetting rules.
+                          Discover Gerry Barney's mathematical grid logo design and the legendary Rail Alphabet typography crafted by Jock Kinneir & Margaret Calvert.
                         </p>
                       </div>
                       <button 
                         onClick={() => setTab('history')}
                         className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
                       >
-                        Explore Design Archives ➔
+                        Explore Design Archive ➔
                       </button>
                     </div>
 
@@ -216,7 +247,7 @@ export default function App() {
                         <div className="text-xl mb-3">🎫</div>
                         <h4 className="font-display font-bold text-slate-800">Split Ticket Mastery</h4>
                         <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Learn how breaking up rail trips into sequential segments keeps you in the same train and cuts off 40%+ costs.
+                          Learn how breaking up your rail trips into sequential segments can cut 40%+ off the cost of your journey.
                         </p>
                       </div>
                       <button 
@@ -230,16 +261,16 @@ export default function App() {
                     <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition">
                       <div>
                         <div className="text-xl mb-3">📅</div>
-                        <h4 className="font-display font-bold text-slate-800">The 12-Week Release Slate</h4>
+                        <h4 className="font-display font-bold text-slate-800">The 12-Week Release Cycle</h4>
                         <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Train companies release their cheapest advance inventory 12 weeks ahead. Track release dates using our reminder tools.
+                          Train companies release their cheapest advance inventory 12 weeks ahead. Track release dates using our easy reminder tool.
                         </p>
                       </div>
                       <button 
                         onClick={() => setTab('guide')}
                         className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
                       >
-                        Release Calendar Tools ➔
+                        Release Calculator & Reminder Tool ➔
                       </button>
                     </div>
 
@@ -270,7 +301,7 @@ export default function App() {
                     <div className="max-lg:contents lg:col-span-7 lg:space-y-4">
                       
                       <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
-                        The Design Legacy of <span className="text-[#a8081b]">British Rail</span>
+                        The Design Legacy of British Rail
                       </h1>
                       
                       <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
@@ -399,11 +430,11 @@ export default function App() {
                       </div>
                       
                       <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
-                        Smart Travel Guide and <span className="text-[#a8081b]">Fare Secrets</span>
+                        Smart Travel Guide and Fare Secrets
                       </h1>
                       
                       <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
-                        Are you systematically overpaying for normal train tickets in the UK? Learn core strategies to book advance windows and maximize discounts.
+                        Overpaying for train journeys? Learn core strategies when booking, leverage split-tickets, maximize discounts and make your UK travel budget go further.
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
@@ -429,20 +460,20 @@ export default function App() {
                       <div className="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full shadow-xl relative overflow-hidden text-slate-300">
                         <div className="flex items-center space-x-2 text-rose-500 mb-3 border-b border-slate-800 pb-2">
                           <ShieldCheck className="w-5 h-5" />
-                          <span className="text-xs font-mono font-bold tracking-widest uppercase text-slate-200">GUARANTEED FARE REDUCTIONS</span>
+                          <span className="text-xs font-mono font-bold tracking-widest uppercase text-slate-200">SOLID FARE REDUCTIONS</span>
                         </div>
                         <ul className="space-y-3.5 text-xs">
                           <li className="flex items-start space-x-2">
                             <span className="text-emerald-400 mt-0.5 font-bold">✓</span>
-                            <span><strong>Split ticketing:</strong> Legally divides journeys, saving ~43% without swapping carriages.</span>
+                            <span><strong>Split ticketing:</strong> Legally divides journeys, saving up to ~43%, sometimes without even swapping seat!</span>
                           </li>
                           <li className="flex items-start space-x-2">
                             <span className="text-emerald-400 mt-0.5 font-bold">✓</span>
-                            <span><strong>12-Week Release:</strong> Grab Tier 1 prices the moment they release on the matrix.</span>
+                            <span><strong>12-Week Release:</strong> Grab Tier 1 prices the moment they release on the system.</span>
                           </li>
                           <li className="flex items-start space-x-2">
                             <span className="text-emerald-400 mt-0.5 font-bold">✓</span>
-                            <span><strong>Off-Peak windows:</strong> Avoid Mon-Fri peak hours (06:30-09:30 & 15:30-18:30).</span>
+                            <span><strong>Off-Peak windows:</strong> Avoid Monday to Friday peak hours (06:30-09:30 and 15:30-18:30).</span>
                           </li>
                         </ul>
                       </div>
@@ -467,7 +498,7 @@ export default function App() {
                       UK National Rail Booking Cheatsheet
                     </h2>
                     <p className="text-sm text-slate-500 font-sans mt-2">
-                      Master these four proven techniques to save hundreds of pounds in yearly travel.
+                      Master these four proven tactics to save hundreds of pounds in yearly travel.
                     </p>
                   </div>
 
@@ -483,7 +514,7 @@ export default function App() {
                           </div>
                           <h4 className="font-display font-bold text-slate-950 text-base mb-2">Mastering Split-Ticketing</h4>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                            Under UK National Rail conditions of carriage, split tickets are completely valid provided the train physically halts at every platform that names your split station. For example, if you are traveling on an LNER HST from London King's Cross to Edinburgh Waverley, buying 'London to York' + 'York to Edinburgh Waverley' tickets is legally valid as long as that specific train makes a scheduled stop at York station, even if you never stand up or change seats!
+                            Under UK National Rail conditions of carriage, <strong className="highlight-text">split tickets are completely valid</strong> provided the train physically halts at your split station(s). For example, if you are traveling on an LNER HST from London King's Cross to Edinburgh Waverley, buying 'London to York' + 'York to Edinburgh Waverley' tickets is legally valid as long as the train makes a scheduled stop at York station, even if you don't stand up or change seats!
                           </p>
                         </div>
                       </div>
@@ -495,7 +526,7 @@ export default function App() {
                           </div>
                           <h4 className="font-display font-bold text-slate-950 text-base mb-2">The Two Together Trick</h4>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                            If you travel with a spouse, sibling, or general peer, the <strong className="highlight-text">Two Together Railcard</strong> costs just £30 and is valid for a whole year. It instantly slices 34% off your total checkout standard prices on all joint travel after 09:30 AM weekdays, paying for itself on just one medium-range trip (such as London to York return).
+                            If you travel with a spouse, sibling, or peer, the <strong className="highlight-text">Two Together Railcard</strong> costs just £30 and is valid for a whole year. It slices 34% off your total checkout standard price on all joint travel after 9:30 AM weekdays, paying for itself on just one medium-range trip (such as London to York return).
                           </p>
                         </div>
                       </div>
@@ -507,7 +538,11 @@ export default function App() {
                           </div>
                           <h4 className="font-display font-bold text-slate-950 text-base mb-2">Advance Tickets Block Releases</h4>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                            Unlike airline ticket price algorithms that move dynamically according to rapid user cookies and browsing queries, train ticket prices are distributed in strict static "Tariff Tiers". Tier 1 remains flat until all assigned inventory on that train has been depleted. Securing bookings at exactly the 12-week release window guarantees you standard tickets at the rock-bottom rate.
+                            Unlike airline ticket price algorithms that move dynamically according to user browsing queries, train ticket prices are distributed in static <strong className="highlight-text">"Tariff Tiers"</strong>. For example, Tier 1 remains flat until all inventory in Tier 1 on that train has been depleted.
+                          </p>
+                          <br/>
+                          <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                            Securing bookings at the start of a 12-week release window guarantees you standard tickets at the lowest rate.
                           </p>
                         </div>
                       </div>
@@ -519,7 +554,7 @@ export default function App() {
                           </div>
                           <h4 className="font-display font-bold text-slate-950 text-base mb-2">The Off-Peak & Super Off-Peak Windows</h4>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                            Peak commuter slots are heavily taxed. Adjusting your travel and booking only "Off-Peak" or "Super Off-Peak" classes bypasses these premium toll fees entirely. These slots usually start after 09:30 AM in towns/cities, and all day during weekends/public holidays.
+                            The busy, peak period, commuter time slots are heavily taxed. Adjusting your travel and booking only <strong className="highlight-text">"Off-Peak"</strong> or <strong className="highlight-text">"Super Off-Peak"</strong> tickets bypasses those premium fees entirely. The "Off-Peak" or "Super Off-Peak" slots usually start after 9:30 AM, and all day during weekends or public holidays.
                           </p>
                         </div>
                       </div>
@@ -577,10 +612,24 @@ export default function App() {
 
             <div className="text-right">
               <p className="text-[11px] font-sans">
-                &copy; 1965-2026 BritishRail.co.uk. All rights reserved.
+                &copy; 2009-2026 BritishRail.co.uk. All rights reserved.
               </p>
               <p className="text-[10px] text-slate-500 mt-1">
-                Contact Webmaster: <span className="font-mono text-slate-400 text-xs">webmaster&#64;britishrail.co.uk</span>
+                <button 
+                  onClick={() => {
+                    const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
+                    const domain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
+                    const subject = String.fromCharCode(84, 111, 32, 119, 101, 98, 109, 97, 115, 116, 101, 114, 32, 111, 102, 32, 98, 114, 105, 116, 105, 115, 104, 114, 97, 105, 108, 46, 99, 111, 46, 117, 107);
+                    window.location.href = `mailto:${user}@${domain}?subject=${encodeURIComponent(subject)}`;
+                  }}
+                  onCopy={(e) => {
+                    e.preventDefault();
+                  }}
+                  className="font-sans text-slate-400 text-[11px] hover:text-rose-500 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-0 p-0 select-none"
+                  title="Contact Webmaster"
+                >
+                  Contact Webmaster
+                </button>
               </p>
             </div>
           </div>

@@ -14,13 +14,13 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
       <div className={`relative ${compact ? 'aspect-[16/9]' : 'aspect-[4/3]'} bg-slate-100 border-b border-rose-100`}>
         <img 
           src={satisfiedTravellerImg} 
-          alt="Satisfied British train passenger holding standard orange ticket smiling next to scenic countryside view" 
+          alt="Satisfied British train passenger holding standard ticket whilst watching scenic countryside go by" 
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
         {/* Artistic Photo Overlay Tag */}
         <div className="absolute top-2.5 right-2.5 bg-emerald-500 text-white text-[9px] font-mono font-bold px-2 py-0.5 rounded shadow-md">
-          REAL SAVINGS PORTRAIT
+          REAL SAVINGS
         </div>
         
         {/* Dynamic Photo Caption caption text */}
@@ -39,13 +39,13 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
 
         <div>
           <h5 className="font-display font-extrabold text-[#002F6C] text-sm uppercase tracking-tight">
-            Claire from Cheltenham Spa
+            Jules from Cheltenham Spa
           </h5>
           <p className="text-xs text-slate-500 font-mono -mt-0.5">Frequent traveller on the Great Western route</p>
         </div>
 
         <p className="text-xs text-slate-600 leading-relaxed font-sans">
-          "UK train travel holds a legendary design heritage, but the ticket pricing structure can easily accumulate to vast expenditures. By switching to the <strong>12-Week Release Slate</strong> and segmenting cross-platform routes through this portal, my commute is now completely affordable, all while keeping my exact seats!"
+          "I depend on travelling by train and tickets can sometimes be very expensive. By switching to using the <strong>12-Week Ticket Calculator</strong> and searching for cheaper routes through this portal, my commute is now much more affordable. I love the design heritage page on this site too :)"
         </p>
       </div>
 
