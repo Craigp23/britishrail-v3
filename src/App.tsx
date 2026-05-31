@@ -538,7 +538,7 @@ export default function App() {
                           </div>
                           <h4 className="font-display font-bold text-slate-950 text-base mb-2">Advance Tickets Block Releases</h4>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                            Unlike airline ticket price algorithms that move dynamically according to user browsing queries, train ticket prices are distributed in static <strong className="highlight-text">"Tariff Tiers"</strong>. For example, Tier 1 remains flat until all inventory in Tier 1 on that train has been depleted.
+                            Unlike airline ticket price algorithms that move dynamically according to user browsing queries, train ticket prices are distributed in static <strong className="highlight-text">"Tariff Tiers"</strong>. For example, the Tier 1 price remains flat until all inventory in Tier 1 on that train has been purchased.
                           </p>
                           <br/>
                           <p className="text-xs text-slate-600 leading-relaxed font-sans">
@@ -574,16 +574,16 @@ export default function App() {
               <section className="py-12 bg-slate-50">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="text-center mb-8">
-                    <h3 className="font-display font-bold text-xl text-rail-blue tracking-tight">Frequently Answered Fares FAQ</h3>
+                    <h3 className="font-display font-bold text-xl text-rail-blue tracking-tight">Frequently Answered Questions - FAQs</h3>
                   </div>
                   <div className="space-y-4">
                     <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                       <h5 className="font-bold text-xs font-sans text-slate-800">Do I have to change seats or get off when using Split Tickets?</h5>
-                      <p className="text-xs text-slate-600 mt-2">No! As long as you remain on the exact same train specified by your segments, you just stay on your reserved seat. Your boarding tickets will simply segment covering the whole line length.</p>
+                      <p className="text-xs text-slate-600 mt-2">As long as the same train is specified for your next journey segment then... No! You can just relax and stay in your reserved seat. Of course, depending on the route and schedule, your next segment may also be on another train.</p>
                     </div>
                     <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                       <h5 className="font-bold text-xs font-sans text-slate-800">What happens if a connecting train is delayed and I miss my connection?</h5>
-                      <p className="text-xs text-slate-600 mt-2">Even if you use split tickets, the National Rail Conditions of Travel protect your complete journey. You are permitted to board the next available scheduled train service for no additional charge.</p>
+                      <p className="text-xs text-slate-600 mt-2">Even if you use split tickets, the UK National Rail Conditions of Carriage protect your whole journey. You are permitted to board the next available scheduled train service at no additional cost.</p>
                     </div>
                   </div>
                 </div>

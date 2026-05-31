@@ -100,17 +100,11 @@ export default function InteractiveTimeline() {
       </div>
 
       {/* 1. COMPACT HORIZONTAL RAILWAY TRACK STEPPER */}
-      <div className="relative mb-8 pt-4">
-        {/* The Track Line perfectly centered at nodes height */}
-        <div className="absolute top-[44px] left-10 right-10 h-1 bg-slate-200 rounded-full" />
-        
-        {/* Active Train Indicator Track overlay aligned perfectly */}
-        <div 
-          className="absolute top-[44px] left-10 h-1 bg-rail-red rounded-full transition-all duration-300"
-          style={{ width: `calc(${(activeIndex / (TIMELINE_EVENTS.length - 1))} * (100% - 5rem))` }}
-        />
+      <div className="relative mb-8 pt-8">
+        {/* The Track Line perfectly aligned under the bottom of wheels (Y = 64px) */}
+        <div className="absolute top-[64px] left-[5%] right-[5%] h-[5px] bg-[#D1DFEC]" />
 
-        {/* Track Stops (Buttons) */}
+        {/* Track Stops (Buttons resembling train wheels sitting tangentially on top of direct grid line) */}
         <div className="flex justify-between items-start relative z-10 px-0">
           {TIMELINE_EVENTS.map((evt, idx) => {
             const isActive = idx === activeIndex;
@@ -120,30 +114,29 @@ export default function InteractiveTimeline() {
                 onClick={() => setActiveIndex(idx)}
                 className="flex flex-col items-center focus:outline-none group cursor-pointer w-full max-w-[120px]"
               >
-                {/* Year Label in fixed-height block to guarantee perfect horizontal alignment across nodes */}
-                <div className="h-6 flex items-end justify-center mb-1">
-                  <span className={`text-xs sm:text-sm font-mono font-bold transition-all duration-200 ${
-                    isActive ? 'text-[#a8081b] scale-110 font-black' : 'text-slate-400 group-hover:text-slate-600'
+                {/* Train Wheel Sitting tangentially on top of target line (h-8 bottom aligns with top of track line) */}
+                <div className="h-8 flex items-end justify-center relative mb-4">
+                  {isActive ? (
+                    <div className="w-8 h-8 rounded-full border-[3.5px] border-[#E5001C] bg-white flex items-center justify-center transition-all duration-200 origin-bottom scale-110">
+                      <div className="w-4.5 h-4.5 rounded-full bg-[#E5001C] flex items-center justify-center">
+                        {/* High precision tiny silver/white metal hub center dot */}
+                        <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full border-[3.5px] border-[#CBD5E1] hover:border-slate-400 bg-white transition-all duration-200 origin-bottom group-hover:scale-105" />
+                  )}
+                </div>
+
+                {/* Sub-node Labels: Year and Title centered underneath. Follows colors/weight of timeline-mockup2.png */}
+                <div className="flex flex-col items-center justify-start text-center">
+                  <span className={`text-[13px] sm:text-[15px] font-sans font-extrabold tracking-tight transition-all duration-200 ${
+                    isActive ? 'text-[#002F6C] scale-105' : 'text-[#8EA2B9] group-hover:text-[#5C738E]'
                   }`}>
                     {evt.year}
                   </span>
-                </div>
-
-                {/* Circular Node / Railway Signal Bulb in fixed vertical alignment containing container */}
-                <div className="h-8 flex items-center justify-center relative">
-                  <div className={`w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all duration-200 shadow-md ${
-                    isActive 
-                      ? 'bg-[#a8081b] border-white ring-2 ring-red-500 scale-117' 
-                      : 'bg-white border-slate-300 hover:border-slate-400 group-hover:scale-105'
-                  }`}>
-                    {isActive && <Circle className="w-1.5 h-1.5 fill-white text-white" />}
-                  </div>
-                </div>
-
-                {/* Event text wrapped fully without truncation inside a stable layout container */}
-                <div className="h-16 flex items-start justify-center px-1 overflow-visible">
-                  <span className={`text-[10px] sm:text-[11px] font-sans font-semibold text-center mt-2 leading-snug transition-all max-w-[90px] sm:max-w-[110px] ${
-                    isActive ? 'text-slate-800 font-bold' : 'text-slate-400 opacity-85 group-hover:text-slate-600'
+                  <span className={`text-[9px] sm:text-[10px] font-sans font-medium text-center mt-1 leading-snug transition-all max-w-[95px] sm:max-w-[115px] ${
+                    isActive ? 'text-[#1E293B] font-bold' : 'text-[#A0B0C4] group-hover:text-slate-500'
                   }`}>
                     {evt.title}
                   </span>
