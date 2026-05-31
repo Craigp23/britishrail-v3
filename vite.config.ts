@@ -6,10 +6,6 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     base: '/britishrail-v3/',
-    
-    // Ask Vite to bundle the public folder contents
-    publicDir: 'public',
-    
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
