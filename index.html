@@ -6,6 +6,33 @@
     <title>My Google AI Studio App</title>
   </head>
   <body>
+     <!-- Friendly Fallback for Old/Unsupported Browsers -->
+    <div id="legacy-browser-warning" style="display:none; padding: 24px; font-family: sans-serif; text-align: center; background-color: #fff; color: #333;">
+      <h2 style="color: #003366;">A More Modern Carriage (Browser :) is Required</h2>
+      <p>To view the British Rail interactive design archives, a more modern web browser is required.</p>
+      <p>Please update your device or switch to a modern browser like recent versions of <strong>Google Chrome, Brave, Mozilla Firefox, or Safari</strong>.</p>
+    </div>
+
+    <script>
+      // Ultra-basic JS that old engines can parse without crashing
+      try {
+        // If the browser doesn't support basic modern features, force the message visible
+        if (!window.ESModulesSupported && (typeof map !== 'undefined' || !window.fetch)) {
+          document.getElementById('legacy-browser-warning').style.display = 'block';
+        }
+      } catch(e) {
+        // If anything fails or crashes, show the message as a safety net
+        document.getElementById('legacy-browser-warning').style.display = 'block';
+      }
+    </script>
+
+    <noscript>
+      <div style="padding: 24px; font-family: sans-serif; text-align: center; background-color: #fff; color: #333;">
+        <h2 style="color: #003366;">JavaScript Required</h2>
+        <p>Please enable JavaScript or use a modern web browser to view this application.</p>
+      </div>
+    </noscript>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

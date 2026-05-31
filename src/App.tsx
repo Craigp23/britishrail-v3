@@ -399,7 +399,7 @@ export default function App() {
                       </div>
                       
                       <h1 className="hero-heading font-display font-extrabold tracking-tight text-white leading-tight max-lg:order-2 max-lg:max-w-xl">
-                        Smart Travel Guide & <span className="text-[#a8081b]">Fare Secrets</span>
+                        Smart Travel Guide and <span className="text-[#a8081b]">Fare Secrets</span>
                       </h1>
                       
                       <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
