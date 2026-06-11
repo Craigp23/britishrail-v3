@@ -16,48 +16,96 @@ const COLOUR_STOPS: ColourStop[] = [
   { id: 'black', name: 'Black', value: '#000000' }
 ];
 
+const BUTTON_NAMES: Record<string, string> = {
+  'flame-red': 'Red',
+  'rail-blue': 'Blue',
+  'electric-teal': 'Teal',
+  'rail-grey': 'Grey',
+  'white': 'White',
+  'black': 'Black'
+};
+
+// Center points and base measurements corresponding to the new 130x78 grid
 export default function DoubleArrowGeometry() {
-  const [strokeWidth, setStrokeWidth] = useState<number>(6);
-  const [gapOffset, setGapOffset] = useState<number>(15); // Arrow head horizontal offset
+  const [strokeWidth, setStrokeWidth] = useState<number>(13);
+  const [gapOffset, setGapOffset] = useState<number>(15.5); // Arrow head horizontal offset
   const [foregroundColourIndex, setForegroundColourIndex] = useState<number>(0); // Flame Red
   const [backgroundColourIndex, setBackgroundColourIndex] = useState<number>(5); // Black
   const [gridOpacity, setGridOpacity] = useState<number>(45);
+  const [taperAngle, setTaperAngle] = useState<number>(2.3); // In degrees. Standard: +2.3 deg (corresponds to authentic photoshop template)
 
   const foregroundColour = COLOUR_STOPS[foregroundColourIndex].value;
   const backgroundColour = COLOUR_STOPS[backgroundColourIndex].value;
 
   const handleReset = () => {
-    setStrokeWidth(6);
-    setGapOffset(15);
+    setStrokeWidth(13);
+    setGapOffset(15.5);
     setForegroundColourIndex(0);
     setBackgroundColourIndex(5);
     setGridOpacity(45);
+    setTaperAngle(2.3);
   };
 
-  // Base coordinates mapping to represent the official 62x39 grid
-  const X_mid = 31;
-  const Y_mid = 19.5;
-  const dy_half = 7.1; // Baseline offset for the horizontal tracks from central Y_mid (19.5)
+  // Center points and base measurements corresponding to the new 130x78 grid
+  const Y_mid = 39;
+  
+  // Track centerlines
+  const y_top_track_center = 25.5;
+  const y_bottom_track_center = 53.5;
 
   // Derived vertical track levels
-  const y_top_track = Y_mid - dy_half;     // 12.4
-  const y_bottom_track = Y_mid + dy_half;  // 26.6
+  const y_top_track_top = y_top_track_center - strokeWidth / 2;
+  const y_top_track_bottom = y_top_track_center + strokeWidth / 2;
+  const y_bottom_track_top = y_bottom_track_center - strokeWidth / 2;
+  const y_bottom_track_bottom = y_bottom_track_center + strokeWidth / 2;
 
   // Horizontal coordinates for arrow joints/bends based on gapOffset
-  const X_left_bend = X_mid - gapOffset;   // Standard: 16 (when gapOffset is 15)
-  const X_right_bend = X_mid + gapOffset;  // Standard: 46 (when gapOffset is 15)
+  const X_left_bend = 65 - gapOffset;   // Standard: 49.5 (when gapOffset is 15.5)
+  const X_right_bend = 65 + gapOffset;  // Standard: 80.5 (when gapOffset is 15.5)
 
-  // Mathematically derived outer points of the parallel diagonals (using the exact 1.5x height split ratio)
-  const X_outer_left = X_mid - 2 * gapOffset;   // Standard: 1 (when gapOffset is 15)
-  const X_outer_right = X_mid + 2 * gapOffset;  // Standard: 61 (when gapOffset is 15)
+  // Arm 1 (Upper-Left tip center) and Arm 5 (Lower-Right tip center)
+  // These are dynamic with gapOffset
+  const tip_center_top = X_right_bend - 2.645 * gapOffset; // Standard: 39.5
+  const tip_center_bottom = X_left_bend + 2.645 * gapOffset; // Standard: 90.5
 
-  // Y-coordinates of the out-of-bounds ends of the parallel diagonals (reaching y=0 and y=39 clipping borders)
-  const Y_outer_top = y_top_track - 1.5 * (y_bottom_track - y_top_track);    // -8.9
-  const Y_outer_bottom = y_bottom_track + 1.5 * (y_bottom_track - y_top_track); // 47.9
+  // Lengths of the arms
+  const arm_dx_top = tip_center_top - X_right_bend;
+  const arm_dy_top = 0 - y_top_track_top;
+  const arm_len_top = Math.sqrt(arm_dx_top * arm_dx_top + arm_dy_top * arm_dy_top);
 
-  // Stroke thicknesses, keeping horizontal slightly wider (1.0667x) for design visual balance
-  const diagonal_stroke = strokeWidth;
-  const horizontal_stroke = strokeWidth * (6.4 / 6.0);
+  const arm_dx_bottom = tip_center_bottom - X_left_bend;
+  const arm_dy_bottom = 78 - y_bottom_track_bottom;
+  const arm_len_bottom = Math.sqrt(arm_dx_bottom * arm_dx_bottom + arm_dy_bottom * arm_dy_bottom);
+
+  // Math to maintain visual (perpendicular) thickness of the diagonals at any Arrow Separation (gapOffset)
+  // Base heights and default horizontal offsets at default gapOffset = 15.5, strokeWidth = 13:
+  // Crossover segments
+  const crossover_L = 2 * gapOffset;
+  const crossover_H = Math.max(1, y_bottom_track_top - y_top_track_bottom);
+  const multiplier_crossover = Math.sqrt(crossover_H * crossover_H + crossover_L * crossover_L) / crossover_H;
+  const multiplier_crossover_default = 2.29589; // value when gapOffset = 15.5, strokeWidth = 13
+  const half_W_h_crossover = (strokeWidth * 13.5 / 13) * (multiplier_crossover / multiplier_crossover_default);
+
+  // Arm 1 (Upper-Left Wing)
+  const arm_L_top = 2.645 * gapOffset;
+  const arm_H_top = Math.max(1, y_top_track_top);
+  const multiplier_arm_top = Math.sqrt(arm_H_top * arm_H_top + arm_L_top * arm_L_top) / arm_H_top;
+  const multiplier_arm_top_default = 2.3782; // value when gapOffset = 15.5, strokeWidth = 13
+  const half_W_h_arm_top = (strokeWidth * 13.5 / 13) * (multiplier_arm_top / multiplier_arm_top_default);
+
+  // Arm 5 (Lower-Right Wing)
+  const arm_L_bottom = 2.645 * gapOffset;
+  const arm_H_bottom = Math.max(1, 78 - y_bottom_track_bottom);
+  const multiplier_arm_bottom = Math.sqrt(arm_H_bottom * arm_H_bottom + arm_L_bottom * arm_L_bottom) / arm_H_bottom;
+  const multiplier_arm_bottom_default = 2.4875; // value when gapOffset = 15.5, strokeWidth = 13
+  const half_W_h_arm_bottom = (strokeWidth * 13.5 / 13) * (multiplier_arm_bottom / multiplier_arm_bottom_default);
+
+  // Dynamic tip widths including taperAngle, scaled by the same slant multiplier to keep visual thickness identical at all separations
+  const activeTaperWidth_top_base = (strokeWidth * 28 / 13) + (arm_len_top * Math.tan((taperAngle * Math.PI) / 180) * 1.65);
+  const activeTaperWidth_bottom_base = (strokeWidth * 27 / 13) + (arm_len_bottom * Math.tan((taperAngle * Math.PI) / 180) * 2.22);
+
+  const activeTaperWidth_top = activeTaperWidth_top_base * (multiplier_arm_top / multiplier_arm_top_default);
+  const activeTaperWidth_bottom = activeTaperWidth_bottom_base * (multiplier_arm_bottom / multiplier_arm_bottom_default);
 
   const isDarkBg = ['black', 'rail-blue', 'electric-teal'].includes(COLOUR_STOPS[backgroundColourIndex].id);
 
@@ -71,16 +119,16 @@ export default function DoubleArrowGeometry() {
     : `rgba(15, 118, 110, ${opacity * 1.0})`;   // teal-700 full solid bold graticule
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8" id="double-arrow-geometry-section">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-3 sm:p-5 lg:p-8" id="double-arrow-geometry-section">
       
       {/* Title block styled with grid to align with controls section below */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start lg:items-center mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-2 items-start lg:items-center mb-3 sm:mb-4 lg:mb-6">
         <div className="lg:col-span-8 flex justify-between items-start sm:items-center gap-4">
           <div>
-            <h3 className="text-lg font-display font-bold text-rail-blue tracking-tight">
+            <h3 className="text-base sm:text-lg font-display font-bold text-rail-blue tracking-tight">
               Geometry of the double arrow icon (Gerry Barney, 1965)
             </h3>
-            <p className="text-xs text-slate-500 font-sans mt-0.5">
+            <p className="text-[11px] sm:text-xs text-slate-500 font-sans mt-0.5">
               Understand how mathematical symmetry and grid lines forged an iconic railway symbol.
             </p>
           </div>
@@ -96,7 +144,7 @@ export default function DoubleArrowGeometry() {
         <div className="lg:col-span-4 w-full">
           {/* Colour collision warning (preserves layout and aligns perfectly with the controls below) */}
           <div 
-            className={`p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-800 font-sans transition-all duration-200 text-center w-full ${
+            className={`p-1.5 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-800 font-sans transition-all duration-200 text-center w-full ${
               foregroundColourIndex === backgroundColourIndex 
                 ? 'opacity-100 scale-100' 
                 : 'opacity-0 scale-95 pointer-events-none'
@@ -108,63 +156,24 @@ export default function DoubleArrowGeometry() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 items-center">
         
         {/* SVG Drawing Canvas (8 cols) */}
         <div 
-          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-visible transition-all duration-300 p-4 sm:p-5 pb-3 ${
+          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-hidden transition-all duration-300 p-2.5 sm:p-4 pb-2 sm:pb-3 h-[220px] sm:h-[384px] ${
             COLOUR_STOPS[backgroundColourIndex].id === 'white' ? 'border border-slate-200' : ''
           }`}
           style={{ 
             backgroundColor: backgroundColour,
-            height: '424px',
           }}
           id="drawing-canvas-container"
         >
-          {/* Vintage Drafting Office Label (1965 Retro Style) */}
-          <div className="absolute top-[12px] left-4 flex border border-black rounded-sm overflow-hidden bg-white shadow-md select-none z-20 font-mono text-[9px]" id="vintage-drafting-label">
-            {/* Left: Solid black block with crispy white logo */}
-            <div className="flex items-center justify-center py-[7px] px-3 bg-black text-white border-r border-black">
-              <svg viewBox="-2 -2 66 43" className="w-[36px] h-auto" stroke="none" fill="none">
-                <clipPath id="mini-arrow-clip">
-                  <rect x="0" y="0" width="62" height="39" />
-                </clipPath>
-                <g clipPath="url(#mini-arrow-clip)" strokeLinecap="butt" strokeLinejoin="miter" fill="none" stroke="#FFFFFF">
-                  <path d="M 0,12.4 H 62 M 62,26.6 H 0" strokeWidth="6.4" />
-                  <path d="M 1,-8.9 L 46,12.4 L 16,26.6 L 61,47.9" strokeWidth="6" />
-                </g>
-              </svg>
-            </div>
-            
-            {/* Right: Four cells with white background, black borders and crisp black text */}
-            <div className="flex flex-col">
-              {/* Row 1 */}
-              <div className="flex flex-1 border-b border-black">
-                <div className="px-2.5 py-[4px] min-w-[62px] bg-white text-black flex items-center justify-start border-r border-black">
-                  <span className="text-[7.5px] font-mono tracking-tight uppercase font-medium">sheet no.</span>
-                </div>
-                <div className="px-3 py-[4px] min-w-[54px] bg-white text-black flex items-center justify-center font-display font-extrabold text-[10px]">
-                  1/05
-                </div>
-              </div>
-              {/* Row 2 */}
-              <div className="flex flex-1">
-                <div className="px-2.5 py-[4px] min-w-[62px] bg-white text-black flex items-center justify-start border-r border-black">
-                  <span className="text-[7.5px] font-mono tracking-tight uppercase font-medium">issued</span>
-                </div>
-                <div className="px-3 py-[4px] min-w-[54px] bg-white text-black flex items-center justify-center font-sans font-bold text-[10px] whitespace-nowrap">
-                  Apr 1965
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Centered Blueprint Canvas Wrapper to position the grid relative to the frame */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-2">
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0.5 sm:pt-2">
             {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
             <svg 
-              viewBox="-10 -10.5 82 60" 
-              className="w-[90%] sm:w-[86%] aspect-[82/60] select-none relative z-10 overflow-hidden transition-all duration-300"
+              viewBox="-10 -10.5 150 99" 
+              className="h-full max-h-[130px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] select-none relative z-10 overflow-hidden transition-all duration-300"
               style={{ 
                 overflow: 'hidden',
                 border: gridOpacity > 0 ? `1.5px solid ${thickStrokeColor}` : 'none',
@@ -179,11 +188,11 @@ export default function DoubleArrowGeometry() {
                   height="10" 
                   patternUnits="userSpaceOnUse"
                 >
-                  {/* 1x1 Small Grid lines (Subdivisions) */}
+                  {/* 5 minor lines (6 squares) between major 10x10 gridlines */}
                   <path 
-                    d="M 1 0 L 1 10 M 2 0 L 2 10 M 3 0 L 3 10 M 4 0 L 4 10 M 5 0 L 5 10 M 6 0 L 6 10 M 7 0 L 7 10 M 8 0 L 8 10 M 9 0 L 9 10 M 0 1 L 10 1 M 0 2 L 10 2 M 0 3 L 10 3 M 0 4 L 10 4 M 0 5 L 10 5 M 0 6 L 10 6 M 0 7 L 10 7 M 0 8 L 10 8 M 0 9 L 10 9" 
+                    d="M 1.67 0 L 1.67 10 M 3.33 0 L 3.33 10 M 5 0 L 5 10 M 6.67 0 L 6.67 10 M 8.33 0 L 8.33 10 M 0 1.67 L 10 1.67 M 0 3.33 L 10 3.33 M 0 5 L 10 5 M 0 6.67 L 10 6.67 M 0 8.33 L 10 8.33" 
                     stroke={thinStrokeColor} 
-                    strokeWidth="0.10" 
+                    strokeWidth="0.12" 
                   />
                   {/* 10x10 Bold Grid lines (Major Graticules) */}
                   <path 
@@ -193,49 +202,101 @@ export default function DoubleArrowGeometry() {
                   />
                 </pattern>
                 <clipPath id="arrow-clip">
-                  <rect x="0" y="0" width="62" height="39" />
+                  <rect x="0" y="0" width="130" height="78" />
                 </clipPath>
               </defs>
 
               {/* Dynamic Real Graph Paper Background Cover extended to bounds */}
               {gridOpacity > 0 && (
-                <rect x="-10" y="-10.5" width="82" height="60" fill="url(#graph-paper-grid)" />
+                <rect x="-10" y="-10.5" width="150" height="99" fill="url(#graph-paper-grid)" />
               )}
 
               {/* Brand geometry paths styled exactly per official guidelines, floating in the center of the grid */}
-              <g clipPath="url(#arrow-clip)" strokeLinecap="butt" strokeLinejoin="miter" fill="none">
-                {/* Top and Bottom track stems */}
-                <path 
-                  d={`M 0,${y_top_track} H 62 M 62,${y_bottom_track} H 0`} 
+              <g clipPath="url(#arrow-clip)">
+                {/* Top track stem */}
+                <polygon 
+                  points={`0,${y_top_track_top} 130,${y_top_track_top} 130,${y_top_track_bottom} 0,${y_top_track_bottom}`}
+                  fill={foregroundColour}
                   className="transition-all duration-150"
-                  stroke={foregroundColour} 
-                  strokeWidth={horizontal_stroke} 
                 />
-                {/* Parallel outer diagonals and intersecting inner branch (zigzag) */}
-                <path 
-                  d={`M ${X_outer_left},${Y_outer_top} L ${X_right_bend},${y_top_track} L ${X_left_bend},${y_bottom_track} L ${X_outer_right},${Y_outer_bottom}`} 
+                
+                {/* Bottom track stem */}
+                <polygon 
+                  points={`0,${y_bottom_track_top} 130,${y_bottom_track_top} 130,${y_bottom_track_bottom} 0,${y_bottom_track_bottom}`}
+                  fill={foregroundColour}
                   className="transition-all duration-150"
-                  stroke={foregroundColour} 
-                  strokeWidth={diagonal_stroke} 
+                />
+                
+                {/* Central Crossover canal */}
+                <polygon 
+                  points={`${X_left_bend - half_W_h_crossover},${y_bottom_track_top + 0.35} ${X_right_bend - half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_right_bend + half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_left_bend + half_W_h_crossover},${y_bottom_track_top + 0.35}`}
+                  fill={foregroundColour}
+                  className="transition-all duration-150"
+                />
+
+                {/* Tapered upper-left wing (Arm 1) */}
+                <polygon 
+                  points={`${tip_center_top - activeTaperWidth_top / 2},0 ${tip_center_top + activeTaperWidth_top / 2},0 ${X_right_bend + half_W_h_arm_top},${y_top_track_top + 0.35} ${X_right_bend - half_W_h_arm_top},${y_top_track_top + 0.35}`}
+                  fill={foregroundColour}
+                  className="transition-all duration-150"
+                />
+
+                {/* Tapered lower-right wing (Arm 5) */}
+                <polygon 
+                  points={`${X_left_bend - half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35} ${tip_center_bottom - activeTaperWidth_bottom / 2},78 ${tip_center_bottom + activeTaperWidth_bottom / 2},78 ${X_left_bend + half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35}`}
+                  fill={foregroundColour}
+                  className="transition-all duration-150"
                 />
               </g>
             </svg>
           </div>
 
-          {/* Bottom aligned Spec Metrics & Grid Indicator Row */}
-          <div className="w-full flex items-center justify-between text-[10px] font-mono select-none px-2 mt-4">
-            <div className={`flex flex-wrap gap-x-4 gap-y-1 transition-colors duration-300 ${
-              isDarkBg ? 'text-slate-400' : 'text-slate-600'
-            }`}>
-              <span>GRID: 24x40 BLUEPRINT</span>
-              <span>ANGLE: 32.7° STANDARD</span>
-              <span>RATIO: 1.667 (5:3)</span>
+          {/* Bottom aligned Legend & Grid Indicator Row */}
+          <div className="w-full flex items-end justify-between select-none px-1 sm:px-2 mt-1 sm:mt-4 z-20">
+            {/* Wrap label in a container that matches the scaled heights to prevent vertical layout bleed/empty space inside the canvas */}
+            <div className="h-[31px] sm:h-[51px] w-[147px] sm:w-[240px] relative">
+              <div 
+                className="absolute bottom-0 left-0 flex border-2 border-black bg-white shadow-md rounded-none select-none font-sans h-[64px] min-w-[300px] scale-[0.49] sm:scale-[0.80] origin-bottom-left transition-all duration-150" 
+                id="vintage-drafting-label"
+              >
+                {/* Left: Solid black block containing font glyph 200 from Brsign */}
+                <div className="flex items-center justify-center bg-black text-white px-[18px] border-r-2 border-black min-w-[110px]">
+                  <span 
+                    style={{ fontFamily: "'Brsign', 'Geist', sans-serif" }} 
+                    className="text-[42px] leading-none select-none font-normal"
+                  >
+                    {String.fromCharCode(200)}
+                  </span>
+                </div>
+                
+                {/* Right: Grid matching Jock Kinneir / Gerry Barney specifications */}
+                <div className="flex flex-col min-w-[190px]">
+                  {/* Row 1 */}
+                  <div className="flex flex-1 border-b-2 border-black h-[32px]">
+                    <div className="px-3.5 bg-white text-black flex items-center justify-start border-r-2 border-black min-w-[85px]">
+                      <span className="text-[12px] font-sans font-extrabold tracking-tight lowercase">sheet no.</span>
+                    </div>
+                    <div className="px-4 bg-white text-black flex items-center justify-center font-sans font-extrabold text-[18px] flex-1">
+                      1/04
+                    </div>
+                  </div>
+                  {/* Row 2 */}
+                  <div className="flex flex-1 h-[32px]">
+                    <div className="px-3.5 bg-white text-black flex items-center justify-start border-r-2 border-black min-w-[85px]">
+                      <span className="text-[12px] font-sans font-extrabold tracking-tight lowercase">issued</span>
+                    </div>
+                    <div className="px-4 bg-white text-black flex items-center justify-center font-sans font-extrabold text-[15px] whitespace-nowrap flex-1">
+                      Apr 1965
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Pill button aligned with metadata row, matching mockup */}
             <button
               onClick={() => setGridOpacity(gridOpacity > 0 ? 0 : 60)}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold font-mono tracking-wider transition-all duration-150 cursor-pointer select-none border whitespace-nowrap ${
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-[10px] font-bold font-mono tracking-wider transition-all duration-150 cursor-pointer select-none border whitespace-nowrap ${
                 gridOpacity > 0 
                   ? (isDarkBg ? 'bg-white/10 text-white border-white/20 hover:bg-white/20 shadow-sm' : 'bg-black/5 text-slate-800 border border-black/10 hover:bg-black/10') 
                   : (isDarkBg ? 'bg-transparent text-slate-500 border-transparent hover:text-slate-300' : 'bg-transparent text-slate-400 border-transparent hover:text-slate-600')
@@ -249,139 +310,145 @@ export default function DoubleArrowGeometry() {
         </div>
 
         {/* Sliders and Controls (4 cols) */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          {/* Foreground Colour Slider */}
-          <div id="foreground-colour-control">
-            <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2">
-              <span>Foreground Colour</span>
-              <span className="text-slate-700 font-sans font-semibold">{COLOUR_STOPS[foregroundColourIndex].name}</span>
-            </div>
-            <div className="relative pt-1 px-1">
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="1"
-                value={foregroundColourIndex}
-                onChange={(e) => setForegroundColourIndex(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-              {/* Tick marks with magnetic behavior for key values */}
-              <div className="flex justify-between text-[9px] text-slate-400 font-mono mt-2 px-0.5">
+        <div className="lg:col-span-4">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2.5 sm:gap-y-3 lg:gap-5">
+            
+            {/* Foreground Colour Selection */}
+            <div id="foreground-colour-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Foreground Colour</span>
+                <span className="text-slate-700 font-semibold text-xs">{COLOUR_STOPS[foregroundColourIndex].name}</span>
+              </div>
+              <div className="bg-slate-50/70 border border-slate-200/50 rounded-xl p-1 sm:p-2 flex justify-between gap-1 items-center">
                 {COLOUR_STOPS.map((stop, idx) => (
                   <button
                     key={`fg-stop-${stop.id}`}
                     type="button"
                     onClick={() => setForegroundColourIndex(idx)}
-                    className={`flex flex-col items-center group cursor-pointer ${
-                      foregroundColourIndex === idx ? 'text-slate-800 font-bold' : 'hover:text-slate-600'
+                    className={`flex flex-col items-center group cursor-pointer flex-1 transition-all ${
+                      foregroundColourIndex === idx ? 'text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
                     <span 
-                      className={`w-3 h-3 rounded-full mb-1 transition-transform border border-slate-300 ${
-                        foregroundColourIndex === idx ? 'scale-125 border-slate-600 ring-2 ring-slate-100' : 'group-hover:scale-110'
+                      className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full mb-0.5 sm:mb-1 transition-all border ${
+                        foregroundColourIndex === idx 
+                          ? 'scale-125 border-slate-900 ring-2 ring-white ring-offset-1' 
+                          : 'border-slate-300 group-hover:scale-110 shadow-sm'
                       }`} 
                       style={{ backgroundColor: stop.value }} 
                     />
-                    <span className="hidden sm:inline text-[8px] whitespace-nowrap">{stop.name.split(' ')[0]}</span>
+                    <span className="text-[8px] sm:text-[9.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
+                      {BUTTON_NAMES[stop.id]}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Background Colour Slider */}
-          <div id="background-colour-control">
-            <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2">
-              <span>Background Colour</span>
-              <span className="text-slate-700 font-sans font-semibold">{COLOUR_STOPS[backgroundColourIndex].name}</span>
-            </div>
-            <div className="relative pt-1 px-1">
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="1"
-                value={backgroundColourIndex}
-                onChange={(e) => setBackgroundColourIndex(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-              {/* Tick marks with magnetic behavior for key values */}
-              <div className="flex justify-between text-[9px] text-slate-400 font-mono mt-2 px-0.5">
+            {/* Background Colour Selection */}
+            <div id="background-colour-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Background Colour</span>
+                <span className="text-slate-700 font-semibold text-xs">{COLOUR_STOPS[backgroundColourIndex].name}</span>
+              </div>
+              <div className="bg-slate-50/70 border border-slate-200/50 rounded-xl p-1 sm:p-2 flex justify-between gap-1 items-center">
                 {COLOUR_STOPS.map((stop, idx) => (
                   <button
                     key={`bg-stop-${stop.id}`}
                     type="button"
                     onClick={() => setBackgroundColourIndex(idx)}
-                    className={`flex flex-col items-center group cursor-pointer ${
-                      backgroundColourIndex === idx ? 'text-slate-800 font-bold' : 'hover:text-slate-600'
+                    className={`flex flex-col items-center group cursor-pointer flex-1 transition-all ${
+                      backgroundColourIndex === idx ? 'text-slate-900 font-bold' : 'text-slate-400 hover:text-slate-600'
                     }`}
                   >
                     <span 
-                      className={`w-3 h-3 rounded-full mb-1 transition-transform border border-slate-300 ${
-                        backgroundColourIndex === idx ? 'scale-125 border-slate-600 ring-2 ring-slate-100' : 'group-hover:scale-110'
+                      className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full mb-0.5 sm:mb-1 transition-all border ${
+                        backgroundColourIndex === idx 
+                          ? 'scale-125 border-slate-900 ring-2 ring-white ring-offset-1' 
+                          : 'border-slate-300 group-hover:scale-110 shadow-sm'
                       }`} 
                       style={{ backgroundColor: stop.value }} 
                     />
-                    <span className="hidden sm:inline text-[8px] whitespace-nowrap">{stop.name.split(' ')[0]}</span>
+                    <span className="text-[8px] sm:text-[9.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
+                      {BUTTON_NAMES[stop.id]}
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Stroke Slider */}
-          <div id="stroke-thickness-control">
-            <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2">
-              <span>Stroke Thickness</span>
-              <span className="text-slate-700 font-semibold">{strokeWidth}px</span>
+            {/* Stroke Slider */}
+            <div id="stroke-thickness-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Stroke Thickness</span>
+                <span className="text-slate-700 font-semibold text-xs">{strokeWidth}px</span>
+              </div>
+              <input
+                type="range"
+                min="4"
+                max="20"
+                value={strokeWidth}
+                onChange={(e) => setStrokeWidth(Number(e.target.value))}
+                className="w-full accent-rail-red cursor-pointer"
+              />
             </div>
-            <input
-              type="range"
-              min="3"
-              max="14"
-              value={strokeWidth}
-              onChange={(e) => setStrokeWidth(Number(e.target.value))}
-              className="w-full accent-rail-red cursor-pointer"
-            />
-          </div>
 
-          {/* Offset Slider */}
-          <div id="arrow-separation-control">
-            <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2">
-              <span>Arrow Separation</span>
-              <span className="text-slate-700 font-semibold">{gapOffset}px</span>
+            {/* Offset Slider */}
+            <div id="arrow-separation-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Arrow Separation</span>
+                <span className="text-slate-700 font-semibold text-xs">{gapOffset.toFixed(1)}px</span>
+              </div>
+              <input
+                type="range"
+                min="4"
+                max="30"
+                step="0.5"
+                value={gapOffset}
+                onChange={(e) => setGapOffset(Number(e.target.value))}
+                className="w-full accent-rail-red cursor-pointer"
+              />
             </div>
-            <input
-              type="range"
-              min="5"
-              max="28"
-              value={gapOffset}
-              onChange={(e) => setGapOffset(Number(e.target.value))}
-              className="w-full accent-rail-red cursor-pointer"
-            />
-          </div>
 
-          {/* Grid Brightness Slider */}
-          <div id="grid-toggle-control">
-            <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-2">
-              <span>Grid Brightness</span>
-              <span className="text-slate-700 font-semibold">
-                {gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
-              </span>
+            {/* Arm Taper Slider */}
+            <div id="arm-taper-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Taper</span>
+                <span className="text-slate-700 font-semibold text-xs">
+                  {taperAngle === 0 ? 'Parallel' : `${taperAngle > 0 ? '+' : ''}${taperAngle.toFixed(1)} deg.`}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="-6"
+                max="6"
+                step="0.1"
+                value={taperAngle}
+                onChange={(e) => setTaperAngle(Number(e.target.value))}
+                className="w-full accent-rail-red cursor-pointer"
+              />
             </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="20"
-              value={gridOpacity}
-              onChange={(e) => setGridOpacity(Number(e.target.value))}
-              className="w-full accent-rail-red cursor-pointer"
-            />
-          </div>
 
+            {/* Grid Brightness Slider */}
+            <div id="grid-toggle-control">
+              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
+                <span>Grid Brightness</span>
+                <span className="text-slate-700 font-semibold text-xs">
+                  {gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="20"
+                value={gridOpacity}
+                onChange={(e) => setGridOpacity(Number(e.target.value))}
+                className="w-full accent-rail-red cursor-pointer"
+              />
+            </div>
+
+          </div>
         </div>
 
       </div>
