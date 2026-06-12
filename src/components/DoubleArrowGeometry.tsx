@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 interface ColourStop {
@@ -26,11 +26,87 @@ const BUTTON_NAMES: Record<string, string> = {
 };
 
 // Center points and base measurements corresponding to the new 130x78 grid
+interface MagneticSliderProps {
+  id: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  defaultValue: number;
+  displayValue: string;
+  onChange: (val: number) => void;
+}
+
+function MagneticSlider({
+  id,
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  defaultValue,
+  displayValue,
+  onChange
+}: MagneticSliderProps) {
+  // Compute percentages for absolute placement
+  const pctCurrent = ((value - min) / (max - min)) * 100;
+  const pctDefault = ((defaultValue - min) / (max - min)) * 100;
+
+  const handleSliderChange = (e: ChangeEvent<HTMLInputElement>) => {
+    onChange(Number(e.target.value));
+  };
+
+  return (
+    <div id={id} className="w-full select-none">
+      <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-1">
+        <span>{label}</span>
+        <span className="text-slate-700 font-semibold text-xs">{displayValue}</span>
+      </div>
+      
+      {/* Custom Slider Track and Custom Thumb Wrapper */}
+      <div className="relative w-full h-6 flex items-center group">
+        {/* Base track (light gray) */}
+        <div className="absolute left-0 right-0 h-1.5 bg-slate-200/80 rounded-full" />
+        
+        {/* Highlight track (red, up to current value) */}
+        <div 
+          className="absolute left-0 h-1.5 bg-[#DC241F] rounded-full transition-all duration-75"
+          style={{ width: `${pctCurrent}%` }}
+        />
+
+        {/* Snap Halo Ring at default position */}
+        <div 
+          className="absolute -translate-x-1/2 w-[22px] h-[22px] rounded-full border-2 border-[#DC241F] bg-transparent pointer-events-none z-10 flex items-center justify-center"
+          style={{ left: `${pctDefault}%` }}
+        />
+
+        {/* Custom Thumb */}
+        <div 
+          className="absolute -translate-x-1/2 w-[12px] h-[12px] rounded-full bg-[#DC241F] border border-[#DC241F] shadow-sm pointer-events-none z-20 group-hover:scale-125 transition-transform duration-75"
+          style={{ left: `${pctCurrent}%` }}
+        />
+
+        {/* Invisible native slider control overlay to capture events */}
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={handleSliderChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function DoubleArrowGeometry() {
   const [strokeWidth, setStrokeWidth] = useState<number>(13);
   const [gapOffset, setGapOffset] = useState<number>(15.5); // Arrow head horizontal offset
   const [foregroundColourIndex, setForegroundColourIndex] = useState<number>(0); // Flame Red
-  const [backgroundColourIndex, setBackgroundColourIndex] = useState<number>(5); // Black
+  const [backgroundColourIndex, setBackgroundColourIndex] = useState<number>(4); // White
   const [gridOpacity, setGridOpacity] = useState<number>(45);
   const [taperAngle, setTaperAngle] = useState<number>(2.3); // In degrees. Standard: +2.3 deg (corresponds to authentic photoshop template)
 
@@ -41,14 +117,11 @@ export default function DoubleArrowGeometry() {
     setStrokeWidth(13);
     setGapOffset(15.5);
     setForegroundColourIndex(0);
-    setBackgroundColourIndex(5);
+    setBackgroundColourIndex(4);
     setGridOpacity(45);
     setTaperAngle(2.3);
   };
 
-  // Center points and base measurements corresponding to the new 130x78 grid
-  const Y_mid = 39;
-  
   // Track centerlines
   const y_top_track_center = 25.5;
   const y_bottom_track_center = 53.5;
@@ -110,7 +183,8 @@ export default function DoubleArrowGeometry() {
   const isDarkBg = ['black', 'rail-blue', 'electric-teal'].includes(COLOUR_STOPS[backgroundColourIndex].id);
 
   // Graph paper graticule colors. Cyan/teal tones for authentic drawing paper feel.
-  const opacity = gridOpacity / 100;
+  // Retain the 123% level of background brightness when the user-facing slider set is 100%
+  const opacity = (gridOpacity * 1.23) / 100;
   const thinStrokeColor = isDarkBg
     ? `rgba(34, 211, 238, ${opacity * 0.7})`   // cyan-400 vivid glow
     : `rgba(13, 148, 136, ${opacity * 0.85})`;  // teal-600 vivid print
@@ -129,7 +203,7 @@ export default function DoubleArrowGeometry() {
               Geometry of the double arrow icon (Gerry Barney, 1965)
             </h3>
             <p className="text-[11px] sm:text-xs text-slate-500 font-sans mt-0.5">
-              Understand how mathematical symmetry and grid lines forged an iconic railway symbol.
+              Create your own double arrow logo inspired by the iconic railway symbol forged over 60 years ago.
             </p>
           </div>
           <button
@@ -144,7 +218,8 @@ export default function DoubleArrowGeometry() {
         <div className="lg:col-span-4 w-full">
           {/* Colour collision warning (preserves layout and aligns perfectly with the controls below) */}
           <div 
-            className={`p-1.5 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-800 font-sans transition-all duration-200 text-center w-full ${
+            style={{ fontSize: '10pt' }}
+            className={`p-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 font-sans transition-all duration-200 text-center w-full ${
               foregroundColourIndex === backgroundColourIndex 
                 ? 'opacity-100 scale-100' 
                 : 'opacity-0 scale-95 pointer-events-none'
@@ -160,7 +235,7 @@ export default function DoubleArrowGeometry() {
         
         {/* SVG Drawing Canvas (8 cols) */}
         <div 
-          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-hidden transition-all duration-300 p-2.5 sm:p-4 pb-2 sm:pb-3 h-[220px] sm:h-[384px] ${
+          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-hidden transition-all duration-300 p-1 sm:p-4 pb-1.5 sm:pb-3 h-[220px] sm:h-[384px] ${
             COLOUR_STOPS[backgroundColourIndex].id === 'white' ? 'border border-slate-200' : ''
           }`}
           style={{ 
@@ -173,7 +248,7 @@ export default function DoubleArrowGeometry() {
             {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
             <svg 
               viewBox="-10 -10.5 150 99" 
-              className="h-full max-h-[130px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] select-none relative z-10 overflow-hidden transition-all duration-300"
+              className="h-full max-h-[155px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] select-none relative z-10 overflow-hidden transition-all duration-300"
               style={{ 
                 overflow: 'hidden',
                 border: gridOpacity > 0 ? `1.5px solid ${thickStrokeColor}` : 'none',
@@ -311,7 +386,7 @@ export default function DoubleArrowGeometry() {
 
         {/* Sliders and Controls (4 cols) */}
         <div className="lg:col-span-4">
-          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2.5 sm:gap-y-3 lg:gap-5">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-[11px] sm:gap-y-[13px] lg:gap-5">
             
             {/* Foreground Colour Selection */}
             <div id="foreground-colour-control">
@@ -337,7 +412,7 @@ export default function DoubleArrowGeometry() {
                       }`} 
                       style={{ backgroundColor: stop.value }} 
                     />
-                    <span className="text-[8px] sm:text-[9.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
+                    <span className="text-[11px] sm:text-[12.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
                       {BUTTON_NAMES[stop.id]}
                     </span>
                   </button>
@@ -369,7 +444,7 @@ export default function DoubleArrowGeometry() {
                       }`} 
                       style={{ backgroundColor: stop.value }} 
                     />
-                    <span className="text-[8px] sm:text-[9.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
+                    <span className="text-[11px] sm:text-[12.5px] font-sans tracking-tight font-medium select-none truncate max-w-full">
                       {BUTTON_NAMES[stop.id]}
                     </span>
                   </button>
@@ -377,76 +452,57 @@ export default function DoubleArrowGeometry() {
               </div>
             </div>
 
-            {/* Stroke Slider */}
-            <div id="stroke-thickness-control">
-              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
-                <span>Stroke Thickness</span>
-                <span className="text-slate-700 font-semibold text-xs">{strokeWidth}px</span>
-              </div>
-              <input
-                type="range"
-                min="4"
-                max="20"
-                value={strokeWidth}
-                onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-            </div>
+            {/* Stroke Thickness Slider */}
+            <MagneticSlider
+              id="stroke-thickness-control"
+              label="Stroke Thickness"
+              value={strokeWidth}
+              min={4}
+              max={20}
+              step={1}
+              defaultValue={13}
+              displayValue={`${strokeWidth}px`}
+              onChange={setStrokeWidth}
+            />
 
-            {/* Offset Slider */}
-            <div id="arrow-separation-control">
-              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
-                <span>Arrow Separation</span>
-                <span className="text-slate-700 font-semibold text-xs">{gapOffset.toFixed(1)}px</span>
-              </div>
-              <input
-                type="range"
-                min="4"
-                max="30"
-                step="0.5"
-                value={gapOffset}
-                onChange={(e) => setGapOffset(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-            </div>
+            {/* Arrow Separation Slider */}
+            <MagneticSlider
+              id="arrow-separation-control"
+              label="Arrow Separation"
+              value={gapOffset}
+              min={4}
+              max={30}
+              step={0.5}
+              defaultValue={15.5}
+              displayValue={`${gapOffset.toFixed(1)}px`}
+              onChange={setGapOffset}
+            />
 
             {/* Arm Taper Slider */}
-            <div id="arm-taper-control">
-              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
-                <span>Taper</span>
-                <span className="text-slate-700 font-semibold text-xs">
-                  {taperAngle === 0 ? 'Parallel' : `${taperAngle > 0 ? '+' : ''}${taperAngle.toFixed(1)} deg.`}
-                </span>
-              </div>
-              <input
-                type="range"
-                min="-6"
-                max="6"
-                step="0.1"
-                value={taperAngle}
-                onChange={(e) => setTaperAngle(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-            </div>
+            <MagneticSlider
+              id="arm-taper-control"
+              label="Arm Taper"
+              value={taperAngle}
+              min={-6}
+              max={8}
+              step={0.1}
+              defaultValue={2.3}
+              displayValue={taperAngle === 0 ? 'PARALLEL' : `${taperAngle > 0 ? '+' : ''}${taperAngle.toFixed(1)}DEG.`}
+              onChange={setTaperAngle}
+            />
 
             {/* Grid Brightness Slider */}
-            <div id="grid-toggle-control">
-              <div className="flex justify-between items-center text-xs font-mono font-medium text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1.5">
-                <span>Grid Brightness</span>
-                <span className="text-slate-700 font-semibold text-xs">
-                  {gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
-                </span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="20"
-                value={gridOpacity}
-                onChange={(e) => setGridOpacity(Number(e.target.value))}
-                className="w-full accent-rail-red cursor-pointer"
-              />
-            </div>
+            <MagneticSlider
+              id="grid-toggle-control"
+              label="Grid Brightness"
+              value={gridOpacity}
+              min={0}
+              max={100}
+              step={1}
+              defaultValue={45}
+              displayValue={gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
+              onChange={setGridOpacity}
+            />
 
           </div>
         </div>
