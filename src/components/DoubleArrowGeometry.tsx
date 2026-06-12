@@ -77,7 +77,7 @@ function MagneticSlider({
 
         {/* Snap Halo Ring at default position */}
         <div 
-          className="absolute -translate-x-1/2 w-[22px] h-[22px] rounded-full border-2 border-[#DC241F] bg-transparent pointer-events-none z-10 flex items-center justify-center"
+          className="absolute -translate-x-1/2 w-[26px] h-[26px] rounded-full border-[4px] border-[#DC241F] bg-transparent pointer-events-none z-10 flex items-center justify-center"
           style={{ left: `${pctDefault}%` }}
         />
 
