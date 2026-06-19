@@ -81,7 +81,7 @@ export default function InteractiveTimeline() {
         <div className="flex-1 min-w-0">
           <h3 className="font-display font-bold text-base sm:text-lg text-rail-blue tracking-tight flex items-center space-x-2">
             <Milestone className="w-5 h-5 text-rail-red flex-shrink-0" />
-            <span className="truncate">Interactive Timeline</span>
+            <span className="truncate">Interactive Timeline (1948 - 1994)</span>
           </h3>
           <p className="text-[10px] sm:text-xs text-slate-500 font-sans mt-0.5 leading-snug">
             Browse highlights in UK railway history using our interactive timeline.
@@ -160,13 +160,13 @@ export default function InteractiveTimeline() {
       <div className="relative mb-8 pt-2">
         {/* Base Track Line */}
         <div 
-          className="absolute top-[33px] h-[6px] bg-slate-200 rounded-full z-10 pointer-events-none" 
+          className="absolute top-[33px] h-[7px] bg-slate-200 rounded-full z-10 pointer-events-none" 
           style={{ left: 'calc(8.333% - 25px)', right: 'calc(8.333% - 25px)' }}
         />
         
         {/* Highlight Track Line representing progress along the timeline in slider style */}
         <div 
-          className="absolute top-[33px] h-[6px] bg-[#E5001C] rounded-full transition-all duration-300 z-10 pointer-events-none"
+          className="absolute top-[33px] h-[7px] bg-[#a8081b] rounded-full transition-all duration-300 z-10 pointer-events-none"
           style={{ 
             left: 'calc(8.333% - 25px)', 
             width: `calc(${activeIndex * 16.666}% + 50px)` 
@@ -184,9 +184,9 @@ export default function InteractiveTimeline() {
                 className="flex flex-col items-center focus:outline-none group cursor-pointer w-full min-w-0 transition-all duration-200 relative pb-2 pt-1 hover:bg-slate-50/50 rounded-xl"
               >
                 {/* Transparent centered "halo" circle placed directly on the line */}
-                <div className="h-12 flex items-center justify-center relative mb-3">
+                <div className="h-12 flex items-center justify-center relative mb-3 translate-y-[0.5px]">
                   {isActive ? (
-                    <div className="w-[26px] h-[26px] rounded-full border-[4px] border-[#E5001C] bg-transparent pointer-events-none transition-all duration-200 scale-110" />
+                    <div className="w-[26px] h-[26px] rounded-full border-[4px] border-[#a8081b] bg-transparent pointer-events-none transition-all duration-200 scale-110" />
                   ) : (
                     <div className="w-[26px] h-[26px] rounded-full border-[4px] border-slate-200 group-hover:border-slate-350 bg-transparent pointer-events-none transition-all duration-200 group-hover:scale-105" />
                   )}
@@ -195,7 +195,7 @@ export default function InteractiveTimeline() {
                 {/* Sub-node Labels */}
                 <div className="flex flex-col items-center justify-start text-center w-full px-1">
                   <span className={`text-[13px] sm:text-[15px] font-sans font-extrabold tracking-tight transition-all duration-200 ${
-                    isActive ? 'text-[#002F6C] scale-105' : 'text-[#8EA2B9] group-hover:text-[#5C738E]'
+                    isActive ? 'text-[#012169] scale-105' : 'text-[#8EA2B9] group-hover:text-[#5C738E]'
                   }`}>
                     {evt.year}
                   </span>

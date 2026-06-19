@@ -8,9 +8,9 @@ interface ColourStop {
 }
 
 const COLOUR_STOPS: ColourStop[] = [
-  { id: 'flame-red', name: 'Flame Red', value: '#DC241F' },
-  { id: 'rail-blue', name: 'Rail Blue', value: '#002F6C' },
-  { id: 'electric-teal', name: 'Electric Teal', value: '#0d9488' },
+  { id: 'flame-red', name: 'Flame Red', value: '#FF3300' },
+  { id: 'rail-blue', name: 'Rail Blue', value: '#00a9cc' },
+  { id: 'electric-teal', name: 'Electric Teal', value: '#007f99' },
   { id: 'rail-grey', name: 'Rail Grey', value: '#C0C2B5' },
   { id: 'white', name: 'White', value: '#FFFFFF' },
   { id: 'black', name: 'Black', value: '#000000' }
@@ -67,23 +67,23 @@ function MagneticSlider({
       {/* Custom Slider Track and Custom Thumb Wrapper */}
       <div className="relative w-full h-6 flex items-center group">
         {/* Base track (light gray) */}
-        <div className="absolute left-0 right-0 h-1.5 bg-slate-200/80 rounded-full" />
+        <div className="absolute left-0 right-0 h-[7px] bg-slate-200/80 rounded-full" />
         
         {/* Highlight track (red, up to current value) */}
         <div 
-          className="absolute left-0 h-1.5 bg-[#DC241F] rounded-full transition-all duration-75"
+          className="absolute left-0 h-[7px] bg-[#a8081b] rounded-full transition-all duration-75"
           style={{ width: `${pctCurrent}%` }}
         />
 
         {/* Snap Halo Ring at default position */}
         <div 
-          className="absolute -translate-x-1/2 w-[26px] h-[26px] rounded-full border-[4px] border-[#DC241F] bg-transparent pointer-events-none z-10 flex items-center justify-center"
+          className="absolute -translate-x-1/2 w-[26px] h-[26px] rounded-full border-[4px] border-[#a8081b] bg-transparent pointer-events-none z-10 flex items-center justify-center"
           style={{ left: `${pctDefault}%` }}
         />
 
         {/* Custom Thumb */}
         <div 
-          className="absolute -translate-x-1/2 w-[12px] h-[12px] rounded-full bg-[#DC241F] border border-[#DC241F] shadow-sm pointer-events-none z-20 group-hover:scale-125 transition-transform duration-75"
+          className="absolute -translate-x-1/2 w-[12px] h-[12px] rounded-full bg-[#a8081b] border border-[#a8081b] shadow-sm pointer-events-none z-20 group-hover:scale-125 transition-transform duration-75"
           style={{ left: `${pctCurrent}%` }}
         />
 
@@ -182,18 +182,17 @@ export default function DoubleArrowGeometry() {
 
   const isDarkBg = ['black', 'rail-blue', 'electric-teal'].includes(COLOUR_STOPS[backgroundColourIndex].id);
 
-  // Graph paper graticule colors. Cyan/teal tones for authentic drawing paper feel.
-  // Retain the 123% level of background brightness when the user-facing slider set is 100%
+  // Graph paper graticule colors with 100% saturation (25% increase from original 76-85%)
   const opacity = (gridOpacity * 1.23) / 100;
   const thinStrokeColor = isDarkBg
-    ? `rgba(34, 211, 238, ${opacity * 0.7})`   // cyan-400 vivid glow
-    : `rgba(13, 148, 136, ${opacity * 0.85})`;  // teal-600 vivid print
+    ? `hsla(188, 100%, 53%, ${opacity * 0.7})`   // cyan-400 vivid glow
+    : `hsla(175, 100%, 31%, ${opacity * 0.85})`;  // teal-600 vivid print
   const thickStrokeColor = isDarkBg
-    ? `rgba(34, 211, 238, ${opacity * 1.0})`   // cyan-400 full solid bold graticule
-    : `rgba(15, 118, 110, ${opacity * 1.0})`;   // teal-700 full solid bold graticule
+    ? `hsla(188, 100%, 53%, ${opacity * 1.0})`   // cyan-400 full solid bold graticule
+    : `hsla(175, 100%, 24%, ${opacity * 1.0})`;   // teal-700 full solid bold graticule
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-3 sm:p-5 lg:p-8" id="double-arrow-geometry-section">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8" id="double-arrow-geometry-section">
       
       {/* Title block styled with grid to align with controls section below */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-2 items-start lg:items-center mb-3 sm:mb-4 lg:mb-6">
@@ -230,12 +229,12 @@ export default function DoubleArrowGeometry() {
           </div>
         </div>
       </div>
-
+      
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 lg:gap-6 items-center">
         
         {/* SVG Drawing Canvas (8 cols) */}
         <div 
-          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-hidden transition-all duration-300 p-1 sm:p-4 pb-1.5 sm:pb-3 h-[220px] sm:h-[384px] ${
+          className={`lg:col-span-8 rounded-xl relative flex flex-col justify-between shadow-inner max-w-lg mx-auto w-full overflow-hidden transition-all duration-300 p-1 sm:p-4 pb-1 sm:pb-3 h-[205px] sm:h-[384px] ${
             COLOUR_STOPS[backgroundColourIndex].id === 'white' ? 'border border-slate-200' : ''
           }`}
           style={{ 
@@ -244,7 +243,7 @@ export default function DoubleArrowGeometry() {
           id="drawing-canvas-container"
         >
           {/* Centered Blueprint Canvas Wrapper to position the grid relative to the frame */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0.5 sm:pt-2">
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0 sm:pt-2">
             {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
             <svg 
               viewBox="-10 -10.5 150 99" 
@@ -259,19 +258,19 @@ export default function DoubleArrowGeometry() {
               <defs>
                 <pattern 
                   id="graph-paper-grid" 
-                  width="10" 
-                  height="10" 
+                  width="20" 
+                  height="20" 
                   patternUnits="userSpaceOnUse"
                 >
-                  {/* 5 minor lines (6 squares) between major 10x10 gridlines */}
+                  {/* 5 minor lines (6 squares) between major 20x20 gridlines */}
                   <path 
-                    d="M 1.67 0 L 1.67 10 M 3.33 0 L 3.33 10 M 5 0 L 5 10 M 6.67 0 L 6.67 10 M 8.33 0 L 8.33 10 M 0 1.67 L 10 1.67 M 0 3.33 L 10 3.33 M 0 5 L 10 5 M 0 6.67 L 10 6.67 M 0 8.33 L 10 8.33" 
+                    d="M 3.33 0 L 3.33 20 M 6.67 0 L 6.67 20 M 10 0 L 10 20 M 13.33 0 L 13.33 20 M 16.67 0 L 16.67 20 M 0 3.33 L 20 3.33 M 0 6.67 L 20 6.67 M 0 10 L 20 10 M 0 13.33 L 20 13.33 M 0 16.67 L 20 16.67" 
                     stroke={thinStrokeColor} 
                     strokeWidth="0.12" 
                   />
-                  {/* 10x10 Bold Grid lines (Major Graticules) */}
+                  {/* 20x20 Bold Grid lines (Major Graticules) */}
                   <path 
-                    d="M 10 0 L 10 10 M 0 10 L 10 10" 
+                    d="M 20 0 L 20 20 M 0 20 L 20 20" 
                     stroke={thickStrokeColor} 
                     strokeWidth="0.30" 
                   />
@@ -326,12 +325,12 @@ export default function DoubleArrowGeometry() {
             </svg>
           </div>
 
-          {/* Bottom aligned Legend & Grid Indicator Row */}
-          <div className="w-full flex items-end justify-between select-none px-1 sm:px-2 mt-1 sm:mt-4 z-20">
+          {/* Bottom aligned Legend & Grid Indicator Row (Only visible on tablet & desktop layouts as requested) */}
+          <div className="hidden sm:flex w-full items-end justify-between select-none px-1 sm:px-2 mt-4 z-20">
             {/* Wrap label in a container that matches the scaled heights to prevent vertical layout bleed/empty space inside the canvas */}
-            <div className="h-[31px] sm:h-[51px] w-[147px] sm:w-[240px] relative">
+            <div className="h-[51px] w-[240px] relative">
               <div 
-                className="absolute bottom-0 left-0 flex border-2 border-black bg-white shadow-md rounded-none select-none font-sans h-[64px] min-w-[300px] scale-[0.49] sm:scale-[0.80] origin-bottom-left transition-all duration-150" 
+                className="absolute bottom-0 left-0 flex border-2 border-black bg-white shadow-md rounded-none select-none font-sans h-[64px] min-w-[300px] scale-[0.80] origin-bottom-left transition-all duration-150" 
                 id="vintage-drafting-label"
               >
                 {/* Left: Solid black block containing font glyph 200 from Brsign */}
@@ -371,7 +370,7 @@ export default function DoubleArrowGeometry() {
             {/* Pill button aligned with metadata row, matching mockup */}
             <button
               onClick={() => setGridOpacity(gridOpacity > 0 ? 0 : 60)}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-[10px] font-bold font-mono tracking-wider transition-all duration-150 cursor-pointer select-none border whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded text-[10px] font-bold font-mono tracking-wider transition-all duration-150 cursor-pointer select-none border whitespace-nowrap ${
                 gridOpacity > 0 
                   ? (isDarkBg ? 'bg-white/10 text-white border-white/20 hover:bg-white/20 shadow-sm' : 'bg-black/5 text-slate-800 border border-black/10 hover:bg-black/10') 
                   : (isDarkBg ? 'bg-transparent text-slate-500 border-transparent hover:text-slate-300' : 'bg-transparent text-slate-400 border-transparent hover:text-slate-600')

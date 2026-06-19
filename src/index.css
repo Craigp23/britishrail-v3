@@ -11,7 +11,7 @@
 }
 
 @theme {
-  --color-rail-blue: #002F6C;
+  --color-rail-blue: #012169;
   --color-rail-red: #a8081b;
   --color-rail-dark: #0f172a;
   --color-rail-gray: #f8fafc;
@@ -31,6 +31,24 @@ body {
 }
 
 /* Layout and generic system accents */
+.double-arrow-glyph {
+  font-size: 26px;
+}
+@media (min-width: 640px) {
+  .double-arrow-glyph {
+    font-size: 34px;
+  }
+}
+
+.direction-arrow-glyph {
+  font-size: 28px;
+}
+@media (min-width: 640px) {
+  .direction-arrow-glyph {
+    font-size: 36px;
+  }
+}
+
 .hero-heading {
   font-size: 28px !important;
 }
@@ -61,3 +79,76 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display) !important;
   font-weight: 700 !important;
 }
+
+/* Custom highly visible scrollbars for selector carousels on mobile and desktop */
+.custom-scrollbar-visible {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+.custom-scrollbar-visible::-webkit-scrollbar {
+  height: 6px !important;
+  width: 6px !important;
+  display: block !important;
+}
+.custom-scrollbar-visible::-webkit-scrollbar-track {
+  background: rgba(4, 55, 152, 0.05) !important;
+  border-radius: 999px !important;
+}
+.custom-scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(4, 55, 152, 0.5) !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+.custom-scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(4, 55, 152, 0.85) !important;
+}
+
+/* Firefox compatibility */
+.custom-scrollbar-visible {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(4, 55, 152, 0.5) rgba(4, 55, 152, 0.05) !important;
+}
+
+/* Centralizing Card Width System for Dynamic Adaptability & Precision viewport behavior */
+#control-card, 
+#typography-settings-card, 
+#double-arrow-card, 
+#arrow-control-pad-card, 
+#pictogram-card, 
+#developer-layout-tuning-card,
+#plank-details-tuning-card {
+  --card-final-width: var(--card-width-custom, 360px);
+  width: var(--card-final-width) !important;
+}
+
+#arrow-control-pad-card {
+  --arrow-carousel-width: var(--arrow-carousel-width-custom, 290px);
+}
+
+#pictogram-card {
+  --pic-carousel-width: var(--pic-carousel-width-custom, 290px);
+}
+
+@media (max-width: 639px) and (orientation: portrait) {
+  #control-card, 
+  #typography-settings-card, 
+  #double-arrow-card, 
+  #arrow-control-pad-card, 
+  #pictogram-card, 
+  #developer-layout-tuning-card,
+  #plank-details-tuning-card {
+    --card-final-width: 280px !important;
+    width: 280px !important;
+  }
+  #arrow-control-pad-card {
+    --arrow-carousel-width: 210px !important;
+  }
+  #pictogram-card {
+    --pic-carousel-width: 210px !important;
+  }
+  #carousel-container {
+    --track-padding-left: calc((100vw - 280px) / 2 + 22px) !important;
+    --track-padding-right: calc((100vw - 280px) / 2 + 22px) !important;
+  }
+}
+

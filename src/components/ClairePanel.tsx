@@ -38,7 +38,7 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
         </div>
 
         <div>
-          <h5 className="font-display font-extrabold text-[#002F6C] text-sm uppercase tracking-tight">
+          <h5 className="font-display font-extrabold text-[#012169] text-sm uppercase tracking-tight">
             Jules from Cheltenham Spa
           </h5>
           <p className="text-xs text-slate-500 font-mono -mt-0.5">Frequent traveller on the Great Western route</p>
@@ -57,7 +57,7 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
         </div>
         <a 
           href="#fare-finder-section"
-          className="bg-[#002F6C] hover:bg-opacity-95 text-white font-sans font-semibold text-xs py-2 px-4 rounded-lg shadow-sm cursor-pointer transition"
+          className="bg-[#012169] hover:bg-opacity-95 text-white font-sans font-semibold text-xs py-2 px-4 rounded-lg shadow-sm cursor-pointer transition"
         >
           Go to Ticket Splitter
         </a>

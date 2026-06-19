@@ -8,6 +8,7 @@ import AdvanceTracker from './components/AdvanceTracker';
 import InteractiveTimeline from './components/InteractiveTimeline';
 import DidYouKnow from './components/DidYouKnow';
 import ClairePanel from './components/ClairePanel';
+import VisualInspector from './components/VisualInspector';
 // @ts-expect-error - image asset
 import ticketImg from './assets/images/ticket.png';
 // @ts-expect-error - image asset
@@ -82,7 +83,7 @@ export default function App() {
               transition={{ duration: 0.25 }}
             >
               {/* Home Hero Split - Preserves Legacy Index Layout */}
-              <section id="hero-home" className="relative bg-[#002F6C] text-white py-16 lg:py-24 overflow-hidden">
+              <section id="hero-home" className="relative bg-[#012169] text-white py-16 lg:py-24 overflow-hidden">
                 {/* Visual grid backdrop lines */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
                 
@@ -291,7 +292,7 @@ export default function App() {
               transition={{ duration: 0.25 }}
             >
               {/* History Hero Split - EXACTLY preserves index hero split styling as requested */}
-              <section id="hero-history" className="relative bg-[#002F6C] text-white py-16 lg:py-24 overflow-hidden">
+              <section id="hero-history" className="relative bg-[#012169] text-white py-16 lg:py-24 overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -416,7 +417,7 @@ export default function App() {
               transition={{ duration: 0.25 }}
             >
               {/* Travel Guide Hero Split - EXACTLY preserves index hero split styling as requested */}
-              <section id="hero-guide" className="relative bg-[#002F6C] text-white py-16 lg:py-24 overflow-hidden">
+              <section id="hero-guide" className="relative bg-[#012169] text-white py-16 lg:py-24 overflow-hidden">
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -595,26 +596,27 @@ export default function App() {
         </AnimatePresence>
       </main>
 
+      {/* <VisualInspector /> */}
       {/* Symmetrical Brand Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 text-slate-400 py-12">
+      <footer className="bg-[#012169] border-t border-blue-900/60 text-slate-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
             <div>
               <div className="flex items-center justify-center md:justify-start">
-                <span className="font-display font-extrabold text-[#a8081b] uppercase tracking-wider text-sm">
+                <span className="font-display font-extrabold text-white uppercase tracking-wider text-sm">
                   BRITISH RAIL DESIGN ARCHIVE
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 mt-2 max-w-md">
+              <p className="text-[10px] text-slate-300 mt-2 max-w-md">
                 An independent historical archive and travel resource portal. Not affiliated with National Rail, Great British Railways, or the Department for Transport.
               </p>
             </div>
 
             <div className="text-right">
-              <p className="text-[11px] font-sans">
-                &copy; 2009-2026 BritishRail.co.uk. All rights reserved.
+              <p className="text-[11px] font-sans text-slate-100">
+                &copy; 2009-{new Date().getFullYear()} BritishRail.co.uk. All rights reserved.
               </p>
-              <p className="text-[10px] text-slate-500 mt-1">
+              <p className="text-[10px] text-slate-300 mt-1">
                 <button 
                   onClick={() => {
                     const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
@@ -625,7 +627,7 @@ export default function App() {
                   onCopy={(e) => {
                     e.preventDefault();
                   }}
-                  className="font-sans text-slate-400 text-[11px] hover:text-rose-500 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-0 p-0 select-none"
+                  className="font-sans text-slate-200 text-[11px] hover:text-amber-400 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-0 p-0 select-none"
                   title="Contact Webmaster"
                 >
                   Contact Webmaster
