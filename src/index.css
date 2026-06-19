@@ -129,7 +129,7 @@ h1, h2, h3, h4, h5, h6 {
   --pic-carousel-width: var(--pic-carousel-width-custom, 290px);
 }
 
-@media (max-width: 639px) and (orientation: portrait) {
+@media (max-width: 639px) {
   #control-card, 
   #typography-settings-card, 
   #double-arrow-card, 
@@ -137,18 +137,20 @@ h1, h2, h3, h4, h5, h6 {
   #pictogram-card, 
   #developer-layout-tuning-card,
   #plank-details-tuning-card {
-    --card-final-width: 280px !important;
-    width: 280px !important;
+    --card-final-width: 100% !important;
+    width: var(--card-final-width) !important;
   }
   #arrow-control-pad-card {
-    --arrow-carousel-width: 210px !important;
+    --arrow-carousel-width: calc(100% - 40px) !important;
   }
   #pictogram-card {
-    --pic-carousel-width: 210px !important;
+    --pic-carousel-width: calc(100% - 40px) !important;
   }
   #carousel-container {
-    --track-padding-left: calc((100vw - 280px) / 2 + 22px) !important;
-    --track-padding-right: calc((100vw - 280px) / 2 + 22px) !important;
+    --track-padding-left: 24px !important;
+    --track-padding-right: 24px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
   }
 }
 

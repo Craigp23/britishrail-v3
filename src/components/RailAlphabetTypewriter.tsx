@@ -861,7 +861,7 @@ export default function RailAlphabetTypewriter() {
   // Dynamic Spacing / Carousel Developer controls with smart responsive default states:
   const [cardWidth, setCardWidth] = useState<number>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      return 280; // Mobile width updated from 290px to 280px
+      return Math.max(280, window.innerWidth - 80);
     }
     return 360;
   });
@@ -871,16 +871,35 @@ export default function RailAlphabetTypewriter() {
   const [miniChevronOffset, setMiniChevronOffset] = useState<number>(18);
   const [arrowCarouselWidth, setArrowCarouselWidth] = useState<number>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      return 210; // Mobile carousel width updated from 245px to 210px
+      return Math.max(210, window.innerWidth - 150);
     }
     return 290;
   });
   const [picCarouselWidth, setPicCarouselWidth] = useState<number>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      return 210; // Mobile carousel width updated from 245px to 210px
+      return Math.max(210, window.innerWidth - 150);
     }
     return 290;
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        const widthVal = Math.max(280, window.innerWidth - 80);
+        setCardWidth(widthVal);
+        setArrowCarouselWidth(Math.max(210, window.innerWidth - 150));
+        setPicCarouselWidth(Math.max(210, window.innerWidth - 150));
+      } else {
+        setCardWidth(360);
+        setArrowCarouselWidth(290);
+        setPicCarouselWidth(290);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Plank Margin, Padding, Offset, and Size controls for Pictograms, Arrows, and Text (Developer Tuning)
   const [plankPicLeft, setPlankPicLeft] = useState<number>(11.5);
@@ -986,7 +1005,17 @@ export default function RailAlphabetTypewriter() {
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTypedText(e.target.value);
+    const rawVal = e.target.value;
+    const filteredVal = rawVal.split('').filter(char => {
+      const code = char.charCodeAt(0);
+      return (code === 32) || 
+             (code >= 33 && code <= 126) || 
+             (code >= 161 && code <= 191) || 
+             (code === 215) || 
+             (code === 223) || 
+             (code === 247);
+    }).join('');
+    setTypedText(filteredVal);
     setSelectedPresetName('custom');
   };
 
@@ -1409,7 +1438,7 @@ export default function RailAlphabetTypewriter() {
           y={textY}
           textAnchor={textAnchor}
           dominantBaseline="central"
-          fontSize={plankTextSize}
+          fontSize={plankTextSize * (textSize / 52)}
           style={{
             fontFamily: "'Brsign', 'Geist', sans-serif",
             fontWeight: 700,
@@ -1616,7 +1645,7 @@ export default function RailAlphabetTypewriter() {
           ` : ''}
 
           <!-- Text -->
-          <text x="${textX}" y="${textY}" text-anchor="${textAnchor}" dominant-baseline="central" font-size="${plankTextSize}" font-family="'Brsign', 'Geist', sans-serif" font-weight="700" letter-spacing="${letterSpacing}em" fill="${contentColor}">${toSentenceCase(textLine)}</text>
+          <text x="${textX}" y="${textY}" text-anchor="${textAnchor}" dominant-baseline="central" font-size="${plankTextSize * (textSize / 52)}" font-family="'Brsign', 'Geist', sans-serif" font-weight="700" letter-spacing="${letterSpacing}em" fill="${contentColor}">${toSentenceCase(textLine)}</text>
         </g>
       `;
     };
@@ -1679,7 +1708,7 @@ export default function RailAlphabetTypewriter() {
   const W = hasArrow ? 180 : 156;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 pb-16 lg:pb-16 max-w-5xl mx-auto my-6 transition-all relative" id="rail-alphabet-typography-section">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 pb-6 lg:pb-8 max-w-5xl mx-auto my-6 transition-all relative" id="rail-alphabet-typography-section">
       
       {/* Title block celebrating Kinneir and Calvert */}
       <div className="mb-6 flex items-start justify-between gap-4">
@@ -1835,7 +1864,7 @@ export default function RailAlphabetTypewriter() {
                             if (idx > 0 && preset.category !== prevCategory) {
                               elements.push(
                                 <option key={`sep-${idx}`} disabled className="text-slate-300 select-none py-0 font-light">
-                                  ────────────────────────
+                                  ────────────
                                 </option>
                               );
                               prevCategory = preset.category;
@@ -1980,7 +2009,7 @@ export default function RailAlphabetTypewriter() {
                       label="Letter Spacing"
                       value={letterSpacing}
                       min={-0.20}
-                      max={0.10}
+                      max={0.20}
                       step={0.01}
                       defaultValue={0.00}
                       displayValue={`${letterSpacing.toFixed(2)}em`}
@@ -2358,7 +2387,7 @@ export default function RailAlphabetTypewriter() {
                                 <span 
                                   style={{ 
                                     fontFamily: "'Brsign', sans-serif", 
-                                    fontSize: '32px',
+                                    fontSize: '28px',
                                     lineHeight: 1,
                                     fontWeight: 'normal'
                                   }}
@@ -3036,6 +3065,7 @@ export default function RailAlphabetTypewriter() {
             className="flex-grow h-10 flex items-center justify-between px-3.5 bg-slate-50 hover:bg-slate-100 active:bg-slate-200 border border-slate-200/60 rounded-lg focus:outline-none cursor-pointer group shadow-sm hover:shadow transition-all duration-300 min-w-0"
           >
             <div className="flex items-center gap-1.5 min-w-0 flex-grow">
+              <Lucide.Sliders className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#012169] transition-colors shrink-0" />
               <span className="text-[10px] font-mono font-black text-slate-400 group-hover:text-[#012169] uppercase tracking-wider transition-colors shrink-0">
                 CUSTOM LAYOUT
               </span>
@@ -3054,7 +3084,20 @@ export default function RailAlphabetTypewriter() {
             title="Download Sign (PNG)"
             id="btn-download-sign"
           >
-            <Lucide.Download className="w-5 h-5 shrink-0" />
+            <motion.div
+              animate={{
+                y: [0, 2, 0, -1, 0]
+              }}
+              transition={{
+                duration: 2.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                repeatDelay: 1.5
+              }}
+              className="flex items-center justify-center shrink-0"
+            >
+              <Lucide.Download className="w-5 h-5 shrink-0" />
+            </motion.div>
           </button>
         </div>
 
