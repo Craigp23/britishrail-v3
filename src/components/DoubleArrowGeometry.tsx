@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
 
 interface ColourStop {
@@ -109,6 +109,18 @@ export default function DoubleArrowGeometry() {
   const [backgroundColourIndex, setBackgroundColourIndex] = useState<number>(4); // White
   const [gridOpacity, setGridOpacity] = useState<number>(45);
   const [taperAngle, setTaperAngle] = useState<number>(2.3); // In degrees. Standard: +2.3 deg (corresponds to authentic photoshop template)
+
+  // Save custom DAS parameters to localStorage so RailAlphabetTypewriter can consume them in real-time
+  useEffect(() => {
+    localStorage.setItem('rail-alphabet-custom-das-geometry', JSON.stringify({
+      strokeWidth,
+      gapOffset,
+      foregroundColourIndex,
+      backgroundColourIndex,
+      taperAngle
+    }));
+    window.dispatchEvent(new Event('custom-das-updated'));
+  }, [strokeWidth, gapOffset, foregroundColourIndex, backgroundColourIndex, taperAngle]);
 
   const foregroundColour = COLOUR_STOPS[foregroundColourIndex].value;
   const backgroundColour = COLOUR_STOPS[backgroundColourIndex].value;
