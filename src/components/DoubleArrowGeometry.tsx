@@ -1,5 +1,6 @@
 import { useState, ChangeEvent, useEffect } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { DraftingTriangleIcon } from './DraftingTriangleIcon';
 
 interface ColourStop {
   id: string;
@@ -110,6 +111,16 @@ export default function DoubleArrowGeometry() {
   const [gridOpacity, setGridOpacity] = useState<number>(45);
   const [taperAngle, setTaperAngle] = useState<number>(2.3); // In degrees. Standard: +2.3 deg (corresponds to authentic photoshop template)
 
+  const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' && window.innerWidth < 640);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Save custom DAS parameters to localStorage so RailAlphabetTypewriter can consume them in real-time
   useEffect(() => {
     localStorage.setItem('rail-alphabet-custom-das-geometry', JSON.stringify({
@@ -204,27 +215,20 @@ export default function DoubleArrowGeometry() {
     : `hsla(175, 100%, 24%, ${opacity * 1.0})`;   // teal-700 full solid bold graticule
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8" id="double-arrow-geometry-section">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 relative" id="double-arrow-geometry-section">
       
       {/* Title block styled with grid to align with controls section below */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-6 gap-y-2 items-start lg:items-center mb-3 sm:mb-4 lg:mb-6">
-        <div className="lg:col-span-8 flex justify-between items-start sm:items-center gap-4">
+        <div className="lg:col-span-8 flex items-center justify-between">
           <div>
-            <h3 className="text-base sm:text-lg font-display font-bold text-rail-blue tracking-tight">
-              Geometry of the double arrow icon (Gerry Barney, 1965)
+            <h3 className="text-base sm:text-lg font-display font-bold text-rail-blue tracking-tight flex items-center space-x-2">
+              <DraftingTriangleIcon className="w-5 h-5 text-rail-red flex-shrink-0" />
+              <span>Geometry of the double arrow icon (Gerry Barney, 1965)</span>
             </h3>
             <p className="text-[11px] sm:text-xs text-slate-500 font-sans mt-0.5">
               Create your own double arrow logo inspired by the iconic railway symbol forged over 60 years ago.
             </p>
           </div>
-          <button
-            onClick={handleReset}
-            className="text-slate-500 hover:text-rail-blue p-2 hover:bg-slate-100 rounded-full transition cursor-pointer flex-shrink-0 animate-fade-in self-center"
-            title="Reset Geometry"
-            id="btn-reset-geometry"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
         <div className="lg:col-span-4 w-full">
           {/* Colour collision warning (preserves layout and aligns perfectly with the controls below) */}
@@ -254,6 +258,24 @@ export default function DoubleArrowGeometry() {
           }}
           id="drawing-canvas-container"
         >
+          {/* Reset button absolutely positioned at top-right, visually aligned across viewports */}
+          <button
+            onClick={handleReset}
+            style={{
+              right: `${isMobile ? 2 : 7}px`,
+              top: `${isMobile ? 2 : 7}px`
+            }}
+            className={`absolute z-20 p-1.5 rounded-[10px] transition-all cursor-pointer border border-transparent shadow-xs ${
+              isDarkBg 
+                ? 'text-white/60 hover:text-white hover:bg-white/10 hover:border-white/10' 
+                : 'text-slate-500 hover:text-[#011F5B] hover:bg-black/5 hover:border-slate-200/40'
+            }`}
+            title="Reset"
+            aria-label="Reset"
+            id="btn-reset-geometry-canvas"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
           {/* Centered Blueprint Canvas Wrapper to position the grid relative to the frame */}
           <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0 sm:pt-2">
             {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
@@ -514,6 +536,8 @@ export default function DoubleArrowGeometry() {
               displayValue={gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
               onChange={setGridOpacity}
             />
+
+
 
           </div>
         </div>

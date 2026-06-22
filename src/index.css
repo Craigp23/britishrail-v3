@@ -115,8 +115,10 @@ h1, h2, h3, h4, h5, h6 {
 #double-arrow-card, 
 #arrow-control-pad-card, 
 #pictogram-card, 
+#weighted-layout-engine-card,
 #developer-layout-tuning-card,
-#plank-details-tuning-card {
+#plank-details-tuning-card,
+#das-custom-tuning-dev-card {
   --card-final-width: var(--card-width-custom, 360px);
   width: var(--card-final-width) !important;
 }
@@ -135,8 +137,10 @@ h1, h2, h3, h4, h5, h6 {
   #double-arrow-card, 
   #arrow-control-pad-card, 
   #pictogram-card, 
+  #weighted-layout-engine-card,
   #developer-layout-tuning-card,
-  #plank-details-tuning-card {
+  #plank-details-tuning-card,
+  #das-custom-tuning-dev-card {
     --card-final-width: 100% !important;
     width: var(--card-final-width) !important;
   }
