@@ -68,6 +68,12 @@ const GLYPH_MAP: Record<string, number> = {
   'catering': 204,
   'luggage': 217,
   'firstaid': 209,
+  'wayin': 208,
+  'baggage': 210,
+  'ships': 213,
+  'lockers': 218,
+  'lostproperty': 221,
+  'hairdresser': 222,
 };
 
 // Beautiful native vector way out icon per client architectural spec
@@ -423,6 +429,22 @@ const PRESETS = [
     letterSpacing: 0.00,
     textAlign: "right"
   },
+  {
+    category: "Trains & Wayfinding",
+    name: "Way in",
+    text: "Way in",
+    theme: "white",
+    arrowDir: "W",
+    arrowPos: "left",
+    logoType: "none",
+    logoPos: "left",
+    picType: "wayin",
+    picPos: "right",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
   // 2. Transportation
   {
     category: "Transportation",
@@ -450,6 +472,22 @@ const PRESETS = [
     logoType: "none",
     logoPos: "left",
     picType: "214",
+    picPos: "left",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
+  {
+    category: "Transportation",
+    name: "Ships",
+    text: "Ships",
+    theme: "white",
+    arrowDir: "E",
+    arrowPos: "right",
+    logoType: "none",
+    logoPos: "left",
+    picType: "ships",
     picPos: "left",
     showSeparator: true,
     textSize: 52,
@@ -516,6 +554,38 @@ const PRESETS = [
     logoPos: "left",
     picType: "201",
     picPos: "right",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
+  {
+    category: "Station Facilities",
+    name: "Lost property",
+    text: "Lost property",
+    theme: "white",
+    arrowDir: "none",
+    arrowPos: "none",
+    logoType: "none",
+    logoPos: "left",
+    picType: "lostproperty",
+    picPos: "left",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
+  {
+    category: "Station Facilities",
+    name: "Hairdresser",
+    text: "Hairdresser",
+    theme: "white",
+    arrowDir: "none",
+    arrowPos: "none",
+    logoType: "none",
+    logoPos: "left",
+    picType: "hairdresser",
+    picPos: "left",
     showSeparator: true,
     textSize: 52,
     letterSpacing: 0.00,
@@ -613,6 +683,38 @@ const PRESETS = [
     logoType: "none",
     logoPos: "left",
     picType: "luggage",
+    picPos: "left",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
+  {
+    category: "Waiting & Luggage",
+    name: "Baggage registration",
+    text: "Baggage registration",
+    theme: "white",
+    arrowDir: "none",
+    arrowPos: "none",
+    logoType: "none",
+    logoPos: "left",
+    picType: "baggage",
+    picPos: "left",
+    showSeparator: true,
+    textSize: 52,
+    letterSpacing: 0.00,
+    textAlign: "left"
+  },
+  {
+    category: "Waiting & Luggage",
+    name: "Luggage lockers",
+    text: "Luggage lockers",
+    theme: "white",
+    arrowDir: "none",
+    arrowPos: "none",
+    logoType: "none",
+    logoPos: "left",
+    picType: "lockers",
     picPos: "left",
     showSeparator: true,
     textSize: 52,
@@ -834,40 +936,46 @@ const COLOUR_STOPS_GEOMETRY = [
   { id: 'black', name: 'Black', value: '#000000' }
 ];
 
-const estimateTextWidth = (text: string, fontSize: number, letterSpacingEm: number) => {
+const estimateTextWidth = (text: string, fontSize: number, letterSpacingEm: number, fontWeight: number = 700) => {
   let totalWidth = 0;
+  // Dynamic weightFactor scaled linearly from baseline 700:
+  // 700 -> 1.02
+  // 800 -> 1.12
+  // 900 -> 1.22
+  const weightFactor = 1.02 + (fontWeight - 700) * 0.001;
+
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
-    let w = 0.42; // default fallback
+    let w = 0.52; // default fallback
     
-    // Proportional widths for standard alphanumeric chars in Rail Alphabet style (medium bold):
+    // Proportional widths calibrated for standard Geist / Inter bold sans-serif weight 700:
     if (char === ' ') {
-      w = 0.28;
+      w = 0.30;
     } else if (/[Iil1]/.test(char)) {
-      w = 0.14;
+      w = 0.22;
     } else if (/[fjrt]/.test(char)) {
-      w = 0.26;
+      w = 0.35;
     } else if (/[cs]/.test(char)) {
-      w = 0.38;
-    } else if (/[mw]/.test(char)) {
-      w = 0.56;
-    } else if (/[MW]/.test(char)) {
-      w = 0.60;
-    } else if (/[EFJL]/.test(char)) {
-      w = 0.44;
-    } else if (/[AGOQ]/.test(char)) {
-      w = 0.52;
-    } else if (/[A-Z]/.test(char)) {
       w = 0.48;
+    } else if (/[mw]/.test(char)) {
+      w = 0.72;
+    } else if (/[MW]/.test(char)) {
+      w = 0.78;
+    } else if (/[EFJL]/.test(char)) {
+      w = 0.56;
+    } else if (/[AGOQ]/.test(char)) {
+      w = 0.66;
+    } else if (/[A-Z]/.test(char)) {
+      w = 0.62;
     } else if (/[0-9]/.test(char)) {
-      w = 0.42;
+      w = 0.54;
     } else if (/[abcdeghkmnopqrsuvwxyz]/.test(char)) {
-      w = 0.42;
+      w = 0.52;
     } else {
-      w = 0.40;
+      w = 0.50;
     }
     
-    totalWidth += w * fontSize;
+    totalWidth += w * fontSize * weightFactor;
     if (i < text.length - 1) {
       totalWidth += letterSpacingEm * fontSize;
     }
@@ -894,18 +1002,16 @@ interface LayoutResult {
 }
 
 interface SignStyle {
-  module: number;
-
-  spacing: {
-    outerMargin: number;
-    defaultGap: number;
-    logoGap: number;
-    arrowGap: number;
-    separatorGap: number;
-    textGap: number;
-  };
-
+  unit: number;
   minimumTextSize: number;
+  spacing?: {
+    outerMargin?: number;
+    defaultGap?: number;
+    logoGap?: number;
+    arrowGap?: number;
+    separatorGap?: number;
+    textGap?: number;
+  };
 }
 
 const toSentenceCase = (str: string) => {
@@ -914,18 +1020,11 @@ const toSentenceCase = (str: string) => {
 };
 
 const BR_STYLE: SignStyle = {
-  module: 24,
-
+  unit: 24,
+  minimumTextSize: 8,
   spacing: {
-    outerMargin: 0.5,
-    defaultGap: 0.5,
-    logoGap: 0.5,
-    arrowGap: 0.75,
-    separatorGap: 0.25,
-    textGap: 0.5
-  },
-
-  minimumTextSize: 8
+    outerMargin: 0.15
+  }
 };
 
 export default function RailAlphabetTypewriter() {
@@ -953,7 +1052,7 @@ export default function RailAlphabetTypewriter() {
   }, [picType]);
   
   const [letterSpacing, setLetterSpacing] = useState<number>(0.00); 
-  const [textSize, setTextSize] = useState<number>(52);
+  const [textSize, setTextSize] = useState<number>(49);
   const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('left');
   const [selectedPresetName, setSelectedPresetName] = useState<string>('Telephones');
   const [lastPresetInfo, setLastPresetInfo] = useState<{ name: string; category: string }>({
@@ -976,70 +1075,34 @@ export default function RailAlphabetTypewriter() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Plank Margin, Padding, Offset, and Size controls for Pictograms, Arrows, and Text (Developer Tuning)
-  const [plankPicLeft, setPlankPicLeft] = useState<number>(4.0);
-  const [plankPicRight, setPlankPicRight] = useState<number>(4.0);
-  const [plankPicY, setPlankPicY] = useState<number>(11.5); // vertical/top-bot offset
-  const [plankPicSize, setPlankPicSize] = useState<number>(16.12);
-
-  const [plankArrowLeft, setPlankArrowLeft] = useState<number>(4.0);
-  const [plankArrowRight, setPlankArrowRight] = useState<number>(4.0);
-  const [plankArrowY, setPlankArrowY] = useState<number>(11.5); // vertical/top-bot offset
-  const [plankArrowSize, setPlankArrowSize] = useState<number>(17.3);
-
-  // New Layout Engine States (Card 6 & layout logic)
-  const [layoutPaddingLeft, setLayoutPaddingLeft] = useState<number>(4.0);
-  const [layoutPaddingRight, setLayoutPaddingRight] = useState<number>(4.0);
-
-  const [gapPicSep, setGapPicSep] = useState<number>(3.5);
-  const [gapSepAny, setGapSepAny] = useState<number>(12.5);
-  const [gapLogoText, setGapLogoText] = useState<number>(21.0);
-  const [gapTextArrow, setGapTextArrow] = useState<number>(9.0);
-  const [gapDefault, setGapDefault] = useState<number>(16.0);
-  const [minimumSafetyGap, setMinimumSafetyGap] = useState<number>(16.0);
-
   // Active British Rail Sign Compositor Engine parameters
-  const [compositorModule, setCompositorModule] = useState<number>(24);
-  const [compositorOuterMargin, setCompositorOuterMargin] = useState<number>(0.15);
-  const [compositorDefaultGap, setCompositorDefaultGap] = useState<number>(0.2);
-  const [compositorLogoGap, setCompositorLogoGap] = useState<number>(0.25);
-  const [compositorArrowGap, setCompositorArrowGap] = useState<number>(0.15);
-  const [compositorSeparatorGap, setCompositorSeparatorGap] = useState<number>(0.15);
-  const [compositorTextGap, setCompositorTextGap] = useState<number>(0.5);
-  const [compositorMinimumTextSize, setCompositorMinimumTextSize] = useState<number>(8);
+  const [compositorUnit, setCompositorUnit] = useState<number>(4);
+  const [compositorOuterMargin, setCompositorOuterMargin] = useState<number>(0.1);
+  const [compositorMinimumTextSize, setCompositorMinimumTextSize] = useState<number>(32);
 
   const currentStyle: SignStyle = {
-    module: compositorModule,
+    unit: compositorUnit,
     spacing: {
-      outerMargin: compositorOuterMargin,
-      defaultGap: compositorDefaultGap,
-      logoGap: compositorLogoGap,
-      arrowGap: compositorArrowGap,
-      separatorGap: compositorSeparatorGap,
-      textGap: compositorTextGap
+      outerMargin: compositorOuterMargin
     },
     minimumTextSize: compositorMinimumTextSize
   };
 
   const [plankLogoY, setPlankLogoY] = useState<number>(11.5);
+  const [plankPicY, setPlankPicY] = useState<number>(11.5);
+  const [plankArrowY, setPlankArrowY] = useState<number>(12.0);
   const [separatorY1, setSeparatorY1] = useState<number>(0.5);
   const [separatorY2, setSeparatorY2] = useState<number>(23.5);
 
-  const [customDasSizeMultiplier, setCustomDasSizeMultiplier] = useState<number>(0.95);
+  const [customDasSizeMultiplier, setCustomDasSizeMultiplier] = useState<number>(0.96);
+  const [customDasSizeMultiplierNonWhite, setCustomDasSizeMultiplierNonWhite] = useState<number>(1.00);
   const [customDasXOffset, setCustomDasXOffset] = useState<number>(0.0);
-  const [customDasYOffset, setCustomDasYOffset] = useState<number>(0.0);
+  const [customDasYOffset, setCustomDasYOffset] = useState<number>(0.2);
+  const [customDasYOffsetNonWhite, setCustomDasYOffsetNonWhite] = useState<number>(0.2);
 
-  const [plankTextLeft, setPlankTextLeft] = useState<number>(28); // L padding when alone
-  const [plankTextRight, setPlankTextRight] = useState<number>(28); // R padding when alone
-  const [plankTextWithElementLeft, setPlankTextWithElementLeft] = useState<number>(27); // L margin when shared
-  const [plankTextWithElementRight, setPlankTextWithElementRight] = useState<number>(27); // R margin when shared
-  const [plankTextWithBothLeft, setPlankTextWithBothLeft] = useState<number>(27); // L margin when both pic & arrow present
-  const [plankTextWithBothRight, setPlankTextWithBothRight] = useState<number>(27); // R margin when both pic & arrow present
-  const [plankTextWithPicLeft, setPlankTextWithPicLeft] = useState<number>(28); // L margin when pic only
-  const [plankTextWithPicRight, setPlankTextWithPicRight] = useState<number>(28); // R margin when pic only
-  const [plankTextYFirstLine, setPlankTextYFirstLine] = useState<number>(12); // vertical coordinate for first line
-  const [plankTextYSecondLine, setPlankTextYSecondLine] = useState<number>(12); // vertical coordinate for second line
+  const [plankTextYFirstLine, setPlankTextYFirstLine] = useState<number>(11.5); // vertical coordinate for first line
   const [plankTextSize, setPlankTextSize] = useState<number>(17.1);
+  const [plankFontWeight, setPlankFontWeight] = useState<number>(700); // 700, 800, 900 for bold sans geometries
 
   // Double Arrow Symbol (DAS) custom tuning states
   const [dasBaseSize, setDasBaseSize] = useState<number>(18.0);
@@ -1070,115 +1133,19 @@ export default function RailAlphabetTypewriter() {
   const targetArrowScale = arrowPosition === 'none' ? 0.0 : 1.0;
   const targetPicScale = picType === 'none' ? 0.0 : 1.0;
 
-  const [smoothDasSize, setSmoothDasSize] = useState(targetDasSize);
-  const [smoothDasSpacingLeft, setSmoothDasSpacingLeft] = useState(targetDasSpacingLeft);
-  const [smoothDasSpacingRight, setSmoothDasSpacingRight] = useState(targetDasSpacingRight);
-  const [smoothDasLeftPadding, setSmoothDasLeftPadding] = useState(targetDasLeftPadding);
-  const [smoothDasRightPadding, setSmoothDasRightPadding] = useState(targetDasRightPadding);
-  const [smoothDasVerticalOffset, setSmoothDasVerticalOffset] = useState(targetDasVerticalOffset);
-  const [smoothLogoScale, setSmoothLogoScale] = useState(targetLogoScale);
-  const [smoothArrowScale, setSmoothArrowScale] = useState(targetArrowScale);
-  const [smoothPicScale, setSmoothPicScale] = useState(targetPicScale);
-
-  const [smoothW, setSmoothW] = useState(targetW);
-  const smoothWRef = useRef(targetW);
-
-  useEffect(() => {
-    smoothWRef.current = smoothW;
-  }, [smoothW]);
-
-  // Unified high-performance animation manager for smooth transitions in perfect sync
-  useEffect(() => {
-    let animationFrameId: number;
-    const startTime = performance.now();
-    const duration = 280; // Smooth 280ms duration transitions for premium fluidity
-
-    // Capture starting frame state snapshots
-    const startValue = smoothWRef.current;
-    const startDasSize = smoothDasSize;
-    const startSpacingLeft = smoothDasSpacingLeft;
-    const startSpacingRight = smoothDasSpacingRight;
-    const startLeftPadding = smoothDasLeftPadding;
-    const startRightPadding = smoothDasRightPadding;
-    const startVerticalOffset = smoothDasVerticalOffset;
-    const startLogoScale = smoothLogoScale;
-    const startArrowScale = smoothArrowScale;
-    const startPicScale = smoothPicScale;
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      if (elapsed >= duration) {
-        smoothWRef.current = targetW;
-        setSmoothW(targetW);
-        setSmoothDasSize(targetDasSize);
-        setSmoothDasSpacingLeft(targetDasSpacingLeft);
-        setSmoothDasSpacingRight(targetDasSpacingRight);
-        setSmoothDasLeftPadding(targetDasLeftPadding);
-        setSmoothDasRightPadding(targetDasRightPadding);
-        setSmoothDasVerticalOffset(targetDasVerticalOffset);
-        setSmoothLogoScale(targetLogoScale);
-        setSmoothArrowScale(targetArrowScale);
-        setSmoothPicScale(targetPicScale);
-      } else {
-        const progress = elapsed / duration;
-        // Cubic easing out for ultra-smooth easing
-        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-        
-        const currentValue = startValue + (targetW - startValue) * easeOutCubic;
-        smoothWRef.current = currentValue;
-        setSmoothW(currentValue);
-
-        setSmoothDasSize(startDasSize + (targetDasSize - startDasSize) * easeOutCubic);
-        setSmoothDasSpacingLeft(startSpacingLeft + (targetDasSpacingLeft - startSpacingLeft) * easeOutCubic);
-        setSmoothDasSpacingRight(startSpacingRight + (targetDasSpacingRight - startSpacingRight) * easeOutCubic);
-        setSmoothDasLeftPadding(startLeftPadding + (targetDasLeftPadding - startLeftPadding) * easeOutCubic);
-        setSmoothDasRightPadding(startRightPadding + (targetDasRightPadding - startRightPadding) * easeOutCubic);
-        setSmoothDasVerticalOffset(startVerticalOffset + (targetDasVerticalOffset - startVerticalOffset) * easeOutCubic);
-        setSmoothLogoScale(startLogoScale + (targetLogoScale - startLogoScale) * easeOutCubic);
-        setSmoothArrowScale(startArrowScale + (targetArrowScale - startArrowScale) * easeOutCubic);
-        setSmoothPicScale(startPicScale + (targetPicScale - startPicScale) * easeOutCubic);
-
-        animationFrameId = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrameId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [
-    targetW,
-    targetDasSize,
-    targetDasSpacingLeft,
-    targetDasSpacingRight,
-    targetDasLeftPadding,
-    targetDasRightPadding,
-    targetDasVerticalOffset,
-    targetLogoScale,
-    targetArrowScale,
-    targetPicScale
-  ]);
+  const smoothDasSize = targetDasSize;
+  const smoothDasSpacingLeft = targetDasSpacingLeft;
+  const smoothDasSpacingRight = targetDasSpacingRight;
+  const smoothDasLeftPadding = targetDasLeftPadding;
+  const smoothDasRightPadding = targetDasRightPadding;
+  const smoothDasVerticalOffset = targetDasVerticalOffset;
+  const smoothLogoScale = targetLogoScale;
+  const smoothArrowScale = targetArrowScale;
+  const smoothPicScale = targetPicScale;
+  const smoothW = targetW;
 
   const getPlankLines = (text: string): string[] => {
-    if (!text) return ['Way out'];
-    if (text.length <= 14) {
-      return [text];
-    }
-    const words = text.split(/\s+/);
-    if (words.length === 1) {
-      const mid = Math.ceil(text.length / 2);
-      return [text.slice(0, mid), text.slice(mid)];
-    }
-    let bestDiff = Infinity;
-    let bestSplit = Math.ceil(words.length / 2);
-    for (let i = 1; i < words.length; i++) {
-      const l1 = words.slice(0, i).join(' ');
-      const l2 = words.slice(i).join(' ');
-      const diff = Math.abs(l1.length - l2.length);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestSplit = i;
-      }
-    }
-    return [words.slice(0, bestSplit).join(' '), words.slice(bestSplit).join(' ')];
+    return [text || 'Way out'];
   };
 
   const solveLayout = (
@@ -1191,295 +1158,150 @@ export default function RailAlphabetTypewriter() {
     activePicScale = 1.0,
     style: SignStyle = BR_STYLE
   ) => {
-    const buildClusters = (spec: any, style: SignStyle) => {
-      const isPicActive = spec.activePicScale > 0.005;
-      const isSepActive = isPicActive && spec.showSeparator;
-      const isArrowActive = spec.activeArrowScale > 0.005;
-      const isLogoActive = spec.logoType !== 'none' && spec.activeLogoScale > 0.005;
+    const isPicActive = activePicScale > 0.005;
+    const isArrowActive = activeArrowScale > 0.005;
+    const isLogoActive = logoType !== 'none' && activeLogoScale > 0.005;
 
-      const effectiveFs = spec.plankTextSize * (spec.effectiveTextSize / 52);
-      const textWidth = estimateTextWidth(toSentenceCase(spec.textLine), effectiveFs, spec.letterSpacing);
+    const u = style.unit;
+    const PICTOGRAM_TILE = 6 * u;
+    const ARROW_TILE = 6 * u;
+    const DAS_ZONE = 9 * u;
 
-      let plateWidth = spec.activeDasSize * spec.activeLogoScale * 1.6;
-      if (spec.logoType === 'red-on-white' || spec.logoType === 'custom-geometry') {
-        plateWidth = plateWidth * spec.dasRedOnWhiteScale;
-      }
+    const targetArrowPos = arrowPosition === 'none' ? lastArrowPosition : arrowPosition;
 
-      const picWidth = spec.plankPicSize * spec.activePicScale;
-      const sepWidth = 0;
-      const arrowWidth = spec.plankArrowSize * spec.activeArrowScale;
+    const hasLeftPic = isPicActive && picPosition === 'left';
+    const hasLeftArrow = isArrowActive && targetArrowPos === 'left';
+    const leftTilesWidth = (hasLeftPic ? (PICTOGRAM_TILE * activePicScale) : 0) + (hasLeftArrow ? (ARROW_TILE * activeArrowScale) : 0);
 
-      // Left Cluster
-      const leftItems: LayoutItem[] = [];
-      const hasLeftPic = isPicActive && spec.picPosition === 'left';
-      const hasLeftSep = hasLeftPic && spec.showSeparator;
-      const targetArrowPos = spec.arrowPosition === 'none' ? spec.lastArrowPosition : spec.arrowPosition;
-      const hasLeftArrow = isArrowActive && targetArrowPos === 'left';
-
-      if (hasLeftPic) {
-        leftItems.push({ id: 'pictogram', width: picWidth, height: picWidth });
-        if (hasLeftSep) {
-          leftItems.push({ id: 'separator', width: sepWidth, height: picWidth });
-        }
-      }
-      if (hasLeftArrow) {
-        leftItems.push({ id: 'arrow', width: arrowWidth, height: arrowWidth });
-      }
-
-      // Right Cluster
-      const rightItems: LayoutItem[] = [];
-      const hasRightPic = isPicActive && spec.picPosition === 'right';
-      const hasRightSep = hasRightPic && spec.showSeparator;
-      const hasRightArrow = isArrowActive && targetArrowPos === 'right';
-
-      if (hasRightPic) {
-        rightItems.push({ id: 'pictogram', width: picWidth, height: picWidth });
-        if (hasRightSep) {
-          rightItems.push({ id: 'separator', width: sepWidth, height: picWidth });
-        }
-      }
-      if (hasRightArrow) {
-        rightItems.push({ id: 'arrow', width: arrowWidth, height: arrowWidth });
-      }
-
-      // Text Cluster
-      const textItems: LayoutItem[] = [];
-      if (isLogoActive) {
-        if (spec.logoPosition === 'left') {
-          textItems.push({ id: 'logo', width: plateWidth, height: spec.activeDasSize });
-          textItems.push({ id: 'text', width: textWidth, height: effectiveFs });
-        } else {
-          textItems.push({ id: 'text', width: textWidth, height: effectiveFs });
-          textItems.push({ id: 'logo', width: plateWidth, height: spec.activeDasSize });
-        }
-      } else {
-        textItems.push({ id: 'text', width: textWidth, height: effectiveFs });
-      }
-
-      return {
-        leftItems,
-        rightItems,
-        textItems,
-        isPicActive,
-        isSepActive,
-        isArrowActive,
-        isLogoActive,
-        effectiveFs,
-        textWidth
-      };
-    };
-
-    const getClusterInternalGap = (item1: LayoutItem, item2: LayoutItem, style: SignStyle): number => {
-      const module = style.module;
-      
-      if (
-        (item1.id === 'pictogram' && item2.id === 'separator') ||
-        (item1.id === 'separator' && item2.id === 'pictogram')
-      ) {
-        return style.spacing.separatorGap * module;
-      }
-      
-      if (
-        (item1.id === 'logo' && item2.id === 'text') ||
-        (item1.id === 'text' && item2.id === 'logo')
-      ) {
-        return style.spacing.logoGap * module;
-      }
-      
-      if (item1.id === 'arrow' || item2.id === 'arrow') {
-        return style.spacing.arrowGap * module;
-      }
-      
-      return style.spacing.defaultGap * module;
-    };
-
-    const measureClusterWidth = (items: LayoutItem[], style: SignStyle): number => {
-      if (items.length === 0) return 0;
-      let totalWidth = items[0].width;
-      for (let i = 1; i < items.length; i++) {
-        const gap = getClusterInternalGap(items[i - 1], items[i], style);
-        totalWidth += gap + items[i].width;
-      }
-      return totalWidth;
-    };
-
-    const layoutClusterItems = (items: LayoutItem[], startX: number, style: SignStyle): { [key: string]: number } => {
-      const positions: { [key: string]: number } = {};
-      if (items.length === 0) return positions;
-      
-      let currentX = startX;
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (i > 0) {
-          currentX += getClusterInternalGap(items[i - 1], item, style);
-        }
-        
-        if (item.id === 'pictogram' || item.id === 'arrow' || item.id === 'logo') {
-          positions[item.id] = currentX + item.width / 2;
-        } else if (item.id === 'separator' || item.id === 'text') {
-          positions[item.id] = currentX;
-        }
-        currentX += item.width;
-      }
-      return positions;
-    };
+    const hasRightPic = isPicActive && picPosition === 'right';
+    const hasRightArrow = isArrowActive && targetArrowPos === 'right';
+    const rightTilesWidth = (hasRightPic ? (PICTOGRAM_TILE * activePicScale) : 0) + (hasRightArrow ? (ARROW_TILE * activeArrowScale) : 0);
 
     let effectiveTextSize = selectedTextSize;
     let effectiveFs = plankTextSize * (effectiveTextSize / 52);
     let layoutOverflow = false;
 
-    while (effectiveTextSize >= style.minimumTextSize) {
+    const outerMargin = (style.spacing?.outerMargin ?? 0.1) * u;
+
+    let hasCollision = true;
+    let textWidth = 0;
+    let textBlockWidth = 0;
+    let textClusterStartX = 0;
+
+    // Component Bounds and Gaps based on physical u unit:
+    const leftBound = outerMargin + leftTilesWidth;
+    const rightBound = W - outerMargin - rightTilesWidth;
+
+    // Word Space (u) is to be inserted between text and any other component or empty ends
+    const leftBoundPlusGap = leftBound + u;
+    const rightBoundMinusGap = rightBound - u;
+    const availableTextWidth = rightBoundMinusGap - leftBoundPlusGap;
+
+    let firstIteration = true;
+    while (effectiveTextSize >= style.minimumTextSize || firstIteration) {
+      firstIteration = false;
       effectiveFs = plankTextSize * (effectiveTextSize / 52);
-
-      const spec = {
-        textLine,
-        W,
-        effectiveTextSize,
-        activeLogoScale,
-        activeDasSize,
-        activeArrowScale,
-        activePicScale,
-        logoType,
-        showSeparator,
-        picPosition,
-        arrowPosition,
-        lastArrowPosition,
-        logoPosition,
-        plankTextSize,
-        letterSpacing,
-        plankPicSize,
-        plankArrowSize,
-        textAlign,
-        dasRedOnWhiteScale
-      };
-
-      const clusters = buildClusters(spec, style);
+      textWidth = estimateTextWidth(toSentenceCase(textLine), effectiveFs, letterSpacing, plankFontWeight);
       
-      const leftClusterWidth = measureClusterWidth(clusters.leftItems, style);
-      const textClusterWidth = measureClusterWidth(clusters.textItems, style);
-      const rightClusterWidth = measureClusterWidth(clusters.rightItems, style);
-
-      let textClusterStartX = 0;
-      let leftClusterStartX = 0;
-      let rightClusterStartX = 0;
-
-      const outerMargin = style.spacing.outerMargin * style.module;
-      const defaultGapLimit = style.spacing.defaultGap * style.module;
-      const textGapLimit = (style.spacing.textGap !== undefined ? style.spacing.textGap : style.spacing.defaultGap) * style.module;
-
-      if (clusters.leftItems.length > 0) {
-        leftClusterStartX = outerMargin;
-      }
-      
-      if (clusters.rightItems.length > 0) {
-        rightClusterStartX = W - outerMargin - rightClusterWidth;
-      } else {
-        rightClusterStartX = W - outerMargin;
-      }
+      // Word Space (u) inside text cluster if logo is present
+      textBlockWidth = textWidth + (isLogoActive ? (DAS_ZONE + u) : 0);
 
       if (textAlign === 'left') {
-        textClusterStartX = clusters.leftItems.length > 0 ? (outerMargin + leftClusterWidth + textGapLimit) : outerMargin;
+        textClusterStartX = leftBoundPlusGap;
       } else if (textAlign === 'right') {
-        const textClusterEndX = clusters.rightItems.length > 0 ? (rightClusterStartX - textGapLimit) : (W - outerMargin);
-        textClusterStartX = textClusterEndX - textClusterWidth;
+        textClusterStartX = rightBoundMinusGap - textBlockWidth;
       } else {
-        // Center
-        textClusterStartX = (W / 2) - (textClusterWidth / 2);
+        // Center text container within available space
+        textClusterStartX = leftBoundPlusGap + (availableTextWidth - textBlockWidth) / 2;
       }
 
-      // Check Collision
-      let hasCollision = false;
-      
-      const leftBound = clusters.leftItems.length > 0 ? (outerMargin + leftClusterWidth + textGapLimit) : outerMargin;
-      if (textClusterStartX < leftBound) {
-        hasCollision = true;
-      }
-
-      const rightBound = clusters.rightItems.length > 0 ? (rightClusterStartX - textGapLimit) : (W - outerMargin);
-      if (textClusterStartX + textClusterWidth > rightBound) {
-        hasCollision = true;
-      }
-
-      const isSepActive = clusters.isSepActive;
-      const isPicActive = clusters.isPicActive;
-      const isArrowActive = clusters.isArrowActive;
-      const isLogoActive = clusters.isLogoActive;
+      // Check collision
+      hasCollision = (textBlockWidth > availableTextWidth) || 
+                     (textClusterStartX < leftBoundPlusGap) || 
+                     (textClusterStartX + textBlockWidth > rightBoundMinusGap);
 
       if (!hasCollision || effectiveTextSize <= style.minimumTextSize) {
         if (hasCollision && effectiveTextSize <= style.minimumTextSize) {
           layoutOverflow = true;
         }
-
-        const leftPositions = layoutClusterItems(clusters.leftItems, leftClusterStartX, style);
-        const rightPositions = layoutClusterItems(clusters.rightItems, rightClusterStartX, style);
-        const textPositions = layoutClusterItems(clusters.textItems, textClusterStartX, style);
-
-        const picX = picPosition === 'left' ? (leftPositions['pictogram'] ?? 0) : (rightPositions['pictogram'] ?? 0);
-        const sepX = picPosition === 'left' ? (leftPositions['separator'] ?? 0) : (rightPositions['separator'] ?? 0);
-        const arrowX = (arrowPosition === 'none' ? lastArrowPosition : arrowPosition) === 'left' ? (leftPositions['arrow'] ?? 0) : (rightPositions['arrow'] ?? 0);
-        const logoX = textPositions['logo'] ?? 0;
-        
-        let textX = 0;
-        let textAnchor = "start";
-
-        const textWidth = clusters.textWidth;
-
-        if (isLogoActive) {
-          textX = textPositions['text'] ?? 0;
-          textAnchor = "start";
-        } else {
-          if (textAlign === 'left') {
-            textX = textPositions['text'] ?? 0;
-            textAnchor = "start";
-          } else if (textAlign === 'right') {
-            textX = (textPositions['text'] ?? 0) + textWidth;
-            textAnchor = "end";
-          } else {
-            textX = (textPositions['text'] ?? 0) + textWidth / 2;
-            textAnchor = "middle";
-          }
-        }
-
-        return {
-          picX,
-          sepX,
-          arrowX,
-          logoX,
-          textX,
-          textAnchor,
-          isPicActive,
-          isSepActive,
-          isArrowActive,
-          isLogoActive,
-          effectiveFs: clusters.effectiveFs,
-          effectiveTextSize,
-          layoutOverflow
-        };
+        break;
       }
 
       effectiveTextSize -= 1.0;
     }
 
+    // Centered placement coordinates
+    const picW = isPicActive ? (PICTOGRAM_TILE * activePicScale) : 0;
+    const arrowW = isArrowActive ? (ARROW_TILE * activeArrowScale) : 0;
+
+    const picX = hasLeftPic 
+      ? (outerMargin + picW / 2) 
+      : hasRightPic 
+        ? (W - outerMargin - picW / 2) 
+        : 0;
+
+    const sepX = (hasLeftPic && showSeparator)
+      ? (outerMargin + picW)
+      : (hasRightPic && showSeparator)
+        ? (W - outerMargin - picW)
+        : 0;
+
+    const arrowX = hasLeftArrow
+      ? (hasLeftPic ? (outerMargin + picW + arrowW / 2) : (outerMargin + arrowW / 2))
+      : hasRightArrow
+        ? (hasRightPic ? (W - outerMargin - picW - arrowW / 2) : (W - outerMargin - arrowW / 2))
+        : 0;
+
+    // Logo and text alignments in the dynamic compositor
+    let logoX = 0;
+    let textX = 0;
+    let textAnchor = "start";
+
+    if (isLogoActive) {
+      if (logoPosition === 'left') {
+        logoX = textClusterStartX + (DAS_ZONE / 2);
+        textX = textClusterStartX + DAS_ZONE + u;
+        textAnchor = "start";
+      } else {
+        textX = textClusterStartX + textWidth;
+        logoX = textClusterStartX + textWidth + u + (DAS_ZONE / 2);
+        textAnchor = "end";
+      }
+    } else {
+      if (textAlign === 'left') {
+        textX = textClusterStartX;
+        textAnchor = "start";
+      } else if (textAlign === 'right') {
+        textX = textClusterStartX + textWidth;
+        textAnchor = "end";
+      } else {
+        textX = textClusterStartX + textWidth / 2;
+        textAnchor = "middle";
+      }
+    }
+
     return {
-      picX: 0,
-      sepX: 0,
-      arrowX: 0,
-      logoX: 0,
-      textX: W / 2,
-      textAnchor: "middle",
-      isPicActive: activePicScale > 0.005,
-      isSepActive: activePicScale > 0.005 && showSeparator,
-      isArrowActive: activeArrowScale > 0.005,
-      isLogoActive: logoType !== 'none' && activeLogoScale > 0.005,
+      picX,
+      sepX,
+      arrowX,
+      logoX,
+      textX,
+      textAnchor,
+      isPicActive,
+      isSepActive: hasLeftPic ? (hasLeftPic && showSeparator) : (hasRightPic && showSeparator),
+      isArrowActive,
+      isLogoActive,
       effectiveFs,
-      effectiveTextSize: style.minimumTextSize,
-      layoutOverflow: true
+      effectiveTextSize,
+      layoutOverflow,
+      leftBound,
+      rightBound
     };
   };
 
   // Helper to adjust DAS sizing and spacing presets atomically when logoType or logoPosition changes
   const updateDasPresets = (type: string, position: 'left' | 'right', paramsOverride?: typeof customDasParams) => {
-    if (type === 'red-on-white' || type === 'red-ruled-red' || type === 'red-ruled-black') {
+    if (type !== 'none') {
       setDasBaseSize(18.0);
       setDasSpacingMultiplier(0.48);
       setDasRedOnWhiteScale(1.3);
@@ -1491,50 +1313,7 @@ export default function RailAlphabetTypewriter() {
         setDasLeftSpacingOffset(2.5);
         setDasLeftPadding(5.0);
       }
-    } else if (type === 'custom-geometry') {
-      const activeParams = paramsOverride !== undefined ? paramsOverride : customDasParams;
-      const backIndex = activeParams?.backgroundColourIndex ?? 4;
-      const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
-      const isWhiteBg = bgVal.toLowerCase() === '#ffffff';
-
-      if (isWhiteBg) {
-        setDasBaseSize(18.0);
-        setDasSpacingMultiplier(0.48);
-        setDasRedOnWhiteScale(1.3);
-        setDasVerticalOffset(0.0);
-        if (position === 'right') {
-          setDasRightSpacingOffset(16.0);
-          setDasRightPadding(9.0);
-        } else {
-          setDasLeftSpacingOffset(2.5);
-          setDasLeftPadding(5.0);
-        }
-      } else {
-        setDasBaseSize(18.0);
-        setDasSpacingMultiplier(0.48);
-        setDasRedOnWhiteScale(1.3);
-        setDasVerticalOffset(0.0);
-        if (position === 'right') {
-          setDasRightSpacingOffset(20.5);
-          setDasRightPadding(13.0);
-        } else {
-          setDasLeftSpacingOffset(7.5);
-          setDasLeftPadding(5.0);
-        }
-      }
-    } else if (type !== 'none') {
-      setDasBaseSize(18.0);
-      setDasSpacingMultiplier(0.48);
-      setDasVerticalOffset(0.4);
-      if (position === 'right') {
-        setDasRightSpacingOffset(20.5);
-        setDasRightPadding(13.0);
-      } else {
-        setDasLeftSpacingOffset(7.5);
-        setDasLeftPadding(5.0);
-      }
     }
-    setGapLogoText(21.0);
   };
 
   // Dynamic Spacing / Carousel Developer controls with smart responsive default states:
@@ -1751,23 +1530,46 @@ export default function RailAlphabetTypewriter() {
              (code === 247);
     }).join('');
 
-    // Check if we are growing the text size
-    if (filteredVal.length > typedText.length) {
-      const prospectiveLines = getPlankLines(filteredVal);
-      let prospectiveOverflow = false;
+    // If deleting or keeping same length, always allow
+    if (filteredVal.length <= typedText.length) {
+      setTypedText(filteredVal);
+      setSelectedPresetName('custom');
+      return;
+    }
+
+    // Now we are growing the text field.
+    // If the CURRENT state is already overflowing, block further key additions
+    if (isCurrentLayoutOverflowing) {
+      return;
+    }
+
+    // Determine the safe prefix that can be typed or pasted.
+    // We allow pasting up to the point of a single character overflow, so the user 
+    // gets the warning and the red border feedback, and further input gets arrested.
+    let allowedVal = typedText;
+    for (let i = typedText.length + 1; i <= filteredVal.length; i++) {
+      const prefix = filteredVal.slice(0, i);
+      const prospectiveLines = getPlankLines(prefix);
+      let wouldOverflow = false;
       for (const textLine of prospectiveLines) {
         const layout = solveLayout(textLine, targetW, textSize, smoothLogoScale, smoothDasSize, smoothArrowScale, smoothPicScale, currentStyle);
         if (layout.layoutOverflow) {
-          prospectiveOverflow = true;
+          wouldOverflow = true;
           break;
         }
       }
-      if (prospectiveOverflow) {
-        return;
+
+      if (wouldOverflow) {
+        // This prefix overflows. We allow exactly this prefix (with 1 character overflowing)
+        // so that the warning message and red border appear, and further characters are blocked.
+        allowedVal = prefix;
+        break;
+      } else {
+        allowedVal = prefix;
       }
     }
 
-    setTypedText(filteredVal);
+    setTypedText(allowedVal);
     setSelectedPresetName('custom');
   };
 
@@ -1784,7 +1586,7 @@ export default function RailAlphabetTypewriter() {
     setPicPosition('left');
     setShowSeparator(true);
     setLetterSpacing(0.00);
-    setTextSize(52);
+    setTextSize(49);
     setTextAlign('left');
     setSelectedPresetName('Telephones');
     setLastPresetInfo({
@@ -1793,6 +1595,13 @@ export default function RailAlphabetTypewriter() {
     });
     setSignageResetTop(7);
     setSignageResetRight(7);
+  };
+
+  const handleAddPicType = (newPic: string) => {
+    if (picType === 'none' && newPic !== 'none') {
+      setShowSeparator(true);
+    }
+    setPicType(newPic);
   };
 
   const handleDownloadCSV = () => {
@@ -1854,56 +1663,27 @@ export default function RailAlphabetTypewriter() {
       textAlign,
       
       // Compositor variables (ACTIVE)
-      compositorModule,
+      compositorUnit,
       compositorOuterMargin,
-      compositorDefaultGap,
-      compositorLogoGap,
-      compositorArrowGap,
-      compositorSeparatorGap,
-      compositorTextGap,
       compositorMinimumTextSize,
       
-      // Geometry variables
-      layoutPaddingLeft,
-      layoutPaddingRight,
-      minimumSafetyGap,
-      gapPicSep,
-      gapSepAny,
-      gapLogoText,
-      gapTextArrow,
-      gapDefault,
-      
       // Plank size guides
-      plankPicLeft,
-      plankPicRight,
-      plankPicY,
-      plankPicSize,
-      
-      plankArrowLeft,
-      plankArrowRight,
-      plankArrowY,
-      plankArrowSize,
-      
       plankLogoY,
+      plankPicY,
+      plankArrowY,
       plankTextYFirstLine,
-      plankTextYSecondLine,
-      plankTextLeft,
-      plankTextRight,
-      plankTextWithElementLeft,
-      plankTextWithElementRight,
-      plankTextWithBothLeft,
-      plankTextWithBothRight,
-      plankTextWithPicLeft,
-      plankTextWithPicRight,
       plankTextSize,
+      plankFontWeight,
       
-      dasBaseSize,
+       dasBaseSize,
       dasLeftSpacingOffset,
       dasRightSpacingOffset,
       dasVerticalOffset,
       customDasSizeMultiplier,
+      customDasSizeMultiplierNonWhite,
       customDasXOffset,
       customDasYOffset,
+      customDasYOffsetNonWhite,
       customDasParams
     };
 
@@ -1939,56 +1719,26 @@ export default function RailAlphabetTypewriter() {
       if (config.textAlign !== undefined) setTextAlign(config.textAlign);
 
       // Compositor variables (ACTIVE)
-      if (config.compositorModule !== undefined) setCompositorModule(config.compositorModule);
+      if (config.compositorUnit !== undefined) setCompositorUnit(config.compositorUnit);
       if (config.compositorOuterMargin !== undefined) setCompositorOuterMargin(config.compositorOuterMargin);
-      if (config.compositorDefaultGap !== undefined) setCompositorDefaultGap(config.compositorDefaultGap);
-      if (config.compositorLogoGap !== undefined) setCompositorLogoGap(config.compositorLogoGap);
-      if (config.compositorArrowGap !== undefined) setCompositorArrowGap(config.compositorArrowGap);
-      if (config.compositorSeparatorGap !== undefined) setCompositorSeparatorGap(config.compositorSeparatorGap);
-      if (config.compositorTextGap !== undefined) setCompositorTextGap(config.compositorTextGap);
       if (config.compositorMinimumTextSize !== undefined) setCompositorMinimumTextSize(config.compositorMinimumTextSize);
 
-      // Geometry variables
-      if (config.layoutPaddingLeft !== undefined) setLayoutPaddingLeft(config.layoutPaddingLeft);
-      if (config.layoutPaddingRight !== undefined) setLayoutPaddingRight(config.layoutPaddingRight);
-      if (config.minimumSafetyGap !== undefined) setMinimumSafetyGap(config.minimumSafetyGap);
-      if (config.gapPicSep !== undefined) setGapPicSep(config.gapPicSep);
-      if (config.gapSepAny !== undefined) setGapSepAny(config.gapSepAny);
-      if (config.gapLogoText !== undefined) setGapLogoText(config.gapLogoText);
-      if (config.gapTextArrow !== undefined) setGapTextArrow(config.gapTextArrow);
-      if (config.gapDefault !== undefined) setGapDefault(config.gapDefault);
-
-      // Plank sizes
-      if (config.plankPicLeft !== undefined) setPlankPicLeft(config.plankPicLeft);
-      if (config.plankPicRight !== undefined) setPlankPicRight(config.plankPicRight);
-      if (config.plankPicY !== undefined) setPlankPicY(config.plankPicY);
-      if (config.plankPicSize !== undefined) setPlankPicSize(config.plankPicSize);
-
-      if (config.plankArrowLeft !== undefined) setPlankArrowLeft(config.plankArrowLeft);
-      if (config.plankArrowRight !== undefined) setPlankArrowRight(config.plankArrowRight);
-      if (config.plankArrowY !== undefined) setPlankArrowY(config.plankArrowY);
-      if (config.plankArrowSize !== undefined) setPlankArrowSize(config.plankArrowSize);
-
       if (config.plankLogoY !== undefined) setPlankLogoY(config.plankLogoY);
+      if (config.plankPicY !== undefined) setPlankPicY(config.plankPicY);
+      if (config.plankArrowY !== undefined) setPlankArrowY(config.plankArrowY);
       if (config.plankTextYFirstLine !== undefined) setPlankTextYFirstLine(config.plankTextYFirstLine);
-      if (config.plankTextYSecondLine !== undefined) setPlankTextYSecondLine(config.plankTextYSecondLine);
-      if (config.plankTextLeft !== undefined) setPlankTextLeft(config.plankTextLeft);
-      if (config.plankTextRight !== undefined) setPlankTextRight(config.plankTextRight);
-      if (config.plankTextWithElementLeft !== undefined) setPlankTextWithElementLeft(config.plankTextWithElementLeft);
-      if (config.plankTextWithElementRight !== undefined) setPlankTextWithElementRight(config.plankTextWithElementRight);
-      if (config.plankTextWithBothLeft !== undefined) setPlankTextWithBothLeft(config.plankTextWithBothLeft);
-      if (config.plankTextWithBothRight !== undefined) setPlankTextWithBothRight(config.plankTextWithBothRight);
-      if (config.plankTextWithPicLeft !== undefined) setPlankTextWithPicLeft(config.plankTextWithPicLeft);
-      if (config.plankTextWithPicRight !== undefined) setPlankTextWithPicRight(config.plankTextWithPicRight);
       if (config.plankTextSize !== undefined) setPlankTextSize(config.plankTextSize);
+      if (config.plankFontWeight !== undefined) setPlankFontWeight(config.plankFontWeight);
 
       if (config.dasBaseSize !== undefined) setDasBaseSize(config.dasBaseSize);
       if (config.dasLeftSpacingOffset !== undefined) setDasLeftSpacingOffset(config.dasLeftSpacingOffset);
       if (config.dasRightSpacingOffset !== undefined) setDasRightSpacingOffset(config.dasRightSpacingOffset);
       if (config.dasVerticalOffset !== undefined) setDasVerticalOffset(config.dasVerticalOffset);
       if (config.customDasSizeMultiplier !== undefined) setCustomDasSizeMultiplier(config.customDasSizeMultiplier);
+      if (config.customDasSizeMultiplierNonWhite !== undefined) setCustomDasSizeMultiplierNonWhite(config.customDasSizeMultiplierNonWhite);
       if (config.customDasXOffset !== undefined) setCustomDasXOffset(config.customDasXOffset);
       if (config.customDasYOffset !== undefined) setCustomDasYOffset(config.customDasYOffset);
+      if (config.customDasYOffsetNonWhite !== undefined) setCustomDasYOffsetNonWhite(config.customDasYOffsetNonWhite);
       if (config.customDasParams !== undefined) setCustomDasParams(config.customDasParams);
 
       setSelectedPresetName('custom');
@@ -2076,7 +1826,7 @@ export default function RailAlphabetTypewriter() {
   };
 
   const renderPlankSvg = (textLine: string, isSecondPlank: boolean) => {
-    const W = targetW;
+    const W = smoothW;
     const layout = solveLayout(textLine, W, textSize, smoothLogoScale, smoothDasSize, smoothArrowScale, smoothPicScale, currentStyle);
 
     let plankBg = "#FFFFFF";
@@ -2105,16 +1855,22 @@ export default function RailAlphabetTypewriter() {
     const picY = plankPicY;
     const arrowY = plankArrowY;
     const logoY = plankLogoY + smoothDasVerticalOffset;
-    const textY = isSecondPlank ? plankTextYSecondLine : plankTextYFirstLine;
+    const textY = plankTextYFirstLine;
 
     // Logo size
     let activeLogoSize = smoothDasSize * smoothLogoScale;
-    if (logoType === 'red-on-white' || logoType === 'custom-geometry') {
+    const isCustom = logoType === 'custom-geometry';
+    const backIndex = customDasParams?.backgroundColourIndex ?? 4;
+    const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
+    const isCustomWhiteBg = bgVal.toLowerCase() === '#ffffff';
+    const shouldScaleUp = logoType === 'red-on-white' || (isCustom && isCustomWhiteBg);
+    if (shouldScaleUp) {
       activeLogoSize = activeLogoSize * dasRedOnWhiteScale;
     }
 
     // Pic glyph code lookup
-    const glyphCode = /^\d+$/.test(picType) ? parseInt(picType) : (GLYPH_MAP[picType] || 201);
+    const activePicForGlyph = picType !== 'none' ? picType : lastPicType;
+    const glyphCode = /^\d+$/.test(activePicForGlyph) ? parseInt(activePicForGlyph) : (GLYPH_MAP[activePicForGlyph] || 201);
 
     return (
       <svg
@@ -2130,10 +1886,10 @@ export default function RailAlphabetTypewriter() {
         }}
       >
         <rect
-          x="0.5"
-          y="0.5"
-          width={W - 1}
-          height="23"
+          x="0.25"
+          y="0.25"
+          width={W - 0.5}
+          height="23.5"
           fill="none"
           stroke={borderStroke}
           strokeWidth="0.5"
@@ -2145,7 +1901,7 @@ export default function RailAlphabetTypewriter() {
             y={picY}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize={plankPicSize}
+            fontSize={17.3}
             style={{
               fontFamily: "'Brsign', 'Geist', sans-serif",
               fontWeight: 'normal',
@@ -2172,7 +1928,36 @@ export default function RailAlphabetTypewriter() {
           />
         )}
 
-        {layout.isLogoActive && renderDasLogo(layout.logoX, logoY, activeLogoSize, `das-logo-${isSecondPlank ? '2' : '1'}`)}
+        <defs>
+          <clipPath id={`text-clip-${isSecondPlank ? '2' : '1'}`}>
+            <rect
+              x={layout.leftBound}
+              y="0"
+              width={Math.max(0, layout.rightBound - layout.leftBound)}
+              height="24"
+            />
+          </clipPath>
+        </defs>
+
+        <g clipPath={`url(#text-clip-${isSecondPlank ? '2' : '1'})`}>
+          {layout.isLogoActive && renderDasLogo(layout.logoX, logoY, activeLogoSize, `das-logo-${isSecondPlank ? '2' : '1'}`)}
+
+          <text
+            x={layout.textX}
+            y={textY}
+            textAnchor={layout.textAnchor}
+            dominantBaseline="central"
+            fontSize={layout.effectiveFs}
+            style={{
+              fontFamily: "'Brsign', 'Geist', sans-serif",
+              fontWeight: plankFontWeight,
+              letterSpacing: `${letterSpacing}em`,
+              fill: contentColor,
+            }}
+          >
+            {toSentenceCase(textLine)}
+          </text>
+        </g>
 
         {layout.isArrowActive && (
           <text
@@ -2180,7 +1965,7 @@ export default function RailAlphabetTypewriter() {
             y={arrowY}
             textAnchor="middle"
             dominantBaseline="central"
-            fontSize={plankArrowSize}
+            fontSize={17.3}
             style={{
               fontFamily: "'Brsign', sans-serif",
               fontWeight: 'normal',
@@ -2192,22 +1977,6 @@ export default function RailAlphabetTypewriter() {
             {String.fromCharCode(DIRECTION_CHAR_CODES[direction] || 194)}
           </text>
         )}
-
-        <text
-          x={layout.textX}
-          y={textY}
-          textAnchor={layout.textAnchor}
-          dominantBaseline="central"
-          fontSize={layout.effectiveFs}
-          style={{
-            fontFamily: "'Brsign', 'Geist', sans-serif",
-            fontWeight: 700,
-            letterSpacing: `${letterSpacing}em`,
-            fill: contentColor,
-          }}
-        >
-          {toSentenceCase(textLine)}
-        </text>
       </svg>
     );
   };
@@ -2217,14 +1986,21 @@ export default function RailAlphabetTypewriter() {
   // Helper to draw the double arrow symbol plates with the correct visual styles
   const renderDasLogo = (cx: number, cy: number, size: number, key: string) => {
     const isCustom = logoType === 'custom-geometry';
-      const activeSize = isCustom ? size * customDasSizeMultiplier : size;
-      const finalCx = isCustom ? cx + customDasXOffset : cx;
-      const finalCy = isCustom ? cy + customDasYOffset : cy;
-      const pW = activeSize * 1.6;
-      const pH = activeSize * 1.05;
-      const px = finalCx - pW / 2;
-      const py = finalCy - pH / 2;
-      const textFontSize = activeSize * 0.72;
+    const backIndex = customDasParams?.backgroundColourIndex ?? 4;
+    const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
+    const isCustomWhiteBg = bgVal.toLowerCase() === '#ffffff';
+
+    const activeSizeMultiplier = isCustomWhiteBg ? customDasSizeMultiplier : customDasSizeMultiplierNonWhite;
+    const activeYOffset = isCustomWhiteBg ? customDasYOffset : customDasYOffsetNonWhite;
+
+    const activeSize = isCustom ? size * activeSizeMultiplier : size;
+    const finalCx = isCustom ? cx + customDasXOffset : cx;
+    const finalCy = isCustom ? cy + activeYOffset : cy;
+    const pW = activeSize * 1.6;
+    const pH = activeSize * 1.05;
+    const px = finalCx - pW / 2;
+    const py = finalCy - pH / 2;
+    const textFontSize = activeSize * 0.72;
       
       let bgFill = "#FFFFFF";
       let strokeColor = "none";
@@ -2495,19 +2271,26 @@ export default function RailAlphabetTypewriter() {
       const picY = plankPicY;
       const arrowY = plankArrowY;
       const logoY = plankLogoY + dasVerticalOffset;
-      const textY = isSecondLine ? plankTextYSecondLine : plankTextYFirstLine;
+      const textY = plankTextYFirstLine;
 
       let activeLogoSize = dasBaseSize;
-      if (logoType === 'red-on-white' || logoType === 'custom-geometry') {
+      const isCustom = logoType === 'custom-geometry';
+      const backIndex = customDasParams?.backgroundColourIndex ?? 4;
+      const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
+      const isCustomWhiteBg = bgVal.toLowerCase() === '#ffffff';
+      const shouldScaleUp = logoType === 'red-on-white' || (isCustom && isCustomWhiteBg);
+      if (shouldScaleUp) {
         activeLogoSize = activeLogoSize * dasRedOnWhiteScale;
       }
 
       let elementsSvg = "";
+      let dasSvg = "";
 
       if (layout.isPicActive) {
-        const glyphCode = /^\d+$/.test(picType) ? parseInt(picType) : (GLYPH_MAP[picType] || 207);
+        const activePicForGlyph = picType !== 'none' ? picType : lastPicType;
+        const glyphCode = /^\d+$/.test(activePicForGlyph) ? parseInt(activePicForGlyph) : (GLYPH_MAP[activePicForGlyph] || 207);
         elementsSvg += `
-          <text x="${layout.picX}" y="${picY}" text-anchor="middle" dominant-baseline="central" font-size="${plankPicSize}" font-family="'Brsign', 'Geist', sans-serif" fill="${contentColor}">${String.fromCharCode(glyphCode)}</text>
+          <text x="${layout.picX}" y="${picY}" text-anchor="middle" dominant-baseline="central" font-size="17.3" font-family="'Brsign', 'Geist', sans-serif" fill="${contentColor}">${String.fromCharCode(glyphCode)}</text>
         `;
         if (layout.isSepActive) {
           elementsSvg += `
@@ -2517,33 +2300,51 @@ export default function RailAlphabetTypewriter() {
       }
 
       if (layout.isLogoActive) {
-        elementsSvg += renderDasString(layout.logoX, logoY, activeLogoSize);
+        dasSvg = renderDasString(layout.logoX, logoY, activeLogoSize);
       }
 
       if (layout.isArrowActive) {
         elementsSvg += `
-          <text x="${layout.arrowX}" y="${arrowY}" text-anchor="middle" dominant-baseline="central" font-size="${plankArrowSize}" font-family="'Brsign', sans-serif" fill="${activeArrowColor}">${String.fromCharCode(DIRECTION_CHAR_CODES[direction] || 194)}</text>
+          <text x="${layout.arrowX}" y="${arrowY}" text-anchor="middle" dominant-baseline="central" font-size="17.3" font-family="'Brsign', sans-serif" fill="${activeArrowColor}">${String.fromCharCode(DIRECTION_CHAR_CODES[direction] || 194)}</text>
         `;
       }
 
+      const clipId = `text-clip-download-${isSecondLine ? "2" : "1"}`;
+      const clipWidth = Math.max(0, layout.rightBound - layout.leftBound);
+
       return `
         <g transform="translate(0, ${yOffset})">
+          <defs>
+            <clipPath id="${clipId}">
+              <rect x="${layout.leftBound}" y="0" width="${clipWidth}" height="24" />
+            </clipPath>
+          </defs>
           <!-- Background and Border -->
-          <rect x="0.5" y="0.5" width="${W - 1}" height="23" fill="${plankBg}" stroke="${borderStroke}" stroke-width="0.5" />
+          <rect x="0.25" y="0.25" width="${W - 0.5}" height="23.5" fill="${plankBg}" stroke="${borderStroke}" stroke-width="0.5" />
           
           ${elementsSvg}
 
-          <!-- Text -->
-          <text x="${layout.textX}" y="${textY}" text-anchor="${layout.textAnchor}" dominant-baseline="central" font-size="${layout.effectiveFs}" font-family="'Brsign', 'Geist', sans-serif" font-weight="700" letter-spacing="${letterSpacing}em" fill="${contentColor}">${toSentenceCase(textLine)}</text>
+          <g clip-path="url(#${clipId})">
+            ${dasSvg}
+            <!-- Text -->
+            <text x="${layout.textX}" y="${textY}" text-anchor="${layout.textAnchor}" dominant-baseline="central" font-size="${layout.effectiveFs}" font-family="'Brsign', 'Geist', sans-serif" font-weight="${plankFontWeight}" letter-spacing="${letterSpacing}em" fill="${contentColor}">${toSentenceCase(textLine)}</text>
+          </g>
         </g>
       `;
     };
 
     const renderDasString = (cx: number, cy: number, size: number) => {
         const isCustom = logoType === 'custom-geometry';
-        const activeSize = isCustom ? size * customDasSizeMultiplier : size;
+        const backIndex = customDasParams?.backgroundColourIndex ?? 4;
+        const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
+        const isCustomWhiteBg = bgVal.toLowerCase() === '#ffffff';
+
+        const activeSizeMultiplier = isCustomWhiteBg ? customDasSizeMultiplier : customDasSizeMultiplierNonWhite;
+        const activeYOffset = isCustomWhiteBg ? customDasYOffset : customDasYOffsetNonWhite;
+
+        const activeSize = isCustom ? size * activeSizeMultiplier : size;
         const finalCx = isCustom ? cx + customDasXOffset : cx;
-        const finalCy = isCustom ? cy + customDasYOffset : cy;
+        const finalCy = isCustom ? cy + activeYOffset : cy;
         const pW = activeSize * 1.6;
         const pH = activeSize * 1.05;
         const px = finalCx - pW / 2;
@@ -2748,10 +2549,10 @@ export default function RailAlphabetTypewriter() {
           </button>
 
           <div 
-            className="flex flex-col gap-[3px] shadow-lg select-all transition-all duration-500 ease-in-out"
+            className="flex flex-col gap-[3px] shadow-lg select-all"
             style={{ 
-              width: `${(targetW / 192) * 100}%`,
-              maxWidth: `${targetW * 4.5}px`
+              width: `${(smoothW / 192) * 100}%`,
+              maxWidth: `${smoothW * 4.5}px`
             }}
           >
             {lines.map((line, idx) => renderPlankSvg(line, idx === 1))}
@@ -2891,7 +2692,7 @@ export default function RailAlphabetTypewriter() {
                     </div>
 
                      {/* Text Input */}
-                    <div>
+                    <div className="relative">
                       <label className="block text-[10px] font-mono font-medium text-slate-400 uppercase tracking-wider mb-1">
                         SIGN TEXT
                       </label>
@@ -2900,11 +2701,11 @@ export default function RailAlphabetTypewriter() {
                           type="text"
                           value={typedText}
                           onChange={handleInputChange}
-                          maxLength={30}
+                          maxLength={120}
                           placeholder="Telephones"
                           className={`w-full bg-white border rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:ring-1 outline-none text-slate-850 transition-all font-sans tracking-wide h-9 ${
                             isCurrentLayoutOverflowing 
-                              ? 'border-red-500 ring-1 ring-red-500 focus:ring-red-500' 
+                              ? 'border-rose-600 ring-1 ring-rose-600/30 focus:ring-rose-600' 
                               : 'border-slate-200 focus:ring-rail-blue'
                           }`}
                         />
@@ -2922,8 +2723,8 @@ export default function RailAlphabetTypewriter() {
                         )}
                       </div>
                       {isCurrentLayoutOverflowing && (
-                        <p id="layout-overflow-warning" className="text-[10px] text-red-500 font-medium mt-1 leading-normal">
-                          ⚠️ No more characters can fit on the sign in its current state.
+                        <p id="layout-overflow-warning" className="absolute left-0 text-[10px] text-rose-600 font-semibold mt-1 leading-normal bg-white/95 backdrop-blur-xs px-2 py-0.5 rounded-lg shadow-sm border border-rose-100 z-10 w-max max-w-full">
+                          ⚠️ Maximum reached for this sign layout
                         </p>
                       )}
                     </div>
@@ -3014,9 +2815,9 @@ export default function RailAlphabetTypewriter() {
                     <SignageStyleSlider
                       label="Text Size"
                       value={textSize}
-                      min={24}
+                      min={18}
                       max={80}
-                      defaultValue={52}
+                      defaultValue={49}
                       displayValue={`${textSize}px`}
                       onChange={(val) => {
                         setTextSize(val);
@@ -3578,7 +3379,7 @@ export default function RailAlphabetTypewriter() {
                               key={`glyph-btn-${glyph.code}`}
                               type="button"
                               onClick={() => {
-                                setPicType(codeStr);
+                                handleAddPicType(codeStr);
                                 setSelectedPresetName('custom');
                               }}
                               className={`h-10 w-10 shrink-0 snap-start flex items-center justify-center rounded-xl border transition-all cursor-pointer ${
@@ -3622,7 +3423,7 @@ export default function RailAlphabetTypewriter() {
                             type="button"
                             onClick={() => {
                               setPicPosition('left');
-                              if (picType === 'none') setPicType(lastPicType);
+                              if (picType === 'none') handleAddPicType(lastPicType);
                               setSelectedPresetName('custom');
                             }}
                             className={`h-8 text-[10.5px] font-bold uppercase rounded-lg cursor-pointer transition flex items-center justify-center ${
@@ -3651,7 +3452,7 @@ export default function RailAlphabetTypewriter() {
                             type="button"
                             onClick={() => {
                               setPicPosition('right');
-                              if (picType === 'none') setPicType(lastPicType);
+                              if (picType === 'none') handleAddPicType(lastPicType);
                               setSelectedPresetName('custom');
                             }}
                             className={`h-8 text-[10.5px] font-bold uppercase rounded-lg cursor-pointer transition flex items-center justify-center ${
@@ -3710,7 +3511,7 @@ export default function RailAlphabetTypewriter() {
               {/* Card 6: BR Sign Compositor Engine Spacing & Grid */}
               <div 
                 id="weighted-layout-engine-card" 
-                className="min-h-[245px] sm:min-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-y-auto"
+                className="min-h-[245px] sm:min-h-[250px] max-h-[245px] sm:max-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-hidden"
                 style={{ width: 'var(--card-final-width)' }}
               >
                 <div>
@@ -3721,59 +3522,48 @@ export default function RailAlphabetTypewriter() {
                     </div>
                   </div>
 
-                  <div className="bg-sky-500/10 border border-sky-500/20 rounded-lg p-2 mb-2 text-[10px] text-sky-300 leading-normal">
-                    ⚙️ Adjust BR module spacing constants in real-time.
-                  </div>
-
-                  <div className="space-y-3 max-h-[140px] pr-1 overflow-y-auto text-xs" style={{ scrollbarWidth: 'thin' }}>
+                  <div className="space-y-2.5 max-h-[155px] sm:max-h-[160px] pr-1 overflow-y-auto text-xs" style={{ scrollbarWidth: 'thin' }}>
                     {/* Primary Spacing & Grid config */}
                     <div>
-                      <div className="text-[10px] font-bold text-sky-300 uppercase tracking-wider mb-1 px-1 border-l-2 border-sky-400">Grid Base Module</div>
+                      <div className="text-[10px] font-bold text-sky-300 uppercase tracking-wider mb-1 px-1 border-l-2 border-sky-400 font-mono">Layout Base Unit (u)</div>
                       <div className="grid grid-cols-2 gap-2 mb-1.5">
                         <div className="col-span-2">
-                          <label className="block text-[8px] font-mono text-slate-200">Module Grid Unit ({compositorModule} px)</label>
-                          <input type="range" min="10" max="40" step="1" value={compositorModule} onChange={(e) => { setCompositorModule(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
+                          <label className="block text-[8px] font-mono text-slate-200">Base Unit (1u = {compositorUnit} px)</label>
+                          <input type="range" min="1" max="40" step="1" value={compositorUnit} onChange={(e) => { setCompositorUnit(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-[10px] font-bold text-sky-300 uppercase tracking-wider mb-1 px-1 border-l-2 border-sky-400">Spacing Modifiers (Modules)</div>
+                      <div className="text-[10px] font-bold text-sky-300 uppercase tracking-wider mb-1 px-1 border-l-2 border-sky-400 font-mono">Spacing & Limits</div>
                       <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
                         <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Outer Margin ({compositorOuterMargin} M)</label>
+                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Outer Margin ({compositorOuterMargin} u)</label>
                           <input type="range" min="0" max="3" step="0.05" value={compositorOuterMargin} onChange={(e) => { setCompositorOuterMargin(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorOuterMargin * compositorModule} px</span>
+                          <span className="text-[7.5px] text-slate-400 block leading-tight mt-0.5">{(compositorOuterMargin * compositorUnit).toFixed(1)} px</span>
                         </div>
                         <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Default Element Gap ({compositorDefaultGap} M)</label>
-                          <input type="range" min="0" max="3" step="0.05" value={compositorDefaultGap} onChange={(e) => { setCompositorDefaultGap(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorDefaultGap * compositorModule} px</span>
+                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Auto-Shrink Limit ({compositorMinimumTextSize} px)</label>
+                          <input type="range" min="24" max="60" step="1" value={compositorMinimumTextSize} onChange={(e) => { setCompositorMinimumTextSize(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
+                          <span className="text-[7.5px] text-slate-400 block leading-tight mt-0.5">Min dynamic text reduction</span>
                         </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Logo Plate Gap ({compositorLogoGap} M)</label>
-                          <input type="range" min="0" max="3" step="0.05" value={compositorLogoGap} onChange={(e) => { setCompositorLogoGap(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorLogoGap * compositorModule} px</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] font-bold text-sky-300 uppercase tracking-wider mb-1 px-1 border-l-2 border-sky-400 font-mono">Architectural Constants (Derived)</div>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[8.5px] text-slate-300 font-mono">
+                        <div className="bg-slate-800/60 p-1.5 rounded border border-slate-800/40">
+                          <div className="text-[7px] text-slate-400 uppercase">Plank Height (6u)</div>
+                          <div className="font-bold text-slate-200">{6 * compositorUnit} px</div>
                         </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Arrow Gap ({compositorArrowGap} M)</label>
-                          <input type="range" min="0" max="3" step="0.05" value={compositorArrowGap} onChange={(e) => { setCompositorArrowGap(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorArrowGap * compositorModule} px</span>
+                        <div className="bg-slate-800/60 p-1.5 rounded border border-slate-800/40">
+                          <div className="text-[7px] text-slate-400 uppercase">Pic/Arrow (6u)</div>
+                          <div className="font-bold text-slate-200">{6 * compositorUnit} px</div>
                         </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Separator Gap ({compositorSeparatorGap} M)</label>
-                          <input type="range" min="0" max="3" step="0.05" value={compositorSeparatorGap} onChange={(e) => { setCompositorSeparatorGap(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorSeparatorGap * compositorModule} px</span>
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Text Gap ({compositorTextGap} M)</label>
-                          <input type="range" min="0" max="3" step="0.05" value={compositorTextGap} onChange={(e) => { setCompositorTextGap(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">{compositorTextGap * compositorModule} px</span>
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-200 font-bold">Auto-Shrink Limit ({compositorMinimumTextSize} pt)</label>
-                          <input type="range" min="4" max="20" step="1" value={compositorMinimumTextSize} onChange={(e) => { setCompositorMinimumTextSize(Number(e.target.value)); setSelectedPresetName('custom'); }} className="w-full h-1 accent-sky-400 bg-slate-800 rounded appearance-none cursor-pointer" />
-                          <span className="text-[7px] text-slate-400 block leading-tight mt-0.5">Min dynamic text reduction threshold</span>
+                        <div className="bg-slate-800/60 p-1.5 rounded border border-slate-800/40 col-span-2">
+                          <div className="text-[7px] text-slate-400 uppercase">Double Arrow Zone (11u)</div>
+                          <div className="font-bold text-slate-200">{11 * compositorUnit} px</div>
                         </div>
                       </div>
                     </div>
@@ -3786,14 +3576,9 @@ export default function RailAlphabetTypewriter() {
                   <button 
                     type="button"
                     onClick={() => {
-                      setCompositorModule(24);
-                      setCompositorOuterMargin(0.15);
-                      setCompositorDefaultGap(1.0);
-                      setCompositorLogoGap(0.25);
-                      setCompositorArrowGap(0.15);
-                      setCompositorSeparatorGap(0.15);
-                      setCompositorTextGap(0.5);
-                      setCompositorMinimumTextSize(8);
+                      setCompositorUnit(4);
+                      setCompositorOuterMargin(0.1);
+                      setCompositorMinimumTextSize(32);
                     }}
                     className="text-sky-400 hover:text-sky-300 font-bold uppercase underline cursor-pointer"
                   >
@@ -3805,7 +3590,7 @@ export default function RailAlphabetTypewriter() {
               {/* Card 7: Developer Layout Tuning */}
               <div 
                 id="developer-layout-tuning-card" 
-                className="min-h-[245px] sm:min-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans"
+                className="min-h-[245px] sm:min-h-[250px] max-h-[245px] sm:max-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-y-auto"
                 style={{ width: 'var(--card-final-width)' }}
               >
                 <div>
@@ -3988,7 +3773,7 @@ export default function RailAlphabetTypewriter() {
               {/* Card 8: Plank Details & Position Tuning */}
               <div 
                 id="plank-details-tuning-card" 
-                className="min-h-[245px] sm:min-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-y-auto"
+                className="min-h-[245px] sm:min-h-[250px] max-h-[245px] sm:max-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-hidden"
                 style={{ width: 'var(--card-final-width)' }}
               >
                 <div>
@@ -3999,91 +3784,13 @@ export default function RailAlphabetTypewriter() {
                     </div>
                   </div>
 
-                  <div className="space-y-3 max-h-[145px] pr-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
-                    {/* Pictograms Section */}
-                    <div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wilder mb-1 px-1 border-l-2 border-emerald-500">Pictograms</div>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Left Inset ({plankPicLeft}px)</label>
-                          <input 
-                            type="range" min="2" max="30" step="0.5" value={plankPicLeft} 
-                            onChange={(e) => { setPlankPicLeft(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Right Inset ({plankPicRight}px)</label>
-                          <input 
-                            type="range" min="2" max="30" step="0.5" value={plankPicRight} 
-                            onChange={(e) => { setPlankPicRight(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Top/Bot Y ({plankPicY}px)</label>
-                          <input 
-                            type="range" min="4" max="20" step="0.5" value={plankPicY} 
-                            onChange={(e) => { setPlankPicY(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Size ({plankPicSize}px)</label>
-                          <input 
-                            type="range" min="8" max="24" step="0.1" value={plankPicSize} 
-                            onChange={(e) => { setPlankPicSize(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Arrows Section */}
-                    <div>
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wilder mb-1 px-1 border-l-2 border-emerald-500">Arrows</div>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Left Inset ({plankArrowLeft}px)</label>
-                          <input 
-                            type="range" min="2" max="30" step="0.5" value={plankArrowLeft} 
-                            onChange={(e) => { setPlankArrowLeft(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Right Inset ({plankArrowRight}px)</label>
-                          <input 
-                            type="range" min="2" max="30" step="0.5" value={plankArrowRight} 
-                            onChange={(e) => { setPlankArrowRight(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Top/Bot Y ({plankArrowY}px)</label>
-                          <input 
-                            type="range" min="4" max="20" step="0.5" value={plankArrowY} 
-                            onChange={(e) => { setPlankArrowY(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Size ({plankArrowSize}px)</label>
-                          <input 
-                            type="range" min="8" max="24" step="0.1" value={plankArrowSize} 
-                            onChange={(e) => { setPlankArrowSize(Number(e.target.value)); setSelectedPresetName('custom'); }}
-                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Active Verticals & Font Size */}
+                  <div className="space-y-2.5 max-h-[155px] sm:max-h-[160px] pr-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                    {/* Verticals & Font Sizing */}
                     <div>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wilder mb-1 px-1 border-l-2 border-emerald-500">Verticals & Font Sizing</div>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                      <div className="grid grid-cols-2 gap-x-2.5 gap-y-1.5 text-xs">
                         <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Line 1 Y ({plankTextYFirstLine}px)</label>
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">Text Y Alignment ({plankTextYFirstLine}px)</label>
                           <input 
                             type="range" min="4" max="23" step="0.5" value={plankTextYFirstLine} 
                             onChange={(e) => { setPlankTextYFirstLine(Number(e.target.value)); setSelectedPresetName('custom'); }}
@@ -4091,18 +3798,34 @@ export default function RailAlphabetTypewriter() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Line 2 Y ({plankTextYSecondLine}px)</label>
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">Text Size ({plankTextSize}px)</label>
                           <input 
-                            type="range" min="4" max="23" step="0.5" value={plankTextYSecondLine} 
-                            onChange={(e) => { setPlankTextYSecondLine(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                            type="range" min="8" max="24" step="0.1" value={plankTextSize} 
+                            onChange={(e) => { setPlankTextSize(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">Pictograms Y ({plankPicY}px)</label>
+                          <input 
+                            type="range" min="4" max="20" step="0.5" value={plankPicY} 
+                            onChange={(e) => { setPlankPicY(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                            className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">Arrows Y ({plankArrowY}px)</label>
+                          <input 
+                            type="range" min="4" max="20" step="0.5" value={plankArrowY} 
+                            onChange={(e) => { setPlankArrowY(Number(e.target.value)); setSelectedPresetName('custom'); }}
                             className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
                           />
                         </div>
                         <div className="col-span-2">
-                          <label className="block text-[8px] font-mono text-slate-550 uppercase">Text Font Size ({plankTextSize}px)</label>
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">DAS Logo Y ({plankLogoY}px)</label>
                           <input 
-                            type="range" min="8" max="24" step="0.1" value={plankTextSize} 
-                            onChange={(e) => { setPlankTextSize(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                            type="range" min="4" max="20" step="0.5" value={plankLogoY} 
+                            onChange={(e) => { setPlankLogoY(Number(e.target.value)); setSelectedPresetName('custom'); }}
                             className="w-full accent-emerald-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
                           />
                         </div>
@@ -4117,25 +3840,12 @@ export default function RailAlphabetTypewriter() {
                   <button 
                     type="button"
                     onClick={() => {
-                      setPlankPicLeft(11.5);
-                      setPlankPicRight(11.5);
-                      setPlankPicY(11.5);
-                      setPlankPicSize(16.12);
-                      setPlankArrowLeft(12);
-                      setPlankArrowRight(12);
-                      setPlankArrowY(11.5);
-                      setPlankArrowSize(17.3);
-                      setPlankTextLeft(28);
-                      setPlankTextRight(28);
-                      setPlankTextWithElementLeft(27);
-                      setPlankTextWithElementRight(27);
-                      setPlankTextWithBothLeft(27);
-                      setPlankTextWithBothRight(27);
-                      setPlankTextWithPicLeft(28);
-                      setPlankTextWithPicRight(28);
                       setPlankTextYFirstLine(12);
-                      setPlankTextYSecondLine(12);
+                      setPlankPicY(11.5);
+                      setPlankArrowY(12);
+                      setPlankLogoY(11.5);
                       setPlankTextSize(17.1);
+                      setPlankFontWeight(700);
                       setSignageResetTop(7);
                       setSignageResetRight(7);
                     }}
@@ -4149,7 +3859,7 @@ export default function RailAlphabetTypewriter() {
               {/* Card 9: DAS Custom Tuning & Dev Tools */}
               <div 
                 id="das-custom-tuning-dev-card" 
-                className="min-h-[245px] sm:min-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-y-auto"
+                className="min-h-[245px] sm:min-h-[250px] max-h-[245px] sm:max-h-[250px] flex-shrink-0 snap-center bg-slate-900 text-slate-100 border border-slate-800 rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between font-sans overflow-hidden"
                 style={{ width: 'var(--card-final-width)' }}
               >
                 <div>
@@ -4160,7 +3870,7 @@ export default function RailAlphabetTypewriter() {
                     </div>
                   </div>
 
-                  <div className="space-y-3 max-h-[155px] pr-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                  <div className="space-y-2.5 max-h-[155px] sm:max-h-[160px] pr-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                     {/* Sizing Controls */}
                     <div>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 px-1 border-l-2 border-rose-500">Sizing Controls</div>
@@ -4194,6 +3904,73 @@ export default function RailAlphabetTypewriter() {
                           onChange={(e) => { setDasVerticalOffset(Number(e.target.value)); setSelectedPresetName('custom'); }}
                           className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
                         />
+                      </div>
+                    </div>
+
+                     {/* Font Weight & Geometry Selection */}
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 px-1 border-l-2 border-rose-500">Weight & Typography Geometry</div>
+                      <div>
+                        <div className="flex justify-between items-center mb-0.5">
+                          <label className="block text-[8px] font-mono text-slate-400 uppercase">Font Weight ({plankFontWeight})</label>
+                          <span className="text-[7.5px] text-slate-400 font-bold uppercase font-mono">
+                            {plankFontWeight === 700 ? 'Bold' : plankFontWeight < 700 ? 'Medium' : plankFontWeight < 850 ? 'Heavy' : 'Black'}
+                          </span>
+                        </div>
+                        <input 
+                          type="range" min="500" max="950" step="5" value={plankFontWeight} 
+                          onChange={(e) => { setPlankFontWeight(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                          className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Custom-Geometry DAS Controls */}
+                    <div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 border-l-2 border-rose-500">Custom Geometry DAS Controls</div>
+                      
+                      <div className="mb-2">
+                        <div className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest mb-1">On White Background</div>
+                        <div className="grid grid-cols-2 gap-x-2.5 gap-y-1 text-xs bg-slate-950/30 p-1.5 rounded-lg border border-slate-800/40">
+                          <div>
+                            <label className="block text-[8px] font-mono text-slate-400 uppercase">White BG Scale ({customDasSizeMultiplier.toFixed(2)}x)</label>
+                            <input 
+                              type="range" min="0.8" max="1.3" step="0.01" value={customDasSizeMultiplier} 
+                              onChange={(e) => { setCustomDasSizeMultiplier(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                              className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[8px] font-mono text-slate-400 uppercase">White BG Y Offset ({customDasYOffset > 0 ? `+${customDasYOffset.toFixed(1)}` : customDasYOffset.toFixed(1)}px)</label>
+                            <input 
+                              type="range" min="-4" max="4" step="0.1" value={customDasYOffset} 
+                              onChange={(e) => { setCustomDasYOffset(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                              className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="text-[7.5px] font-bold text-slate-500 uppercase tracking-widest mb-1">On Non-White Background</div>
+                        <div className="grid grid-cols-2 gap-x-2.5 gap-y-1 text-xs bg-slate-950/30 p-1.5 rounded-lg border border-slate-800/40">
+                          <div>
+                            <label className="block text-[8px] font-mono text-slate-400 uppercase">Coloured BG Scale ({customDasSizeMultiplierNonWhite.toFixed(2)}x)</label>
+                            <input 
+                              type="range" min="0.7" max="1.5" step="0.01" value={customDasSizeMultiplierNonWhite} 
+                              onChange={(e) => { setCustomDasSizeMultiplierNonWhite(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                              className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[8px] font-mono text-slate-400 uppercase">Coloured BG Y Offset ({customDasYOffsetNonWhite > 0 ? `+${customDasYOffsetNonWhite.toFixed(1)}` : customDasYOffsetNonWhite.toFixed(1)}px)</label>
+                            <input 
+                              type="range" min="-4" max="4" step="0.1" value={customDasYOffsetNonWhite} 
+                              onChange={(e) => { setCustomDasYOffsetNonWhite(Number(e.target.value)); setSelectedPresetName('custom'); }}
+                              className="w-full accent-rose-500 h-1 bg-slate-800 rounded appearance-none cursor-pointer"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -4236,6 +4013,8 @@ export default function RailAlphabetTypewriter() {
                     type="button"
                     onClick={() => {
                       updateDasPresets(logoType, logoPosition);
+                      setCustomDasSizeMultiplier(0.95);
+                      setCustomDasYOffset(0.0);
                     }}
                     className="text-rose-450 hover:text-rose-400 font-bold uppercase underline cursor-pointer"
                   >
