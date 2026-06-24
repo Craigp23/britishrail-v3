@@ -211,10 +211,14 @@ export default function DoubleArrowGeometry() {
   }, [sliderRight, sliderTopOffset, sliderHeightPct, sliderMaxHeightPx, showDevControls]);
 
   const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' && window.innerWidth < 640);
+  const [isMobilePortrait, setIsMobilePortrait] = useState<boolean>(
+    typeof window !== 'undefined' && window.innerWidth < 640 && window.innerHeight > window.innerWidth
+  );
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
+      setIsMobilePortrait(window.innerWidth < 640 && window.innerHeight > window.innerWidth);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -234,6 +238,12 @@ export default function DoubleArrowGeometry() {
 
   const foregroundColour = COLOUR_STOPS[foregroundColourIndex].value;
   const backgroundColour = COLOUR_STOPS[backgroundColourIndex].value;
+
+  // Dynamic responsive values for the vertical grid slider positioning
+  // When dev controls are closed, we apply the precise user-requested values automatically
+  const activeSliderRight = showDevControls ? sliderRight : (isMobilePortrait ? 5 : 16);
+  const activeSliderTopOffset = showDevControls ? sliderTopOffset : (isMobilePortrait ? 52 : 50);
+  const activeSliderHeightPct = showDevControls ? sliderHeightPct : (isMobilePortrait ? 90 : 70);
 
   const handleReset = () => {
     setStrokeWidth(13);
@@ -381,12 +391,12 @@ export default function DoubleArrowGeometry() {
           </button>
           {/* Centered Blueprint Canvas Wrapper to position the grid relative to the frame */}
           <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0 sm:pt-2 relative">
-            {/* Responsive wrapper matching the exact dimensions of the SVG to keep the vertical slider anchored consistently */}
-            <div className="relative h-full max-h-[155px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] flex items-center justify-center">
+            {/* The relative wrapper is inline-flex so its size is EXACTLY determined by the SVG inside it, guaranteeing consistent layout across viewports and orientations */}
+            <div className="relative inline-flex items-center justify-center">
               {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
               <svg 
                 viewBox="-10 -10.5 150 99" 
-                className="w-full h-full select-none relative z-10 overflow-hidden transition-all duration-300"
+                className="select-none relative z-10 overflow-hidden transition-all duration-300 block h-[135px] sm:h-[260px] w-auto"
                 style={{ 
                   overflow: 'hidden',
                   border: gridOpacity > 0 ? `1.5px solid ${thickStrokeColor}` : 'none',
@@ -462,22 +472,22 @@ export default function DoubleArrowGeometry() {
                   />
                 </g>
               </svg>
-            </div>
-          </div>
 
-          {/* Vertical Grid Slider positioned absolutely relative to the outer card container (#drawing-canvas-container) */}
-          <div 
-            style={{
-              position: 'absolute',
-              right: `${sliderRight}px`,
-              top: `${sliderTopOffset}%`,
-              transform: 'translateY(-50%)',
-              height: `${sliderHeightPct}%`,
-              maxHeight: `${sliderMaxHeightPx}px`
-            }}
-            className="z-20 transition-all duration-150"
-          >
-            <VerticalGridSlider value={gridOpacity} onChange={setGridOpacity} isDarkBg={isDarkBg} />
+              {/* Vertical Grid Slider positioned absolutely relative to the SVG's responsive wrapper to maintain 100% height and position consistency */}
+              <div 
+                style={{
+                  position: 'absolute',
+                  left: `calc(100% + ${activeSliderRight}px)`,
+                  top: `${activeSliderTopOffset}%`,
+                  transform: 'translateY(-50%)',
+                  height: `${activeSliderHeightPct}%`,
+                  maxHeight: `${sliderMaxHeightPx}px`
+                }}
+                className="z-20 transition-all duration-150"
+              >
+                <VerticalGridSlider value={gridOpacity} onChange={setGridOpacity} isDarkBg={isDarkBg} />
+              </div>
+            </div>
           </div>
 
           {/* Bottom aligned Legend & Grid Indicator Row (Only visible on tablet & desktop layouts as requested) */}
