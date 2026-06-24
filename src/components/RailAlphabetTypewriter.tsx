@@ -4,7 +4,7 @@ import * as Lucide from 'lucide-react';
 import { DraftingTriangleIcon } from './DraftingTriangleIcon';
 
 // @ts-ignore
-import brsignFontUrl from '../assets/fonts/Brsign-Black.woff2';
+import brsignFontUrl from '../assets/fonts/Brsign-Black-2.woff2';
 
 interface DirectionConfig {
   key: string;
@@ -355,7 +355,12 @@ function SignageStyleSlider({
           max={max}
           step={step}
           value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
+          onChange={(e) => {
+            if (document.activeElement instanceof HTMLInputElement && document.activeElement.type === 'text') {
+              document.activeElement.blur();
+            }
+            onChange(Number(e.target.value));
+          }}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-35"
         />
       </div>
@@ -1090,7 +1095,7 @@ export default function RailAlphabetTypewriter() {
 
   const [plankLogoY, setPlankLogoY] = useState<number>(11.5);
   const [plankPicY, setPlankPicY] = useState<number>(11.5);
-  const [plankArrowY, setPlankArrowY] = useState<number>(12.0);
+  const [plankArrowY, setPlankArrowY] = useState<number>(11.5);
   const [separatorY1, setSeparatorY1] = useState<number>(0.5);
   const [separatorY2, setSeparatorY2] = useState<number>(23.5);
 
@@ -1119,7 +1124,7 @@ export default function RailAlphabetTypewriter() {
   const computedTargetW = hasArrowOrPic ? 192 : 168; // 7-tile or 8-tile long, DAS does not change this
   const targetW = computedTargetW;
 
-  // Smoothly animated DAS states matching the fluid transitions of the plank width
+  // DAS state properties aligned directly with targets (dynamic animations/smoothW removed)
   const fsForDas = plankTextSize * (textSize / 52);
   const currentDasSpacing = dasSpacingMultiplier * fsForDas;
 
@@ -1132,17 +1137,6 @@ export default function RailAlphabetTypewriter() {
   const targetLogoScale = logoType === 'none' ? 0.0 : 1.0;
   const targetArrowScale = arrowPosition === 'none' ? 0.0 : 1.0;
   const targetPicScale = picType === 'none' ? 0.0 : 1.0;
-
-  const smoothDasSize = targetDasSize;
-  const smoothDasSpacingLeft = targetDasSpacingLeft;
-  const smoothDasSpacingRight = targetDasSpacingRight;
-  const smoothDasLeftPadding = targetDasLeftPadding;
-  const smoothDasRightPadding = targetDasRightPadding;
-  const smoothDasVerticalOffset = targetDasVerticalOffset;
-  const smoothLogoScale = targetLogoScale;
-  const smoothArrowScale = targetArrowScale;
-  const smoothPicScale = targetPicScale;
-  const smoothW = targetW;
 
   const getPlankLines = (text: string): string[] => {
     return [text || 'Way out'];
@@ -1512,7 +1506,7 @@ export default function RailAlphabetTypewriter() {
   const linesForOverflowCheck = getPlankLines(typedText);
   let isCurrentLayoutOverflowing = false;
   for (const textLine of linesForOverflowCheck) {
-    const layout = solveLayout(textLine, targetW, textSize, smoothLogoScale, smoothDasSize, smoothArrowScale, smoothPicScale, currentStyle);
+    const layout = solveLayout(textLine, targetW, textSize, targetLogoScale, targetDasSize, targetArrowScale, targetPicScale, currentStyle);
     if (layout.layoutOverflow) {
       isCurrentLayoutOverflowing = true;
     }
@@ -1552,7 +1546,7 @@ export default function RailAlphabetTypewriter() {
       const prospectiveLines = getPlankLines(prefix);
       let wouldOverflow = false;
       for (const textLine of prospectiveLines) {
-        const layout = solveLayout(textLine, targetW, textSize, smoothLogoScale, smoothDasSize, smoothArrowScale, smoothPicScale, currentStyle);
+        const layout = solveLayout(textLine, targetW, textSize, targetLogoScale, targetDasSize, targetArrowScale, targetPicScale, currentStyle);
         if (layout.layoutOverflow) {
           wouldOverflow = true;
           break;
@@ -1823,11 +1817,18 @@ export default function RailAlphabetTypewriter() {
   const selectDirection = (dirStr: string) => {
     setDirection(dirStr);
     setSelectedPresetName('custom');
+    if (arrowPosition === 'none') {
+      if (picType !== 'none') {
+        setArrowPosition(picPosition === 'left' ? 'right' : 'left');
+      } else {
+        setArrowPosition(lastArrowPosition !== 'none' ? lastArrowPosition : 'right');
+      }
+    }
   };
 
   const renderPlankSvg = (textLine: string, isSecondPlank: boolean) => {
-    const W = smoothW;
-    const layout = solveLayout(textLine, W, textSize, smoothLogoScale, smoothDasSize, smoothArrowScale, smoothPicScale, currentStyle);
+    const W = targetW;
+    const layout = solveLayout(textLine, W, textSize, targetLogoScale, targetDasSize, targetArrowScale, targetPicScale, currentStyle);
 
     let plankBg = "#FFFFFF";
     let borderStroke = "#000000";
@@ -1854,11 +1855,11 @@ export default function RailAlphabetTypewriter() {
     // Y spacing values
     const picY = plankPicY;
     const arrowY = plankArrowY;
-    const logoY = plankLogoY + smoothDasVerticalOffset;
+    const logoY = plankLogoY + targetDasVerticalOffset;
     const textY = plankTextYFirstLine;
 
     // Logo size
-    let activeLogoSize = smoothDasSize * smoothLogoScale;
+    let activeLogoSize = targetDasSize * targetLogoScale;
     const isCustom = logoType === 'custom-geometry';
     const backIndex = customDasParams?.backgroundColourIndex ?? 4;
     const bgVal = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
@@ -1906,7 +1907,7 @@ export default function RailAlphabetTypewriter() {
               fontFamily: "'Brsign', 'Geist', sans-serif",
               fontWeight: 'normal',
               fill: contentColor,
-              opacity: smoothPicScale
+              opacity: targetPicScale
             }}
             className="select-none"
           >
@@ -1923,7 +1924,7 @@ export default function RailAlphabetTypewriter() {
             stroke={borderStroke}
             strokeWidth="1"
             style={{
-              opacity: smoothPicScale
+              opacity: targetPicScale
             }}
           />
         )}
@@ -1970,7 +1971,7 @@ export default function RailAlphabetTypewriter() {
               fontFamily: "'Brsign', sans-serif",
               fontWeight: 'normal',
               fill: activeArrowColor,
-              opacity: smoothArrowScale
+              opacity: targetArrowScale
             }}
             className="select-none"
           >
@@ -2085,7 +2086,7 @@ export default function RailAlphabetTypewriter() {
         const activeTaperWidth_bottom = activeTaperWidth_bottom_base * (multiplier_arm_bottom / multiplier_arm_bottom_default);
 
         return (
-          <g key={key} style={{ opacity: smoothLogoScale }}>
+          <g key={key} style={{ opacity: targetLogoScale }}>
             {strokeColor !== "none" ? (
               <rect
                 x={px}
@@ -2129,7 +2130,7 @@ export default function RailAlphabetTypewriter() {
       }
 
       return (
-        <g key={key} style={{ opacity: smoothLogoScale }}>
+        <g key={key} style={{ opacity: targetLogoScale }}>
           {strokeColor !== "none" ? (
             <rect
               x={px}
@@ -2179,6 +2180,12 @@ export default function RailAlphabetTypewriter() {
     if (el) {
       setCanScrollLeft(el.scrollLeft > 10);
       setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+      
+      // If user scrolls away from Card 1 on mobile, blur active text input 
+      // to dismiss keyboard and prevent automatic scroll snapping back to Card 1
+      if (el.scrollLeft > 50 && document.activeElement instanceof HTMLInputElement && document.activeElement.type === 'text') {
+        document.activeElement.blur();
+      }
     }
   };
 
@@ -2266,7 +2273,7 @@ export default function RailAlphabetTypewriter() {
 
     // Helper to generate a single plank's SVG group content
     const generatePlankGroup = (textLine: string, yOffset: number, isSecondLine: boolean) => {
-      const layout = solveLayout(textLine, W, textSize, 1.0, dasBaseSize, 1.0, 1.0, currentStyle);
+      const layout = solveLayout(textLine, W, textSize, targetLogoScale, targetDasSize, targetArrowScale, targetPicScale, currentStyle);
 
       const picY = plankPicY;
       const arrowY = plankArrowY;
@@ -2463,7 +2470,7 @@ export default function RailAlphabetTypewriter() {
 
     const fontStyleSource = base64Font 
       ? `url('${base64Font}') format('woff2')`
-      : `url('${window.location.origin}/assets/fonts/Brsign-Black.woff2') format('woff2')`;
+      : `url('${window.location.origin}/assets/fonts/Brsign-Black-2.woff2') format('woff2')`;
 
     const fullSvgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="background-color: transparent;">
       <defs>
@@ -2521,10 +2528,10 @@ export default function RailAlphabetTypewriter() {
       {/* Title block celebrating Kinneir and Calvert */}
       <div className="mb-6">
         <h3 className="text-lg font-display font-bold text-rail-blue tracking-tight">
-          The Art of Clear Signage and Typography
+          The Art of Clear Typography and Signage 
         </h3>
         <p className="text-xs text-slate-500 font-sans mt-0.5">
-          Create your own station signage to the design style crafted in 1965 by Margaret Calvert and Jock Kinneir.
+          Create your own station signage to the design style crafted by Margaret Calvert and Jock Kinneir over 60 years ago.
         </p>
       </div>
 
@@ -2551,8 +2558,8 @@ export default function RailAlphabetTypewriter() {
           <div 
             className="flex flex-col gap-[3px] shadow-lg select-all"
             style={{ 
-              width: `${(smoothW / 192) * 100}%`,
-              maxWidth: `${smoothW * 4.5}px`
+              width: `${(targetW / 192) * 100}%`,
+              maxWidth: `${targetW * 4.5}px`
             }}
           >
             {lines.map((line, idx) => renderPlankSvg(line, idx === 1))}
@@ -4081,7 +4088,7 @@ export default function RailAlphabetTypewriter() {
             type="button"
             onClick={downloadSignPNG}
             className="flex items-center justify-center w-10 h-10 bg-[#012169] hover:bg-[#a8081b] text-white border border-transparent rounded-lg focus:outline-none cursor-pointer shadow-sm hover:shadow hover:scale-105 active:scale-95 transition-all duration-300 shrink-0"
-            title="Download Sign (PNG)"
+            title="Download sign image (PNG)"
             id="btn-download-sign"
           >
             <motion.div

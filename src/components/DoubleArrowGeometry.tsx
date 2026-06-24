@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { DraftingTriangleIcon } from './DraftingTriangleIcon';
 
@@ -103,13 +103,112 @@ function MagneticSlider({
   );
 }
 
+interface VerticalGridSliderProps {
+  value: number;
+  onChange: (val: number) => void;
+  isDarkBg: boolean;
+}
+
+function VerticalGridSlider({ value, onChange, isDarkBg }: VerticalGridSliderProps) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    if (!trackRef.current) return;
+    const track = trackRef.current;
+    
+    const updateValue = (clientY: number) => {
+      const rect = track.getBoundingClientRect();
+      const height = rect.height;
+      // Calculate from bottom of the track up (so 0% is at the bottom, 100% is at the top)
+      const relativeY = rect.bottom - clientY;
+      const pct = Math.max(0, Math.min(100, (relativeY / height) * 100));
+      onChange(Math.round(pct / 20) * 20);
+    };
+
+    updateValue(e.clientY);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      updateValue(moveEvent.clientY);
+    };
+
+    const handlePointerUp = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-1.5 h-full py-1.5 select-none" style={{ touchAction: 'none' }}>
+      <span className={`text-[9px] font-mono font-bold tracking-wider ${isDarkBg ? 'text-white/50' : 'text-slate-400'}`}>GRID</span>
+      
+      <div 
+        ref={trackRef}
+        onPointerDown={handlePointerDown}
+        className="relative w-4 flex-1 cursor-pointer flex justify-center group touch-none"
+      >
+        {/* Base track (7px width) */}
+        <div className={`absolute top-0 bottom-0 w-[7px] rounded-full ${isDarkBg ? 'bg-white/10' : 'bg-slate-200/80'}`} />
+        
+        {/* Fill track (from bottom up, 7px width) */}
+        <div 
+          className="absolute bottom-0 w-[7px] bg-[#a8081b] rounded-full transition-all duration-75"
+          style={{ height: `${value}%` }}
+        />
+
+        {/* Custom Thumb (12px circular knob, same size as other sliders) */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 w-[12px] h-[12px] rounded-full bg-[#a8081b] border border-[#a8081b] shadow-sm pointer-events-none z-20 group-hover:scale-125 transition-transform duration-75"
+          style={{ bottom: `calc(${value}% - 6px)` }}
+        />
+      </div>
+
+      <span className={`text-[10px] font-mono font-bold whitespace-nowrap min-w-[28px] text-center ${isDarkBg ? 'text-white/80' : 'text-slate-800'}`}>
+        {value === 0 ? 'OFF' : `${value}%`}
+      </span>
+    </div>
+  );
+}
+
 export default function DoubleArrowGeometry() {
   const [strokeWidth, setStrokeWidth] = useState<number>(13);
   const [gapOffset, setGapOffset] = useState<number>(15.5); // Arrow head horizontal offset
   const [foregroundColourIndex, setForegroundColourIndex] = useState<number>(0); // Flame Red
   const [backgroundColourIndex, setBackgroundColourIndex] = useState<number>(4); // White
-  const [gridOpacity, setGridOpacity] = useState<number>(45);
+  const [gridOpacity, setGridOpacity] = useState<number>(60);
   const [taperAngle, setTaperAngle] = useState<number>(2.3); // In degrees. Standard: +2.3 deg (corresponds to authentic photoshop template)
+
+  // Dev layout states for vertical slider positioning with persistent localStorage
+  const [sliderRight, setSliderRight] = useState<number>(() => {
+    const saved = localStorage.getItem('slider-dev-right-v4');
+    return saved ? Number(saved) : 11;
+  });
+  const [sliderTopOffset, setSliderTopOffset] = useState<number>(() => {
+    const saved = localStorage.getItem('slider-dev-top-v4');
+    return saved ? Number(saved) : 44;
+  });
+  const [sliderHeightPct, setSliderHeightPct] = useState<number>(() => {
+    const saved = localStorage.getItem('slider-dev-height-v4');
+    return saved ? Number(saved) : 52;
+  });
+  const [sliderMaxHeightPx, setSliderMaxHeightPx] = useState<number>(() => {
+    const saved = localStorage.getItem('slider-dev-max-height-v4');
+    return saved ? Number(saved) : 260;
+  });
+  const [showDevControls, setShowDevControls] = useState<boolean>(() => {
+    return localStorage.getItem('slider-dev-show-v4') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('slider-dev-right-v4', sliderRight.toString());
+    localStorage.setItem('slider-dev-top-v4', sliderTopOffset.toString());
+    localStorage.setItem('slider-dev-height-v4', sliderHeightPct.toString());
+    localStorage.setItem('slider-dev-max-height-v4', sliderMaxHeightPx.toString());
+    localStorage.setItem('slider-dev-show-v4', showDevControls.toString());
+  }, [sliderRight, sliderTopOffset, sliderHeightPct, sliderMaxHeightPx, showDevControls]);
 
   const [isMobile, setIsMobile] = useState<boolean>(typeof window !== 'undefined' && window.innerWidth < 640);
 
@@ -141,8 +240,12 @@ export default function DoubleArrowGeometry() {
     setGapOffset(15.5);
     setForegroundColourIndex(0);
     setBackgroundColourIndex(4);
-    setGridOpacity(45);
+    setGridOpacity(60);
     setTaperAngle(2.3);
+    setSliderRight(11);
+    setSliderTopOffset(44);
+    setSliderHeightPct(52);
+    setSliderMaxHeightPx(260);
   };
 
   // Track centerlines
@@ -223,10 +326,10 @@ export default function DoubleArrowGeometry() {
           <div>
             <h3 className="text-base sm:text-lg font-display font-bold text-rail-blue tracking-tight flex items-center space-x-2">
               <DraftingTriangleIcon className="w-5 h-5 text-rail-red flex-shrink-0" />
-              <span>Geometry of the double arrow icon (Gerry Barney, 1965)</span>
+              <span>Geometry of the double arrow icon</span>
             </h3>
             <p className="text-[11px] sm:text-xs text-slate-500 font-sans mt-0.5">
-              Create your own double arrow logo inspired by the iconic railway symbol forged over 60 years ago.
+              Create your own double arrow logo inspired by the iconic railway symbol forged in 1965 by Gerry Barney.
             </p>
           </div>
         </div>
@@ -277,86 +380,104 @@ export default function DoubleArrowGeometry() {
             <RefreshCw className="w-4 h-4" />
           </button>
           {/* Centered Blueprint Canvas Wrapper to position the grid relative to the frame */}
-          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0 sm:pt-2">
-            {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
-            <svg 
-              viewBox="-10 -10.5 150 99" 
-              className="h-full max-h-[155px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] select-none relative z-10 overflow-hidden transition-all duration-300"
-              style={{ 
-                overflow: 'hidden',
-                border: gridOpacity > 0 ? `1.5px solid ${thickStrokeColor}` : 'none',
-              }}
-              fill="none" 
-              stroke="none"
-            >
-              <defs>
-                <pattern 
-                  id="graph-paper-grid" 
-                  width="20" 
-                  height="20" 
-                  patternUnits="userSpaceOnUse"
-                >
-                  {/* 5 minor lines (6 squares) between major 20x20 gridlines */}
-                  <path 
-                    d="M 3.33 0 L 3.33 20 M 6.67 0 L 6.67 20 M 10 0 L 10 20 M 13.33 0 L 13.33 20 M 16.67 0 L 16.67 20 M 0 3.33 L 20 3.33 M 0 6.67 L 20 6.67 M 0 10 L 20 10 M 0 13.33 L 20 13.33 M 0 16.67 L 20 16.67" 
-                    stroke={thinStrokeColor} 
-                    strokeWidth="0.12" 
+          <div className="flex-1 flex items-center justify-center w-full min-h-0 pt-0 sm:pt-2 relative">
+            {/* Responsive wrapper matching the exact dimensions of the SVG to keep the vertical slider anchored consistently */}
+            <div className="relative h-full max-h-[155px] sm:max-h-none sm:w-[86%] w-auto aspect-[150/99] flex items-center justify-center">
+              {/* Double Arrow Symbol Render with expanded viewBox to scale the grid beautifully larger */}
+              <svg 
+                viewBox="-10 -10.5 150 99" 
+                className="w-full h-full select-none relative z-10 overflow-hidden transition-all duration-300"
+                style={{ 
+                  overflow: 'hidden',
+                  border: gridOpacity > 0 ? `1.5px solid ${thickStrokeColor}` : 'none',
+                }}
+                fill="none" 
+                stroke="none"
+              >
+                <defs>
+                  <pattern 
+                    id="graph-paper-grid" 
+                    width="20" 
+                    height="20" 
+                    patternUnits="userSpaceOnUse"
+                  >
+                    {/* 5 minor lines (6 squares) between major 20x20 gridlines */}
+                    <path 
+                      d="M 3.33 0 L 3.33 20 M 6.67 0 L 6.67 20 M 10 0 L 10 20 M 13.33 0 L 13.33 20 M 16.67 0 L 16.67 20 M 0 3.33 L 20 3.33 M 0 6.67 L 20 6.67 M 0 10 L 20 10 M 0 13.33 L 20 13.33 M 0 16.67 L 20 16.67" 
+                      stroke={thinStrokeColor} 
+                      strokeWidth="0.12" 
+                    />
+                    {/* 20x20 Bold Grid lines (Major Graticules) */}
+                    <path 
+                      d="M 20 0 L 20 20 M 0 20 L 20 20" 
+                      stroke={thickStrokeColor} 
+                      strokeWidth="0.30" 
+                    />
+                  </pattern>
+                  <clipPath id="arrow-clip">
+                    <rect x="0" y="0" width="130" height="78" />
+                  </clipPath>
+                </defs>
+
+                {/* Dynamic Real Graph Paper Background Cover extended to bounds */}
+                {gridOpacity > 0 && (
+                  <rect x="-10" y="-10.5" width="150" height="99" fill="url(#graph-paper-grid)" />
+                )}
+
+                {/* Brand geometry paths styled exactly per official guidelines, floating in the center of the grid */}
+                <g clipPath="url(#arrow-clip)">
+                  {/* Top track stem */}
+                  <polygon 
+                    points={`0,${y_top_track_top} 130,${y_top_track_top} 130,${y_top_track_bottom} 0,${y_top_track_bottom}`}
+                    fill={foregroundColour}
+                    className="transition-all duration-150"
                   />
-                  {/* 20x20 Bold Grid lines (Major Graticules) */}
-                  <path 
-                    d="M 20 0 L 20 20 M 0 20 L 20 20" 
-                    stroke={thickStrokeColor} 
-                    strokeWidth="0.30" 
+                  
+                  {/* Bottom track stem */}
+                  <polygon 
+                    points={`0,${y_bottom_track_top} 130,${y_bottom_track_top} 130,${y_bottom_track_bottom} 0,${y_bottom_track_bottom}`}
+                    fill={foregroundColour}
+                    className="transition-all duration-150"
                   />
-                </pattern>
-                <clipPath id="arrow-clip">
-                  <rect x="0" y="0" width="130" height="78" />
-                </clipPath>
-              </defs>
+                  
+                  {/* Central Crossover canal */}
+                  <polygon 
+                    points={`${X_left_bend - half_W_h_crossover},${y_bottom_track_top + 0.35} ${X_right_bend - half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_right_bend + half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_left_bend + half_W_h_crossover},${y_bottom_track_top + 0.35}`}
+                    fill={foregroundColour}
+                    className="transition-all duration-150"
+                  />
 
-              {/* Dynamic Real Graph Paper Background Cover extended to bounds */}
-              {gridOpacity > 0 && (
-                <rect x="-10" y="-10.5" width="150" height="99" fill="url(#graph-paper-grid)" />
-              )}
+                  {/* Tapered upper-left wing (Arm 1) */}
+                  <polygon 
+                    points={`${tip_center_top - activeTaperWidth_top / 2},0 ${tip_center_top + activeTaperWidth_top / 2},0 ${X_right_bend + half_W_h_arm_top},${y_top_track_top + 0.35} ${X_right_bend - half_W_h_arm_top},${y_top_track_top + 0.35}`}
+                    fill={foregroundColour}
+                    className="transition-all duration-150"
+                  />
 
-              {/* Brand geometry paths styled exactly per official guidelines, floating in the center of the grid */}
-              <g clipPath="url(#arrow-clip)">
-                {/* Top track stem */}
-                <polygon 
-                  points={`0,${y_top_track_top} 130,${y_top_track_top} 130,${y_top_track_bottom} 0,${y_top_track_bottom}`}
-                  fill={foregroundColour}
-                  className="transition-all duration-150"
-                />
-                
-                {/* Bottom track stem */}
-                <polygon 
-                  points={`0,${y_bottom_track_top} 130,${y_bottom_track_top} 130,${y_bottom_track_bottom} 0,${y_bottom_track_bottom}`}
-                  fill={foregroundColour}
-                  className="transition-all duration-150"
-                />
-                
-                {/* Central Crossover canal */}
-                <polygon 
-                  points={`${X_left_bend - half_W_h_crossover},${y_bottom_track_top + 0.35} ${X_right_bend - half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_right_bend + half_W_h_crossover},${y_top_track_bottom - 0.35} ${X_left_bend + half_W_h_crossover},${y_bottom_track_top + 0.35}`}
-                  fill={foregroundColour}
-                  className="transition-all duration-150"
-                />
+                  {/* Tapered lower-right wing (Arm 5) */}
+                  <polygon 
+                    points={`${X_left_bend - half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35} ${tip_center_bottom - activeTaperWidth_bottom / 2},78 ${tip_center_bottom + activeTaperWidth_bottom / 2},78 ${X_left_bend + half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35}`}
+                    fill={foregroundColour}
+                    className="transition-all duration-150"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
 
-                {/* Tapered upper-left wing (Arm 1) */}
-                <polygon 
-                  points={`${tip_center_top - activeTaperWidth_top / 2},0 ${tip_center_top + activeTaperWidth_top / 2},0 ${X_right_bend + half_W_h_arm_top},${y_top_track_top + 0.35} ${X_right_bend - half_W_h_arm_top},${y_top_track_top + 0.35}`}
-                  fill={foregroundColour}
-                  className="transition-all duration-150"
-                />
-
-                {/* Tapered lower-right wing (Arm 5) */}
-                <polygon 
-                  points={`${X_left_bend - half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35} ${tip_center_bottom - activeTaperWidth_bottom / 2},78 ${tip_center_bottom + activeTaperWidth_bottom / 2},78 ${X_left_bend + half_W_h_arm_bottom},${y_bottom_track_bottom - 0.35}`}
-                  fill={foregroundColour}
-                  className="transition-all duration-150"
-                />
-              </g>
-            </svg>
+          {/* Vertical Grid Slider positioned absolutely relative to the outer card container (#drawing-canvas-container) */}
+          <div 
+            style={{
+              position: 'absolute',
+              right: `${sliderRight}px`,
+              top: `${sliderTopOffset}%`,
+              transform: 'translateY(-50%)',
+              height: `${sliderHeightPct}%`,
+              maxHeight: `${sliderMaxHeightPx}px`
+            }}
+            className="z-20 transition-all duration-150"
+          >
+            <VerticalGridSlider value={gridOpacity} onChange={setGridOpacity} isDarkBg={isDarkBg} />
           </div>
 
           {/* Bottom aligned Legend & Grid Indicator Row (Only visible on tablet & desktop layouts as requested) */}
@@ -400,19 +521,6 @@ export default function DoubleArrowGeometry() {
                 </div>
               </div>
             </div>
-
-            {/* Pill button aligned with metadata row, matching mockup */}
-            <button
-              onClick={() => setGridOpacity(gridOpacity > 0 ? 0 : 60)}
-              className={`px-2.5 py-1 rounded text-[10px] font-bold font-mono tracking-wider transition-all duration-150 cursor-pointer select-none border whitespace-nowrap ${
-                gridOpacity > 0 
-                  ? (isDarkBg ? 'bg-white/10 text-white border-white/20 hover:bg-white/20 shadow-sm' : 'bg-black/5 text-slate-800 border border-black/10 hover:bg-black/10') 
-                  : (isDarkBg ? 'bg-transparent text-slate-500 border-transparent hover:text-slate-300' : 'bg-transparent text-slate-400 border-transparent hover:text-slate-600')
-              }`}
-              title="Quick Toggle Grid Brightness"
-            >
-              GRID: {gridOpacity > 0 ? `${gridOpacity}%` : 'OFF'}
-            </button>
           </div>
 
         </div>
@@ -524,18 +632,77 @@ export default function DoubleArrowGeometry() {
               onChange={setTaperAngle}
             />
 
-            {/* Grid Brightness Slider */}
-            <MagneticSlider
-              id="grid-toggle-control"
-              label="Grid Brightness"
-              value={gridOpacity}
-              min={0}
-              max={100}
-              step={1}
-              defaultValue={45}
-              displayValue={gridOpacity === 0 ? 'OFF' : `${gridOpacity}%`}
-              onChange={setGridOpacity}
-            />
+            {/* Dev Controls Header & Collapsible Section */}
+            <div className="mt-2 border-t border-slate-200/60 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowDevControls(!showDevControls)}
+                className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-xs font-mono font-bold uppercase tracking-wider text-slate-600 transition-all duration-150 cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className="text-sm">🛠️</span> Slider Dev Positioner
+                </span>
+                <span className="text-[10px] bg-slate-200/70 text-slate-700 px-1.5 py-0.5 rounded">
+                  {showDevControls ? 'HIDE' : 'SHOW'}
+                </span>
+              </button>
+
+              {showDevControls && (
+                <div className="mt-3 bg-slate-50/50 border border-dashed border-slate-200 rounded-xl p-3 flex flex-col gap-3.5 transition-all duration-150">
+                  <MagneticSlider
+                    id="slider-right-control"
+                    label="Position Right (px)"
+                    value={sliderRight}
+                    min={-50}
+                    max={100}
+                    step={1}
+                    defaultValue={11}
+                    displayValue={`${sliderRight}px`}
+                    onChange={setSliderRight}
+                  />
+
+                  <MagneticSlider
+                    id="slider-top-control"
+                    label="Position Top (%)"
+                    value={sliderTopOffset}
+                    min={10}
+                    max={90}
+                    step={1}
+                    defaultValue={44}
+                    displayValue={`${sliderTopOffset}%`}
+                    onChange={setSliderTopOffset}
+                  />
+
+                  <MagneticSlider
+                    id="slider-height-control"
+                    label="Slider Height (%)"
+                    value={sliderHeightPct}
+                    min={30}
+                    max={100}
+                    step={1}
+                    defaultValue={52}
+                    displayValue={`${sliderHeightPct}%`}
+                    onChange={setSliderHeightPct}
+                  />
+
+                  <MagneticSlider
+                    id="slider-max-height-control"
+                    label="Max Height (px)"
+                    value={sliderMaxHeightPx}
+                    min={80}
+                    max={400}
+                    step={5}
+                    defaultValue={260}
+                    displayValue={`${sliderMaxHeightPx}px`}
+                    onChange={setSliderMaxHeightPx}
+                  />
+                  
+                  <div className="text-[10px] font-mono text-slate-400 leading-tight">
+                    * Values are fully persistent and automatically saved in real-time.
+                  </div>
+                </div>
+              )}
+            </div>
 
 
 
