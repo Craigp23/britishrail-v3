@@ -128,7 +128,7 @@ export default function AdvanceTracker() {
               className="w-full inline-flex items-center justify-center space-x-2 bg-rail-blue text-white hover:bg-opacity-95 font-sans font-bold text-xs py-3 rounded-xl transition-all shadow-sm transform hover:-translate-y-0.5 cursor-pointer"
             >
               <Bell className="w-4 h-4 text-amber-300 animate-bounce" />
-              <span>Instantly Add Google Calendar Booking Alert</span>
+              <span>Add Alert To My Google Calendar</span>
             </a>
           </div>
         )}

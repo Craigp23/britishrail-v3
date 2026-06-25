@@ -47,7 +47,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-1">
+          <nav className="hidden lg:flex space-x-1">
             <button
               onClick={() => setTab('home')}
               className={`pl-[8px] pr-[8px] ml-[16px] py-2 rounded-md font-sans font-medium text-sm transition-all duration-200 ${
@@ -93,7 +93,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex md:hidden">
+          <div className="flex lg:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 focus:outline-none"
@@ -107,7 +107,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
           <button
             onClick={() => { setTab('home'); setMobileMenuOpen(false); }}
             className={`w-full text-left px-4 py-3 rounded-md font-sans font-medium text-sm ${
@@ -142,7 +142,11 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
 
           <div className="pt-3 border-t border-slate-100 flex items-center space-x-2 px-4 justify-between">
             <span className="text-[11px] font-mono text-slate-400">Independent Historical Portal</span>
-            <span className="bg-emerald-100 text-emerald-800 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full">
+            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border border-emerald-200/50 flex items-center gap-1.5">
+              <span className="flex h-2 w-2 relative shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
               Live Updates
             </span>
           </div>

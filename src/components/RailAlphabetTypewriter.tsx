@@ -1319,6 +1319,7 @@ export default function RailAlphabetTypewriter() {
   });
   const [containerPadding, setContainerPadding] = useState<number>(57);
   const [chevronOffset, setChevronOffset] = useState<number>(16);
+  const [chevronVerticalPos, setChevronVerticalPos] = useState<number>(42);
 
   const [miniChevronOffset, setMiniChevronOffset] = useState<number>(18);
   const [arrowCarouselWidth, setArrowCarouselWidth] = useState<number>(() => {
@@ -1449,6 +1450,7 @@ export default function RailAlphabetTypewriter() {
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const exportPresetsToCSV = () => {
     const headers = [
@@ -2181,10 +2183,37 @@ export default function RailAlphabetTypewriter() {
       setCanScrollLeft(el.scrollLeft > 10);
       setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
       
+      const firstCard = el.firstElementChild;
+      if (firstCard) {
+        const gap = window.innerWidth >= 640 ? 20 : 16;
+        const cardSize = firstCard.getBoundingClientRect().width + gap;
+        const calculatedIndex = Math.min(
+          8,
+          Math.max(0, Math.round(el.scrollLeft / cardSize))
+        );
+        setActiveCardIndex(calculatedIndex);
+      }
+      
       // If user scrolls away from Card 1 on mobile, blur active text input 
       // to dismiss keyboard and prevent automatic scroll snapping back to Card 1
       if (el.scrollLeft > 50 && document.activeElement instanceof HTMLInputElement && document.activeElement.type === 'text') {
         document.activeElement.blur();
+      }
+    }
+  };
+
+  const scrollToCard = (index: number) => {
+    const el = carouselRef.current;
+    if (el) {
+      const firstCard = el.firstElementChild;
+      if (firstCard) {
+        const gap = window.innerWidth >= 640 ? 20 : 16;
+        const cardSize = firstCard.getBoundingClientRect().width + gap;
+        el.scrollTo({
+          left: index * cardSize,
+          behavior: 'smooth'
+        });
+        setActiveCardIndex(index);
       }
     }
   };
@@ -2608,7 +2637,7 @@ export default function RailAlphabetTypewriter() {
               onClick={() => handleScroll('left')}
               disabled={!canScrollLeft}
               className="hidden sm:flex absolute top-1/2 -translate-y-1/2 z-30 items-center justify-center w-10 h-10 bg-transparent text-slate-600 hover:text-[#a8081b] hover:scale-115 transition-all focus:outline-none cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
-              style={{ left: `${chevronOffset}px` }}
+              style={{ left: `${chevronOffset}px`, top: `${chevronVerticalPos}%` }}
               title="Scroll Left"
             >
               <Lucide.ChevronLeft className="w-6 h-6 shrink-0" />
@@ -2620,7 +2649,7 @@ export default function RailAlphabetTypewriter() {
               onClick={() => handleScroll('right')}
               disabled={!canScrollRight}
               className="hidden sm:flex absolute top-1/2 -translate-y-1/2 z-30 items-center justify-center w-10 h-10 bg-transparent text-slate-600 hover:text-[#a8081b] hover:scale-115 transition-all focus:outline-none cursor-pointer disabled:opacity-0 disabled:pointer-events-none"
-              style={{ right: `${chevronOffset}px` }}
+              style={{ right: `${chevronOffset}px`, top: `${chevronVerticalPos}%` }}
               title="Scroll Right"
             >
               <Lucide.ChevronRight className="w-6 h-6 shrink-0" />
@@ -3680,6 +3709,18 @@ export default function RailAlphabetTypewriter() {
                         className="w-full accent-rose-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-[9px] font-mono text-slate-400 uppercase mb-0.5">Chev Vert Pos ({chevronVerticalPos}%)</label>
+                      <input 
+                        type="range" 
+                        min="10" 
+                        max="90" 
+                        value={chevronVerticalPos} 
+                        onChange={(e) => setChevronVerticalPos(Number(e.target.value))}
+                        className="w-full accent-rose-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -3693,6 +3734,7 @@ export default function RailAlphabetTypewriter() {
                         setCardWidth(isMobile ? 280 : 360);
                         setContainerPadding(isMobile ? 22 : 57);
                         setChevronOffset(16);
+                        setChevronVerticalPos(42);
                         setMiniChevronOffset(18);
                         setArrowCarouselWidth(isMobile ? 210 : 290);
                         setPicCarouselWidth(isMobile ? 210 : 290);
@@ -4032,31 +4074,62 @@ export default function RailAlphabetTypewriter() {
 
             </div>
 
-            {/* Scroll indicator with interactive chevrons for mobile portrait screens */}
-            <div className="sm:hidden flex items-center justify-center gap-1 select-none pb-2 pt-1">
-              <button
-                type="button"
-                onClick={() => handleScroll('left')}
-                disabled={!canScrollLeft}
-                className="flex items-center justify-center w-8 h-8 bg-transparent text-slate-600 hover:text-[#a8081b] hover:scale-115 active:text-[#a8081b] active:scale-110 transition-all focus:outline-none cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
-                title="Scroll Left"
-              >
-                <Lucide.ChevronLeft className="w-5 h-5 shrink-0" />
-              </button>
+            {/* Universal Pagination Dots / Active State Indicators under the Control Cards Carousel */}
+            <div className="flex items-center justify-center select-none pb-1 pt-0.5">
+              <div className="flex items-center gap-1.5 bg-slate-100/60 px-3 py-1 rounded-lg border border-slate-200/50 shadow-sm">
+                {/* Scroll Left */}
+                <button
+                  type="button"
+                  onClick={() => handleScroll('left')}
+                  disabled={!canScrollLeft}
+                  className="flex items-center justify-center w-6 h-6 text-slate-600 hover:text-[#a8081b] hover:scale-115 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                  title="Scroll Left"
+                >
+                  <Lucide.ChevronLeft className="w-4 h-4 shrink-0" />
+                </button>
 
-              <span className="text-[10px] font-mono font-bold tracking-wider text-[#012169]/75 select-none animate-pulse">
-                &nbsp;&nbsp;
-              </span>
+                {/* 9 Dots */}
+                <div className="flex items-center gap-1.5 mx-1">
+                  {[...Array(9)].map((_, idx) => {
+                    const isActive = idx === activeCardIndex;
+                    const cardNames = [
+                      "Preset & Type",
+                      "Spacing & Typography",
+                      "Double Arrow Logo",
+                      "Arrows Alignment",
+                      "Pictograms",
+                      "Engine Spacing & Grid",
+                      "Developer Tuning",
+                      "Plank Advanced positioning",
+                      "DAS Custom Tuning & Dev Tools"
+                    ];
+                    return (
+                      <button
+                        key={`pag-dot-${idx}`}
+                        type="button"
+                        onClick={() => scrollToCard(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
+                          isActive 
+                            ? 'w-5 bg-[#012169]' 
+                            : 'w-2 bg-slate-300 hover:bg-[#a8081b]/75'
+                        }`}
+                        title={`Go to Card ${idx + 1}: ${cardNames[idx]}`}
+                      />
+                    );
+                  })}
+                </div>
 
-              <button
-                type="button"
-                onClick={() => handleScroll('right')}
-                disabled={!canScrollRight}
-                className="flex items-center justify-center w-8 h-8 bg-transparent text-slate-600 hover:text-[#a8081b] hover:scale-115 active:text-[#a8081b] active:scale-110 transition-all focus:outline-none cursor-pointer disabled:opacity-20 disabled:pointer-events-none"
-                title="Scroll Right"
-              >
-                <Lucide.ChevronRight className="w-5 h-5 shrink-0" />
-              </button>
+                {/* Scroll Right */}
+                <button
+                  type="button"
+                  onClick={() => handleScroll('right')}
+                  disabled={!canScrollRight}
+                  className="flex items-center justify-center w-6 h-6 text-slate-600 hover:text-[#a8081b] hover:scale-115 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                  title="Scroll Right"
+                >
+                  <Lucide.ChevronRight className="w-4 h-4 shrink-0" />
+                </button>
+              </div>
             </div>
 
               </div>
@@ -4078,7 +4151,7 @@ export default function RailAlphabetTypewriter() {
               </span>
               <span className="text-slate-300 shrink-0 hidden sm:inline">|</span>
               <span className="text-xs text-slate-500 font-sans font-semibold group-hover:text-slate-800 transition-colors truncate hidden sm:inline">
-                {isCustomLayoutOpen ? "Close drawer" : "Adjust spacing & alignment"}
+                {isCustomLayoutOpen ? "Close drawer" : "More signs or create your own"}
               </span>
             </div>
             <Lucide.ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 shrink-0 ml-3 ${isCustomLayoutOpen ? 'rotate-180 text-[#012169]' : ''}`} />

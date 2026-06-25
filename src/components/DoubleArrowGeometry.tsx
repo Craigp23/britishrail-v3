@@ -241,9 +241,9 @@ export default function DoubleArrowGeometry() {
 
   // Dynamic responsive values for the vertical grid slider positioning
   // When dev controls are closed, we apply the precise user-requested values automatically
-  const activeSliderRight = showDevControls ? sliderRight : (isMobilePortrait ? 5 : 16);
-  const activeSliderTopOffset = showDevControls ? sliderTopOffset : (isMobilePortrait ? 52 : 50);
-  const activeSliderHeightPct = showDevControls ? sliderHeightPct : (isMobilePortrait ? 90 : 70);
+  const activeSliderRight = showDevControls ? sliderRight : 16;
+  const activeSliderTopOffset = showDevControls ? sliderTopOffset : 50;
+  const activeSliderHeightPct = showDevControls ? sliderHeightPct : 70;
 
   const handleReset = () => {
     setStrokeWidth(13);

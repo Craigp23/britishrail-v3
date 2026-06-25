@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Page, Station } from './types';
 import Header from './components/Header';
 import FareFinder from './components/FareFinder';
@@ -22,6 +22,11 @@ import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
   const [currentTab, setTab] = useState<Page>('home');
+  const [pendingScroll, setPendingScroll] = useState(false);
+  const [pendingCalculatorScroll, setPendingCalculatorScroll] = useState(false);
+  const [pendingStrategiesScroll, setPendingStrategiesScroll] = useState(false);
+
+  const prevTabRef = useRef<Page>(currentTab);
 
   // Bilateral synchronization between URL hash and application state
   useEffect(() => {
@@ -54,6 +59,92 @@ export default function App() {
     }
   }, [currentTab]);
 
+  // Reset scroll to top of viewport ONLY on authentic tab switch to prevent scroll clamping issues
+  // but only if we are not coordinating a pending scroll navigation to the splitter
+  useEffect(() => {
+    if (prevTabRef.current !== currentTab) {
+      prevTabRef.current = currentTab;
+      if (!pendingScroll) {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+    }
+  }, [currentTab, pendingScroll]);
+
+  // Robust pending scroll handler that runs after Home tab enters the DOM
+  useEffect(() => {
+    if (currentTab === 'home' && pendingScroll) {
+      const scrollTimes = [0, 50, 150, 300, 500, 800, 1200];
+      const timers: NodeJS.Timeout[] = [];
+
+      scrollTimes.forEach((delay) => {
+        const t = setTimeout(() => {
+          const el = document.getElementById('fare-finder-section');
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto', block: 'start' });
+            if (delay === scrollTimes[scrollTimes.length - 1]) {
+              setPendingScroll(false);
+            }
+          }
+        }, delay);
+        timers.push(t);
+      });
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
+    }
+  }, [currentTab, pendingScroll]);
+
+  // Robust pending calculator scroll handler that runs after Guide tab enters the DOM
+  useEffect(() => {
+    if (currentTab === 'guide' && pendingCalculatorScroll) {
+      const scrollTimes = [0, 50, 150, 300, 500, 800, 1200];
+      const timers: NodeJS.Timeout[] = [];
+
+      scrollTimes.forEach((delay) => {
+        const t = setTimeout(() => {
+          const el = document.getElementById('advance-tracker-section');
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto', block: 'start' });
+            if (delay === scrollTimes[scrollTimes.length - 1]) {
+              setPendingCalculatorScroll(false);
+            }
+          }
+        }, delay);
+        timers.push(t);
+      });
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
+    }
+  }, [currentTab, pendingCalculatorScroll]);
+
+  // Robust pending strategies scroll handler that runs after Guide tab enters the DOM
+  useEffect(() => {
+    if (currentTab === 'guide' && pendingStrategiesScroll) {
+      const scrollTimes = [0, 50, 150, 300, 500, 800, 1200];
+      const timers: NodeJS.Timeout[] = [];
+
+      scrollTimes.forEach((delay) => {
+        const t = setTimeout(() => {
+          const el = document.getElementById('strategies-guide');
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto', block: 'start' });
+            if (delay === scrollTimes[scrollTimes.length - 1]) {
+              setPendingStrategiesScroll(false);
+            }
+          }
+        }, delay);
+        timers.push(t);
+      });
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
+    }
+  }, [currentTab, pendingStrategiesScroll]);
+
   // Precision custom inline SVG representing the double arrow logo
   const doubleArrowLogo = (
     <svg viewBox="0 0 100 60" className="w-12 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="square">
@@ -62,6 +153,42 @@ export default function App() {
       <path d="M 35 27 L 15 12 M 65 33 L 85 48" />
     </svg>
   );
+
+  const navigateToSplitter = () => {
+    if (currentTab === 'home') {
+      const el = document.getElementById('fare-finder-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    } else {
+      setPendingScroll(true);
+      setTab('home');
+    }
+  };
+
+  const navigateToCalculator = () => {
+    if (currentTab === 'guide') {
+      const el = document.getElementById('advance-tracker-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      setPendingCalculatorScroll(true);
+      setTab('guide');
+    }
+  };
+
+  const navigateToStrategies = () => {
+    if (currentTab === 'guide') {
+      const el = document.getElementById('strategies-guide');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      setPendingStrategiesScroll(true);
+      setTab('guide');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans antialiased">
@@ -110,7 +237,7 @@ export default function App() {
                         </a>
                         <button 
                           onClick={() => setTab('guide')}
-                          className="px-6 py-3 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-100 rounded-xl font-bold text-center text-sm transition-all"
+                          className="px-6 py-3 bg-transparent border-2 border-white/60 hover:border-white hover:bg-white/10 text-white rounded-xl font-bold text-center text-sm transition-all cursor-pointer"
                         >
                           Smart Split-Ticket Tips
                         </button>
@@ -185,7 +312,7 @@ export default function App() {
                           <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">03</span>
                           <h4 className="font-display font-bold text-slate-800 text-sm mt-4">Enforce Railcard Codes</h4>
                           <p className="text-xs text-slate-600 mt-2 leading-relaxed font-sans">
-                            Applying digital Railcards (Two Together, Student 16-25, Senior) auto-slashes another 34% off the price.
+                            Applying digital Railcards (Two Together, Student 16-25, Senior) cuts another 34% off the price.
                           </p>
                         </div>
                       </div>
@@ -202,8 +329,12 @@ export default function App() {
                     </div>
 
                     {/* Right Column: Claire Panel */}
-                    <div className="lg:col-span-4">
-                      <ClairePanel compact={true} />
+                    <div className="lg:col-span-4" id="home-claire-panel-container">
+                      <ClairePanel 
+                        compact={true} 
+                        onNavigateToSplitter={navigateToSplitter} 
+                        onNavigateToCalculator={navigateToCalculator} 
+                      />
                     </div>
 
                   </div>
@@ -252,7 +383,7 @@ export default function App() {
                         </p>
                       </div>
                       <button 
-                        onClick={() => setTab('guide')}
+                        onClick={navigateToStrategies}
                         className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
                       >
                         Read Travel Strategies ➔
@@ -268,7 +399,7 @@ export default function App() {
                         </p>
                       </div>
                       <button 
-                        onClick={() => setTab('guide')}
+                        onClick={navigateToCalculator}
                         className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
                       >
                         Release Calculator & Reminder Tool ➔
@@ -312,13 +443,20 @@ export default function App() {
                       <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
                         <a 
                           href="#exhibit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const el = document.getElementById('exhibit');
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }}
                           className="px-6 py-3 bg-[#a8081b] hover:bg-opacity-95 text-white rounded-xl font-bold text-center text-sm shadow-md transition-all cursor-pointer"
                         >
                           Explore Interactive Exhibit
                         </a>
                         <button 
                           onClick={() => setTab('home')}
-                          className="px-6 py-3 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-100 rounded-xl font-bold text-center text-sm transition-all"
+                          className="px-6 py-3 bg-transparent border-2 border-white/60 hover:border-white hover:bg-white/10 text-white rounded-xl font-bold text-center text-sm transition-all cursor-pointer"
                         >
                           Back to Travel Portal
                         </button>
@@ -347,7 +485,7 @@ export default function App() {
               </section>
 
               {/* CORPORATE DESIGN IDENTITY ELEMENTS GRID - From legacy history page */}
-              <section id="exhibit" className="py-12 bg-white border-b border-slate-200/80">
+              <section id="exhibit" className="py-12 bg-white border-b border-slate-200/80 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="text-center max-w-2xl mx-auto mb-10">
                     <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-rail-blue tracking-tight">
@@ -359,39 +497,64 @@ export default function App() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {DESIGN_ELEMENTS.map((elem) => (
-                      <div key={elem.id} className="bg-slate-50 rounded-xl border border-slate-200/50 p-5 flex flex-col justify-between hover:shadow-md transition">
-                        <div>
-                          <div className="flex justify-between items-baseline border-b border-slate-200 pb-2 mb-3">
-                            <span className="text-xs font-mono font-bold text-slate-400">ELEMENT {elem.number}</span>
-                            <span className="text-xs font-bold text-[#a8081b]">ACTIVE ERA</span>
+                    {DESIGN_ELEMENTS.map((elem) => {
+                      const targetId = elem.id === 'double-arrow' || elem.id === 'flame-red'
+                        ? 'double-arrow-geometry-section'
+                        : elem.id === 'rail-alphabet'
+                        ? 'rail-alphabet-typewriter-section'
+                        : elem.id === 'intercity-125'
+                        ? 'timeline-section'
+                        : '';
+
+                      return (
+                        <div key={elem.id} className="bg-slate-50 rounded-xl border border-slate-200/50 p-5 flex flex-col justify-between hover:shadow-md transition">
+                          <div>
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+                              <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">ELEMENT {elem.number}</span>
+                              {targetId ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    const el = document.getElementById(targetId);
+                                    if (el) {
+                                      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
+                                  }}
+                                  className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition cursor-pointer font-sans"
+                                >
+                                  INTERACTIVE &gt;
+                                </button>
+                              ) : (
+                                <span className="text-xs font-bold text-[#a8081b]">ACTIVE ERA</span>
+                              )}
+                            </div>
+                            <h4 className="font-display font-bold text-slate-800 text-sm mt-1">{elem.title}</h4>
+                            <p className="text-xs text-slate-600 mt-2 leading-relaxed">{elem.description}</p>
                           </div>
-                          <h4 className="font-display font-bold text-slate-800 text-sm mt-1">{elem.title}</h4>
-                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">{elem.description}</p>
+                          <div className="text-[10px] text-slate-400 mt-4 italic font-sans font-medium">Design Research Unit archive</div>
                         </div>
-                        <div className="text-[10px] text-slate-400 mt-4 italic font-sans font-medium">Design Research Unit archive</div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </section>
 
               {/* MODULE 1: INTERACTIVE TIMELINE */}
-              <section className="py-12 bg-slate-50 border-b border-slate-200">
+              <section id="timeline-section" className="py-12 bg-slate-50 border-b border-slate-200 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <InteractiveTimeline />
                 </div>
               </section>
 
               {/* MODULE 2: INTERACTIVE GERRY BARNEY MATHEMATICAL GEOMETRY DESIGN SLIDERS */}
-              <section className="py-12 bg-white border-b border-slate-200">
+              <section id="double-arrow-geometry-section" className="py-12 bg-white border-b border-slate-200 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <DoubleArrowGeometry />
                 </div>
               </section>
 
               {/* MODULE 3: INTERACTIVE RAIL ALPHABET TYPOGRAPHY SIGN GENERATOR */}
-              <section className="py-12 bg-slate-50 border-b border-slate-200">
+              <section id="rail-alphabet-typewriter-section" className="py-12 bg-slate-50 border-b border-slate-200 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <RailAlphabetTypewriter />
                 </div>
@@ -400,7 +563,10 @@ export default function App() {
               {/* MODULE 4: DID YOU KNOW SECTION */}
               <section className="py-12 bg-white border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <DidYouKnow />
+                  <DidYouKnow 
+                    onNavigateToSplitter={navigateToSplitter} 
+                    onNavigateToCalculator={navigateToCalculator} 
+                  />
                 </div>
               </section>
 
@@ -449,7 +615,14 @@ export default function App() {
                         </a>
                         <a 
                           href="#strategies-guide"
-                          className="px-6 py-3 bg-slate-850 hover:bg-slate-800 border border-slate-700 text-slate-100 rounded-xl font-bold text-center text-sm transition-all text-center"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const el = document.getElementById('strategies-guide');
+                            if (el) {
+                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }}
+                          className="px-6 py-3 bg-transparent border-2 border-white/60 hover:border-white hover:bg-white/10 text-white rounded-xl font-bold text-center text-sm transition-all text-center cursor-pointer"
                         >
                           Read Core Strategies
                         </a>
@@ -485,14 +658,14 @@ export default function App() {
               </section>
 
               {/* DYNAMIC 12-WEEK BOOKING WINDOW TRACKER REMINDER CALCULATOR */}
-              <section className="py-12 bg-slate-50">
+              <section id="advance-tracker-section" className="py-12 bg-slate-50 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <AdvanceTracker />
                 </div>
               </section>
 
               {/* DETAILED TRAVEL HACKS AND FARES SECTION */}
-              <section id="strategies-guide" className="py-12 bg-white border-y border-slate-200">
+              <section id="strategies-guide" className="py-12 bg-white border-y border-slate-200 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="text-center max-w-2xl mx-auto mb-12">
                     <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-rail-blue tracking-tight">
@@ -563,8 +736,12 @@ export default function App() {
                     </div>
 
                     {/* Right Column: Claire Panel */}
-                    <div className="lg:col-span-4">
-                      <ClairePanel compact={true} />
+                    <div className="lg:col-span-4" id="guide-claire-panel-container">
+                      <ClairePanel 
+                        compact={true} 
+                        onNavigateToSplitter={navigateToSplitter} 
+                        onNavigateToCalculator={navigateToCalculator} 
+                      />
                     </div>
 
                   </div>
@@ -607,8 +784,8 @@ export default function App() {
                   BRITISH RAIL DESIGN ARCHIVE
                 </span>
               </div>
-              <p className="text-[10px] text-slate-300 mt-2 max-w-md">
-                An independent historical archive and travel resource portal. Not affiliated with National Rail, Great British Railways, or the Department for Transport.
+              <p className="text-[10px] text-slate-300 mt-2 max-w-xl leading-relaxed">
+                An independent home for British railway design heritage and travel knowledge. The site funds itself through ethical travel partnerships and is not affiliated with National Rail, Great British Railways, or the Department for Transport. ❤️🙏
               </p>
             </div>
 
@@ -617,21 +794,25 @@ export default function App() {
                 &copy; 2009-{new Date().getFullYear()} BritishRail.co.uk. All rights reserved.
               </p>
               <p className="text-[10px] text-slate-300 mt-1">
-                <button 
-                  onClick={() => {
+                <a 
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
                     const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
                     const domain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
                     const subject = String.fromCharCode(84, 111, 32, 119, 101, 98, 109, 97, 115, 116, 101, 114, 32, 111, 102, 32, 98, 114, 105, 116, 105, 115, 104, 114, 97, 105, 108, 46, 99, 111, 46, 117, 107);
-                    window.location.href = `mailto:${user}@${domain}?subject=${encodeURIComponent(subject)}`;
+                    
+                    const tempLink = document.createElement('a');
+                    tempLink.href = `mailto:${user}@${domain}?subject=${encodeURIComponent(subject)}`;
+                    document.body.appendChild(tempLink);
+                    tempLink.click();
+                    document.body.removeChild(tempLink);
                   }}
-                  onCopy={(e) => {
-                    e.preventDefault();
-                  }}
-                  className="font-sans text-slate-200 text-[11px] hover:text-amber-400 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer bg-transparent border-0 p-0 select-none"
+                  className="font-sans text-slate-200 text-[11px] hover:text-amber-400 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer select-none"
                   title="Contact Webmaster"
                 >
                   Contact Webmaster
-                </button>
+                </a>
               </p>
             </div>
           </div>

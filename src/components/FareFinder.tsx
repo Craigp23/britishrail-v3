@@ -75,7 +75,7 @@ export default function FareFinder() {
   );
 
   return (
-    <div id="fare-finder-section" className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 max-w-4xl mx-auto my-6">
+    <div id="fare-finder-section" className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 max-w-4xl mx-auto my-6 scroll-mt-20">
       
       {/* Title */}
       <div className="flex items-center space-x-3 mb-6">
@@ -268,7 +268,7 @@ export default function FareFinder() {
           ) : (
             <>
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Analyse Splitting & Fares</span>
+              <span>Intelligent Fare Search</span>
             </>
           )}
         </button>

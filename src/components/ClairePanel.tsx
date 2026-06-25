@@ -4,9 +4,11 @@ import satisfiedTravellerImg from '../assets/images/satisfied_traveller_17800429
 
 interface ClairePanelProps {
   compact?: boolean;
+  onNavigateToSplitter?: () => void;
+  onNavigateToCalculator?: () => void;
 }
 
-export default function ClairePanel({ compact = false }: ClairePanelProps) {
+export default function ClairePanel({ compact = false, onNavigateToSplitter, onNavigateToCalculator }: ClairePanelProps) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm flex flex-col h-full justify-between">
       
@@ -34,7 +36,7 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
       <div className="p-5 flex-grow space-y-4">
         <div className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border border-emerald-100">
           <ShieldCheck className="w-3.5 h-3.5" />
-          <span>SAVINGS VERIFIED: 45% COST SLASH</span>
+          <span>SAVINGS VERIFIED: 45%</span>
         </div>
 
         <div>
@@ -45,19 +47,39 @@ export default function ClairePanel({ compact = false }: ClairePanelProps) {
         </div>
 
         <p className="text-xs text-slate-600 leading-relaxed font-sans">
-          "I depend on travelling by train and tickets can sometimes be very expensive. By switching to using the <strong>12-Week Ticket Calculator</strong> and searching for cheaper routes through this portal, my commute is now much more affordable. I love the design heritage page on this site too :)"
+          "I depend on travelling by train and tickets can sometimes be very expensive. By switching to using the{" "}
+          {onNavigateToCalculator ? (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToCalculator();
+              }}
+              className="font-bold text-[#012169] hover:text-[#a8081b] underline cursor-pointer bg-transparent border-0 p-0 inline font-semibold transition-colors"
+            >
+              12-Week Ticket Calculator
+            </button>
+          ) : (
+            <strong className="font-semibold text-[#012169]">12-Week Ticket Calculator</strong>
+          )}{" "}
+          and searching for cheaper routes through this portal, my commute is now much more affordable. I love the design heritage page on this site too :)"
         </p>
       </div>
 
       {/* Call to travel action footer */}
-      <div className="bg-slate-50 px-5 py-4 border-t border-slate-150 flex items-center justify-between">
+      <div className="bg-slate-50 px-4 sm:px-5 py-4 border-t border-slate-150 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div className="flex flex-col">
           <span className="text-[9px] font-mono text-slate-400 uppercase tracking-widest font-bold font-semibold">Standard Single Savings</span>
           <span className="text-sm font-display font-extrabold text-emerald-600">Avg. £42/trip Saved</span>
         </div>
         <a 
           href="#fare-finder-section"
-          className="bg-[#012169] hover:bg-opacity-95 text-white font-sans font-semibold text-xs py-2 px-4 rounded-lg shadow-sm cursor-pointer transition"
+          onClick={(e) => {
+            if (onNavigateToSplitter) {
+              e.preventDefault();
+              onNavigateToSplitter();
+            }
+          }}
+          className="bg-[#012169] hover:bg-opacity-95 text-white font-sans font-semibold text-xs py-2.5 px-4 rounded-lg shadow-sm cursor-pointer transition text-center whitespace-nowrap"
         >
           Go to Ticket Splitter
         </a>

@@ -11,7 +11,12 @@ interface ObscureFact {
   text: string;
 }
 
-export default function DidYouKnow() {
+interface DidYouKnowProps {
+  onNavigateToSplitter?: () => void;
+  onNavigateToCalculator?: () => void;
+}
+
+export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculator }: DidYouKnowProps) {
   const [activeFactId, setActiveFactId] = useState<string | null>(null);
 
   const facts: ObscureFact[] = [
@@ -67,7 +72,7 @@ export default function DidYouKnow() {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-6 lg:p-8 max-w-7xl mx-auto my-6">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-md p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto my-6">
       
       {/* Header Block */}
       <div className="flex items-center space-x-3 mb-8">
@@ -143,7 +148,10 @@ export default function DidYouKnow() {
 
         {/* Right Side: Satisfied Passenger Card Column with our Reusable ClairePanel */}
         <div className="lg:col-span-5 flex flex-col justify-between">
-          <ClairePanel />
+          <ClairePanel 
+            onNavigateToSplitter={onNavigateToSplitter} 
+            onNavigateToCalculator={onNavigateToCalculator} 
+          />
         </div>
 
       </div>
