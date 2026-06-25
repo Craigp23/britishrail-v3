@@ -753,6 +753,9 @@ export default function App() {
                 </div>
               </section>
 
+              {/* ADVERTISEMENT PLACEHOLDER (AdSense Slot 2) */}
+              <AdSenseContainer slotIndex={2} />
+
               {/* FAQ Section */}
               <section className="py-12 bg-slate-50">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -777,6 +780,9 @@ export default function App() {
 
         </AnimatePresence>
       </main>
+
+      {/* ADVERTISEMENT PLACEHOLDER (AdSense Slot 3) */}
+      <AdSenseContainer slotIndex={3} />
 
       {/* <VisualInspector /> */}
       {/* Symmetrical Brand Footer */}

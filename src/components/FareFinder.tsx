@@ -268,7 +268,7 @@ export default function FareFinder() {
       <div className="mt-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
         <button
           onClick={() => handleCalculate(true)}
-          className="flex-1 h-11 bg-rail-blue text-white hover:bg-opacity-95 rounded-xl font-sans font-semibold text-sm px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-rail-blue flex items-center justify-center space-x-2 cursor-pointer"
+          className="flex-1 h-12 bg-rail-blue text-white hover:bg-opacity-95 rounded-xl font-sans font-semibold text-sm px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-rail-blue flex items-center justify-center space-x-2 cursor-pointer"
         >
           {calculating ? (
             <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
