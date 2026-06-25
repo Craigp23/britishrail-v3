@@ -87,23 +87,17 @@ export default function LegalModals({ activeModal, onClose }: LegalModalsProps) 
                 <>
                   {/* ABOUT PANEL */}
                   <div>
-                    <h3 className="font-display font-bold text-slate-800 text-sm mb-2 uppercase tracking-wide">
-                      The British Rail Heritage Hub
-                    </h3>
                     <p>
-                      Welcome to <strong>britishrail.co.uk</strong>, an independent digital archive and travel optimizer celebrating the design heritage of British Railways (1948–1997) while providing modern split-ticketing tools to maximize savings for contemporary passengers.
+                      Welcome to <strong>britishrail.co.uk</strong>, an independent site celebrating the design heritage of British Railways (1948–1997), providing useful resources for rail enthusiasts, historians, modellers, and modern split-ticketing tools to maximise savings for contemporary travellers.
                     </p>
                     <p className="mt-2.5">
-                      This site is intended as a tribute to the legendary corporate identity guidelines designed by the Design Research Unit (DRU) in 1965; in particular Gerry Barney's iconic <strong>Double Arrow logo</strong> and Margaret Calvert & Jock Kinneir's <strong>Rail Alphabet</strong> typography - a font classic.
+                      This site is intended as a tribute to the legendary corporate identity guidelines crafted by the Design Research Unit (DRU) in the mid 1960s; in particular Gerry Barney's iconic <strong>Double Arrow logo</strong> and Margaret Calvert & Jock Kinneir's <strong>Rail Alphabet</strong> typography - both modern classics.
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="font-display font-bold text-slate-800 text-sm mb-2 uppercase tracking-wide">
-                      The Travel Portal
-                    </h3>
                     <p className="mt-2.5">
-                      We believe in affordable train travel for all - sustainable and accessible. By analyzing rail routes, split points, and ticket structures on-the-fly, our <strong>Intelligent Fare Search</strong> helps split expensive through-fares into cheaper sequential journeys, saving travellers up to 43% on long-distance fares without changing trains.
+                      We believe in affordable train travel for all - sustainable and accessible. By analysing rail routes, split points, and ticket structures on-the-fly, our <strong>Intelligent Fare Search</strong> helps split expensive through-fares into cheaper sequential journeys, saving travellers up to 43% on long-distance fares without changing trains.
                     </p>
                   </div>
 
@@ -139,7 +133,7 @@ export default function LegalModals({ activeModal, onClose }: LegalModalsProps) 
                       At <strong>britishrail.co.uk</strong>, protecting your personal data is a primary commitment. This policy outlines how we handle information in compliance with the UK General Data Protection Regulation (UK GDPR) and the UK Data Protection Act 2018.
                     </p>
                     <p className="mt-2">
-                      When utilizing our Intelligent Fare Search, your search origin, destination, date & time of travel, and railcard type are processed in real-time. We <strong>do not store, save, or share</strong> your travel inputs, search histories, or journey routes on our servers.
+                      When utilising our Intelligent Fare Search, your search origin, destination, date & time of travel, and railcard type are processed in real-time. We <strong>do not store, save, or share</strong> your travel inputs, search histories, or journey routes on our servers.
                     </p>
                   </div>
 
@@ -148,7 +142,7 @@ export default function LegalModals({ activeModal, onClose }: LegalModalsProps) 
                       2. What are Cookies?
                     </h3>
                     <p>
-                      Cookies are small text files placed on your device to ensure optimal performance, remember interface preferences, and support monetization models. Non-essential cookies can easily be controlled or blocked via your web browser settings.
+                      Cookies are small text files placed on your device to ensure optimal performance, remember interface preferences, and support monetisation models. Non-essential cookies can easily be controlled or blocked via your web browser settings.
                     </p>
                   </div>
 
@@ -183,7 +177,7 @@ export default function LegalModals({ activeModal, onClose }: LegalModalsProps) 
                     </p>
                     <ul className="list-disc pl-5 mt-2 space-y-1.5 text-xs text-slate-500">
                       <li>Users can opt out of personalised advertising by visiting the <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-rail-blue underline font-semibold hover:text-opacity-80">Google Ads Settings page</a>.</li>
-                      <li>Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-rail-blue underline font-semibold hover:text-opacity-80">aboutads.info</a>.</li>
+                      <li>Alternatively, you can opt out of a third-party vendor's use of cookies for personalised advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-rail-blue underline font-semibold hover:text-opacity-80">aboutads.info</a>.</li>
                       <li>For users inside the UK & EEA, a GDPR-compliant solution is provided. You can withdraw or adjust your consent choices at any time by clicking "Manage Cookies" in the page footer.</li>
                     </ul>
                   </div>
