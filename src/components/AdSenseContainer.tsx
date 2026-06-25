@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 export default function AdSenseContainer() {
   // @ts-ignore
-  const adClientId = (import.meta as any).env?.VITE_ADSENSE_CLIENT_ID;
+  const adClientId = import.meta.env.VITE_ADSENSE_CLIENT_ID;
   // @ts-ignore
-  const adSlotId = (import.meta as any).env?.VITE_ADSENSE_SLOT_ID;
+  const adSlotId = import.meta.env.VITE_ADSENSE_SLOT_ID;
   const [adError, setAdError] = useState(false);
 
   useEffect(() => {

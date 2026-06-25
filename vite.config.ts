@@ -7,6 +7,14 @@ export default defineConfig(() => {
   return {
     base: '/britishrail-v3/',
     plugins: [react(), tailwindcss()],
+    define: {
+      'import.meta.env.VITE_ADSENSE_CLIENT_ID': JSON.stringify(
+        process.env.VITE_ADSENSE_CLIENT_ID || process.env.ADSENSE_CLIENT_ID || ''
+      ),
+      'import.meta.env.VITE_ADSENSE_SLOT_ID': JSON.stringify(
+        process.env.VITE_ADSENSE_SLOT_ID || process.env.ADSENSE_SLOT_ID || ''
+      ),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
