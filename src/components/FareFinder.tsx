@@ -24,10 +24,11 @@ export default function FareFinder() {
   
   const [fareResult, setFareResult] = useState<FareCalculation | null>(null);
   const [calculating, setCalculating] = useState(false);
+  const [highlightActive, setHighlightActive] = useState(false);
 
   // Load initial fare details
   useEffect(() => {
-    handleCalculate();
+    handleCalculate(false);
   }, []);
 
   const handleSwap = () => {
@@ -54,8 +55,11 @@ export default function FareFinder() {
     if (currentDest && !destSearch) setDestSearch(currentDest.name);
   }, [destination]);
 
-  const handleCalculate = () => {
+  const handleCalculate = (explicitClick: boolean = false) => {
     setCalculating(true);
+    if (explicitClick) {
+      setHighlightActive(true);
+    }
     setTimeout(() => {
       const result = calculateFare(origin, destination, railcard, travelDate, travelTime);
       setFareResult(result);
@@ -253,6 +257,9 @@ export default function FareFinder() {
             <option value="two-together">Two Together Railcard</option>
             <option value="senior">Senior Railcard</option>
             <option value="disabled">Disabled Persons Railcard</option>
+            <option value="forces">HM Forces Railcard</option>
+            <option value="family">Family & Friends Railcard</option>
+            <option value="network">Network Railcard</option>
           </select>
         </div>
       </div>
@@ -260,8 +267,8 @@ export default function FareFinder() {
       {/* Calculate Buttons */}
       <div className="mt-6 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
         <button
-          onClick={handleCalculate}
-          className="flex-1 bg-rail-blue text-white hover:bg-opacity-95 rounded-xl font-sans font-semibold text-sm py-3 px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-rail-blue flex items-center justify-center space-x-2 cursor-pointer"
+          onClick={() => handleCalculate(true)}
+          className="flex-1 h-11 bg-rail-blue text-white hover:bg-opacity-95 rounded-xl font-sans font-semibold text-sm px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:ring-rail-blue flex items-center justify-center space-x-2 cursor-pointer"
         >
           {calculating ? (
             <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
@@ -287,81 +294,114 @@ export default function FareFinder() {
 
       {/* Results Panel */}
       <AnimatePresence mode="wait">
-        {fareResult && !calculating && (
+        {fareResult && (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             className="mt-8 border-t border-slate-150 pt-6"
           >
-            {/* Split Comparison Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-              
-              {/* Card 1: Standard Fare */}
-              <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-0 right-0 bg-slate-200 text-slate-600 text-[9px] font-mono px-2 py-0.5 rounded-bl">
-                  DIRECT ROUTE
+            {/* Core Fare Cards and Booking Link highlighted container */}
+            <div className={`pt-4 pb-2 px-4 sm:pt-6 sm:pb-3 sm:px-6 rounded-2xl transition-all duration-500 relative ${
+              calculating ? 'opacity-40 pointer-events-none' : 'opacity-100'
+            } ${
+              highlightActive 
+                ? 'border-2 border-amber-400 bg-amber-500/[0.02] shadow-[0_0_25px_rgba(245,158,11,0.18)] ring-4 ring-amber-400/20' 
+                : 'border border-transparent'
+            }`}>
+              {highlightActive && (
+                <div className="absolute -top-3 left-4 bg-amber-400 text-amber-950 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center space-x-1">
+                  <Sparkles className="w-3 h-3 text-amber-950" />
+                  <span>Search Results</span>
                 </div>
-                <div>
-                  <h4 className="text-xs font-mono text-slate-500 uppercase tracking-widest font-bold">Standard Single Fare</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Purchased as a single ticket across the entire network journey.</p>
-                </div>
+              )}
+
+              {/* Split Comparison Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 
-                <div className="my-5">
-                  <span className="text-3xl font-display font-bold text-slate-800">
-                    £{fareResult.standardPrice.toFixed(2)}
-                  </span>
-                  <span className="text-xs text-slate-400 font-mono ml-1">one-way</span>
-                </div>
-
-                <div className="text-xs text-slate-500 bg-white/60 p-2.5 rounded-lg border border-slate-100 flex items-center space-x-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
-                  <span>1 separate booking required.</span>
-                </div>
-              </div>
-
-              {/* Card 2: Split Fare (Saves Money) */}
-              <div className="bg-emerald-50/50 rounded-xl border border-emerald-200/80 p-5 flex flex-col justify-between relative overflow-hidden ring-2 ring-emerald-500/20">
-                <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] font-mono font-bold px-3 py-0.5 rounded-bl flex items-center space-x-1">
-                  <Flame className="w-3 h-3 text-amber-200" />
-                  <span>SAVE {fareResult.savingsPercent}%</span>
-                </div>
-                
-                <div>
-                  <h4 className="text-xs font-mono text-emerald-800 uppercase tracking-widest font-bold flex items-center space-x-1">
-                    <span>Smart Splitting Ticket</span>
-                  </h4>
-                  <p className="text-xs text-emerald-700/80 mt-0.5">Splitting fares at intermediate platforms. No train transfers necessary!</p>
-                </div>
-
-                <div className="my-4 flex items-baseline space-x-2">
-                  <span className="text-3xl font-display font-bold text-emerald-700">
-                    £{fareResult.splitPrice.toFixed(2)}
-                  </span>
-                  <span className="text-xs text-emerald-600/70 font-mono">one-way</span>
-                  <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold ml-auto font-mono">
-                    Save £{(fareResult.standardPrice - fareResult.splitPrice).toFixed(2)}!
-                  </span>
-                </div>
-
-                <div className="text-xs text-emerald-800 bg-white/95 p-3 rounded-lg border border-emerald-100 flex flex-col space-y-1">
-                  <div className="font-semibold text-emerald-900 border-b border-slate-100 pb-1 mb-1 flex justify-between">
-                    <span>Split Leg details:</span>
-                    <span className="text-[10px] text-emerald-600">Travel same train!</span>
+                {/* Card 1: Standard Fare */}
+                <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 flex flex-col justify-between relative overflow-hidden">
+                  <div className="absolute top-0 right-0 bg-slate-200 text-slate-600 text-[9px] font-mono px-2 py-0.5 rounded-bl">
+                    DIRECT ROUTE
                   </div>
-                  {fareResult.splitSegments.map((seg, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-[11px] text-slate-600 font-mono">
-                      <span>{seg.from} ➔ {seg.to}</span>
-                      <span className="font-semibold text-slate-800">£{seg.price.toFixed(2)}</span>
-                    </div>
-                  ))}
+                  <div>
+                    <h4 className="text-xs font-mono text-slate-500 uppercase tracking-widest font-bold">Standard Single Fare</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">Purchased as a single ticket across the entire journey.</p>
+                  </div>
+                  
+                  <div className="my-5">
+                    <span className="text-3xl font-display font-bold text-slate-800">
+                      £{fareResult.standardPrice.toFixed(2)}
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono ml-1">one-way</span>
+                  </div>
+
+                  <div className="text-xs text-slate-500 bg-white/60 p-2.5 rounded-lg border border-slate-100 flex items-center space-x-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    <span>1 continuous ticket. Simple single booking.</span>
+                  </div>
                 </div>
+
+                {/* Card 2: Split Fare (Saves Money) */}
+                <div className="bg-emerald-50/50 rounded-xl border border-emerald-200/80 p-5 flex flex-col justify-between relative overflow-hidden ring-2 ring-emerald-500/20">
+                  <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] font-mono font-bold px-3 py-0.5 rounded-bl flex items-center space-x-1">
+                    <Flame className="w-3 h-3 text-amber-200" />
+                    <span>SAVE {fareResult.savingsPercent}%</span>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-xs font-mono text-emerald-800 uppercase tracking-widest font-bold flex items-center space-x-1">
+                      <span>Smart Fare</span>
+                    </h4>
+                    <p className="text-xs text-emerald-700/80 mt-0.5">Save by splitting at intermediate stations. No train transfers necessary</p>
+                  </div>
+
+                  <div className="my-4 flex items-baseline space-x-2">
+                    <span className="text-3xl font-display font-bold text-emerald-700">
+                      £{fareResult.splitPrice.toFixed(2)}
+                    </span>
+                    <span className="text-xs text-emerald-600/70 font-mono">one-way</span>
+                    <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold ml-auto font-mono">
+                      Save £{(fareResult.standardPrice - fareResult.splitPrice).toFixed(2)}!
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-emerald-800 bg-white/95 p-3 rounded-lg border border-emerald-100 flex flex-col space-y-1">
+                    <div className="font-semibold text-emerald-900 border-b border-slate-100 pb-1 mb-1 flex justify-between">
+                      <span>Split Leg details:</span>
+                      <span className="text-[10px] text-emerald-600">Travel same train</span>
+                    </div>
+                    {fareResult.splitSegments.map((seg, idx) => (
+                      <div key={idx} className="flex justify-between items-center text-[11px] text-slate-600 font-mono">
+                        <span>{seg.from} ➔ {seg.to}</span>
+                        <span className="font-semibold text-slate-800">£{seg.price.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
+              {/* Booking Portal Action link (Moved above voucher) */}
+              <div className="flex justify-center mt-3 mb-0.5">
+                <a
+                  href={`https://www.thetrainline.com/book/results?origin=${fareResult.origin.code}&destination=${fareResult.destination.code}&outwardDate=${fareResult.date}T${fareResult.time}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    // Prevent event propagation so browser/iframe sandboxes do not capture the click and trigger flashes
+                    e.stopPropagation();
+                  }}
+                  className="inline-flex items-center justify-center space-x-2 bg-rail-red text-white hover:bg-opacity-95 font-sans font-bold text-sm py-2.5 px-6 rounded-xl transition duration-150 shadow-md transform hover:-translate-y-0.5 cursor-pointer"
+                >
+                  <span>Navigate to Secure Booking on Trainline</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
 
             {/* Retro Orange Cardboard Train Ticket Design Mockup */}
-            <div className="mt-8">
+            <div className="mt-8 max-w-full sm:max-w-md md:max-w-lg mx-auto w-full px-1 sm:px-0">
               <div className="text-center mb-3">
                 <span className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center justify-center space-x-1">
                   <span>Your Souvenir Boarding Voucher</span>
@@ -369,7 +409,7 @@ export default function FareFinder() {
               </div>
 
               {/* Classic UK Cardboard Train Ticket Render */}
-              <div className="bg-amber-100 border-2 border-amber-300 rounded-lg p-4 font-mono text-amber-900 shadow-sm relative overflow-hidden">
+              <div className="bg-amber-100 border-2 border-amber-300 rounded-lg px-4 sm:px-8 py-4 font-mono text-amber-900 shadow-sm relative overflow-hidden">
                 
                 {/* Magnetic Stripe representation on top */}
                 <div className="absolute top-0 left-0 w-full h-3 bg-neutral-800" />
@@ -378,51 +418,53 @@ export default function FareFinder() {
                 <div className="pt-3">
                   
                   {/* Top line header */}
-                  <div className="flex justify-between items-center text-[10px] font-bold border-b border-amber-300/60 pb-1 mb-2">
+                  <div className="flex flex-wrap justify-between items-center text-[9px] sm:text-[10px] font-bold border-b border-amber-300/60 pb-1 mb-2">
                     <span>M* National Rail</span>
                     <span>CLASS: STANDARD</span>
-                    <span>TICKET No: BR-{Math.floor(100000 + Math.random() * 900000)}</span>
+                    <span>No: BR-{Math.floor(100000 + Math.random() * 900000)}</span>
                   </div>
 
                   {/* Journey routing */}
                   <div className="grid grid-cols-2 gap-2 my-2.5">
                     <div>
-                      <span className="text-[9px] text-amber-800 block">FROM: (ORIGIN)</span>
-                      <span className="text-sm font-bold tracking-tight uppercase">{fareResult.origin.name}</span>
+                      <span className="text-[8px] sm:text-[9px] text-amber-800 block">FROM: (ORIGIN)</span>
+                      <span className="text-xs sm:text-sm font-bold tracking-tight uppercase leading-tight">{fareResult.origin.name}</span>
                     </div>
                     <div>
-                      <span className="text-[9px] text-amber-800 block">TO: (DESTINATION)</span>
-                      <span className="text-sm font-bold tracking-tight uppercase">{fareResult.destination.name}</span>
+                      <span className="text-[8px] sm:text-[9px] text-amber-800 block">TO: (DESTINATION)</span>
+                      <span className="text-xs sm:text-sm font-bold tracking-tight uppercase leading-tight">{fareResult.destination.name}</span>
                     </div>
                   </div>
 
                   {/* Route conditions */}
-                  <div className="grid grid-cols-3 gap-1 my-2 bg-amber-50/60 p-2 rounded border border-amber-300/30 text-[10px]">
+                  <div className="grid grid-cols-3 gap-1 my-2 bg-amber-50/60 p-1.5 sm:p-2 rounded border border-amber-300/30 text-[9px] sm:text-[10px]">
                     <div>
-                      <span className="text-[8px] text-amber-800 block uppercase">Validity</span>
-                      <span className="font-semibold">ON DATE SHOWN</span>
+                      <span className="text-[7px] sm:text-[8px] text-amber-800 block uppercase">Validity</span>
+                      <span className="font-semibold block truncate">ON DATE SHOWN</span>
                     </div>
                     <div>
-                      <span className="text-[8px] text-amber-800 block uppercase font-mono">Travel Date</span>
-                      <span className="font-semibold">{fareResult.date}</span>
+                      <span className="text-[7px] sm:text-[8px] text-amber-800 block uppercase font-mono">Travel Date</span>
+                      <span className="font-semibold block truncate">{fareResult.date}</span>
                     </div>
                     <div>
-                      <span className="text-[8px] text-amber-800 block uppercase font-mono">Departure</span>
-                      <span className="font-semibold">~ {fareResult.time}</span>
+                      <span className="text-[7px] sm:text-[8px] text-amber-800 block uppercase font-mono">Departure</span>
+                      <span className="font-semibold block truncate">{fareResult.time}</span>
                     </div>
                   </div>
 
                   {/* Bottom Ticket footer */}
-                  <div className="flex justify-between items-end mt-3 pt-1 border-t border-amber-300/60 text-[9px]">
-                    <div className="flex items-center space-x-2">
-                      <div className="text-[12px] font-bold uppercase tracking-wider text-rose-600 font-sans border border-rose-400 px-1 rounded-sm rotate-[-2deg]">
+                  <div className="flex justify-between items-end mt-3 pt-1 border-t border-amber-300/60 text-[8px] sm:text-[9px]">
+                    <div>
+                      <span className="text-[7px] sm:text-[8px] text-amber-700/80">Railcard: {fareResult.railcard !== 'none' ? fareResult.railcard.toUpperCase() : 'NONE'}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 sm:space-x-3 text-right">
+                      <div className="text-[10px] sm:text-[12px] font-bold uppercase tracking-wider text-rose-600 font-sans border border-rose-400 px-1 rounded-sm rotate-[-2deg] shrink-0">
                         SPLIT SAVER
                       </div>
-                      <span className="text-[8px] text-amber-700/80">Railcard: {fareResult.railcard !== 'none' ? fareResult.railcard.toUpperCase() : 'NONE'}</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[8px] text-amber-800 uppercase block font-mono">Combined Price</span>
-                      <span className="text-sm font-bold">£{fareResult.splitPrice.toFixed(2)}</span>
+                      <div>
+                        <span className="text-[7px] sm:text-[8px] text-amber-800 uppercase block font-mono">Combined Price</span>
+                        <span className="text-xs sm:text-sm font-bold">£{fareResult.splitPrice.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -432,19 +474,6 @@ export default function FareFinder() {
                 <div className="absolute top-1/2 -right-2 transform -translate-y-1/2 w-4 h-4 bg-white border border-slate-300 rounded-full" />
                 <div className="absolute top-1/2 -left-2 transform -translate-y-1/2 w-4 h-4 bg-white border border-slate-300 rounded-full" />
               </div>
-            </div>
-
-            {/* Booking Portal Action link */}
-            <div className="mt-6 flex justify-center">
-              <a
-                href={`https://www.thetrainline.com/book/results?origin=${fareResult.origin.code}&destination=${fareResult.destination.code}&outwardDate=${fareResult.date}T${fareResult.time}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center space-x-2 bg-rail-red text-white hover:bg-opacity-95 font-sans font-bold text-sm py-2.5 px-6 rounded-xl transition duration-150 shadow-md transform hover:-translate-y-0.5 cursor-pointer"
-              >
-                <span>Navigate to Secure Booking on Trainline</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
             </div>
 
           </motion.div>

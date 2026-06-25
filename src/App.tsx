@@ -9,6 +9,7 @@ import InteractiveTimeline from './components/InteractiveTimeline';
 import DidYouKnow from './components/DidYouKnow';
 import ClairePanel from './components/ClairePanel';
 import VisualInspector from './components/VisualInspector';
+import AdSenseContainer from './components/AdSenseContainer';
 // @ts-expect-error - image asset
 import ticketImg from './assets/images/ticket.png';
 // @ts-expect-error - image asset
@@ -354,17 +355,8 @@ export default function App() {
                 </div>
               </section>
 
-              {/* ADVERTISEMENT PLACEHOLDER (Clean, Non-obtrusive) */}
-              <div className="max-w-4xl mx-auto my-6 px-4">
-                <div className="bg-slate-100 p-4 rounded-xl border border-slate-200 text-center relative">
-                  <div className="text-[9px] font-mono text-slate-400 absolute top-2 left-1/2 transform -translate-x-1/2 uppercase tracking-widest">
-                    Advertisement
-                  </div>
-                  <div className="text-xs font-medium text-slate-500 pt-3">
-                    Looking for accommodations? Plan hotel stays simultaneously to save more bundle travel values.
-                  </div>
-                </div>
-              </div>
+              {/* ADVERTISEMENT PLACEHOLDER (AdSense Enabled) */}
+              <AdSenseContainer />
 
               {/* THREE COLUMN INFO GRID */}
               <section className="py-12 bg-slate-50">
@@ -798,7 +790,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[10px] text-slate-300 mt-2 max-w-xl leading-relaxed">
-                An independent home for British railway design heritage and travel knowledge. The site funds itself through ethical travel partnerships and is not affiliated with National Rail, Great British Railways, or the Department for Transport. ❤️🙏
+                An independent home for British railway design heritage and travel ticket tips. The site funds itself through ethical travel partnerships and is not affiliated with National Rail, Great British Railways, or the Department for Transport. ❤️🙏
               </p>
             </div>
 

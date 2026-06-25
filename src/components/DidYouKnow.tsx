@@ -140,10 +140,6 @@ export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculato
             })}
 
           </div>
-
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center text-xs text-slate-500 font-mono">
-            Pro Tip: Click any fact card above to expand and reveal full trivia details.
-          </div>
         </div>
 
         {/* Right Side: Satisfied Passenger Card Column with our Reusable ClairePanel */}
