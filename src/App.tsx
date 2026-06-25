@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Page, Station } from './types';
 import Header from './components/Header';
 import FareFinder from './components/FareFinder';
@@ -10,13 +10,16 @@ import DidYouKnow from './components/DidYouKnow';
 import ClairePanel from './components/ClairePanel';
 import VisualInspector from './components/VisualInspector';
 import AdSenseContainer from './components/AdSenseContainer';
+import CookieBanner from './components/CookieBanner';
+import LegalModals from './components/LegalModals';
 // @ts-expect-error - image asset
 import ticketImg from './assets/images/ticket.png';
 // @ts-expect-error - image asset
 import heroImg from './assets/images/british_rail_history_hero_1780041941158.png';
 import { 
   Train, ArrowRight, ArrowUpDown, Calendar, HelpCircle, ShieldCheck, 
-  Clock, Info, Layout, Sliders, Type, Landmark, ExternalLink, Sparkles 
+  Clock, Info, Layout, Sliders, Type, Landmark, ExternalLink, Sparkles,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { TIMELINE_EVENTS, DESIGN_ELEMENTS } from './data/railData';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,21 +29,34 @@ export default function App() {
   const [pendingScroll, setPendingScroll] = useState(false);
   const [pendingCalculatorScroll, setPendingCalculatorScroll] = useState(false);
   const [pendingStrategiesScroll, setPendingStrategiesScroll] = useState(false);
-  const [contactHref, setContactHref] = useState('#');
-  const [emailCopied, setEmailCopied] = useState(false);
+  const [activeLegalModal, setActiveLegalModal] = useState<'about' | 'privacy' | null>(null);
+  const [cookieBannerKey, setCookieBannerKey] = useState(0);
+  const [activeDesignIndex, setActiveDesignIndex] = useState(0);
+  const [designTouchStart, setDesignTouchStart] = useState<number | null>(null);
+  const [designTouchEnd, setDesignTouchEnd] = useState<number | null>(null);
+
+  const handleDesignTouchStart = (e: React.TouchEvent) => {
+    setDesignTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleDesignTouchMove = (e: React.TouchEvent) => {
+    setDesignTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleDesignTouchEnd = () => {
+    if (!designTouchStart || !designTouchEnd) return;
+    const distance = designTouchStart - designTouchEnd;
+    const minSwipeDistance = 50;
+    if (distance > minSwipeDistance) {
+      setActiveDesignIndex((prev) => (prev === DESIGN_ELEMENTS.length - 1 ? 0 : prev + 1));
+    } else if (distance < -minSwipeDistance) {
+      setActiveDesignIndex((prev) => (prev === 0 ? DESIGN_ELEMENTS.length - 1 : prev - 1));
+    }
+    setDesignTouchStart(null);
+    setDesignTouchEnd(null);
+  };
 
   const prevTabRef = useRef<Page>(currentTab);
-
-  // Safely construct obfuscated contact email address to prevent scrapers while maintaining native behavior
-  useEffect(() => {
-    const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
-    const domain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 46, 117, 107); // 23healing@gmail.co.uk? No, wait!
-    // Let's check the previous user message: "mailto:23healing@gmail.com?subject=To%20webmaster%20of%20britishrail.co.uk"
-    // String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109) is "gmail.com". Yes! Let's make sure it is exactly "23healing@gmail.com".
-    const gmailDomain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
-    const subject = String.fromCharCode(84, 111, 32, 119, 101, 98, 109, 97, 115, 116, 101, 114, 32, 111, 102, 32, 98, 114, 105, 116, 105, 115, 104, 114, 97, 105, 108, 46, 99, 111, 46, 117, 107);
-    setContactHref(`mailto:${user}@${gmailDomain}?subject=${encodeURIComponent(subject)}`);
-  }, []);
 
   // Bilateral synchronization between URL hash and application state
   useEffect(() => {
@@ -501,7 +517,8 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Desktop Grid Layout */}
+                  <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {DESIGN_ELEMENTS.map((elem) => {
                       const targetId = elem.id === 'double-arrow' || elem.id === 'flame-red'
                         ? 'double-arrow-geometry-section'
@@ -540,6 +557,104 @@ export default function App() {
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Mobile Interactive Carousel */}
+                  <div className="md:hidden relative">
+                    <div 
+                      onTouchStart={handleDesignTouchStart}
+                      onTouchMove={handleDesignTouchMove}
+                      onTouchEnd={handleDesignTouchEnd}
+                      className="overflow-hidden rounded-xl border border-slate-200/65 bg-slate-50 p-6 flex flex-col justify-between min-h-[220px]"
+                    >
+                      <AnimatePresence mode="wait">
+                        {DESIGN_ELEMENTS.map((elem, idx) => {
+                          if (idx !== activeDesignIndex) return null;
+                          const targetId = elem.id === 'double-arrow' || elem.id === 'flame-red'
+                            ? 'double-arrow-geometry-section'
+                            : elem.id === 'rail-alphabet'
+                            ? 'rail-alphabet-typewriter-section'
+                            : elem.id === 'intercity-125'
+                            ? 'timeline-section'
+                            : '';
+
+                          return (
+                            <motion.div
+                              key={elem.id}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -20 }}
+                              transition={{ duration: 0.2 }}
+                              className="flex flex-col justify-between h-full flex-1 touch-pan-y select-none"
+                            >
+                              <div>
+                                <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
+                                  <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">
+                                    ELEMENT {elem.number}
+                                  </span>
+                                  {targetId ? (
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        const el = document.getElementById(targetId);
+                                        if (el) {
+                                          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }
+                                      }}
+                                      className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition cursor-pointer font-sans"
+                                    >
+                                      INTERACTIVE &gt;
+                                    </button>
+                                  ) : (
+                                    <span className="text-xs font-bold text-[#a8081b]">ACTIVE ERA</span>
+                                  )}
+                                </div>
+                                <h4 className="font-display font-bold text-slate-800 text-sm mt-1">{elem.title}</h4>
+                                <p className="text-xs text-slate-600 mt-2 leading-relaxed">{elem.description}</p>
+                              </div>
+                              <div className="text-[10px] text-slate-400 mt-4 italic font-sans font-medium">
+                                Design Research Unit archive
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Integrated Carousel Navigation Pill */}
+                    <div className="flex items-center justify-center mt-4">
+                      <div className="inline-flex items-center space-x-3 bg-white border border-slate-200 shadow-sm rounded-xl py-1.5 px-3">
+                        <button
+                          onClick={() => setActiveDesignIndex((prev) => (prev === 0 ? DESIGN_ELEMENTS.length - 1 : prev - 1))}
+                          className="text-slate-500 hover:text-[#a8081b] active:scale-95 transition cursor-pointer p-0.5"
+                          aria-label="Previous slide"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+
+                        {/* Dots Indicators */}
+                        <div className="flex space-x-1.5">
+                          {DESIGN_ELEMENTS.map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setActiveDesignIndex(idx)}
+                              className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                                idx === activeDesignIndex ? 'w-4 bg-[#a8081b]' : 'bg-slate-200 hover:bg-slate-350'
+                              }`}
+                              aria-label={`Go to slide ${idx + 1}`}
+                            />
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => setActiveDesignIndex((prev) => (prev === DESIGN_ELEMENTS.length - 1 ? 0 : prev + 1))}
+                          className="text-slate-500 hover:text-[#a8081b] active:scale-95 transition cursor-pointer p-0.5"
+                          aria-label="Next slide"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -800,33 +915,52 @@ export default function App() {
               </p>
             </div>
 
-            <div className="text-right">
+            <div className="flex flex-col items-center md:items-end space-y-2 text-right">
               <p className="text-[11px] font-sans text-slate-100">
                 &copy; 2009-{new Date().getFullYear()} BritishRail.co.uk. All rights reserved.
               </p>
-              <p className="text-[10px] text-slate-300 mt-1">
-                <a 
-                  href={contactHref}
-                  target="_top"
-                  onClick={() => {
-                    const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
-                    const gmailDomain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
-                    const email = `${user}@${gmailDomain}`;
-                    navigator.clipboard.writeText(email).then(() => {
-                      setEmailCopied(true);
-                      setTimeout(() => setEmailCopied(false), 2500);
-                    }).catch(() => {});
-                  }}
-                  className="font-sans text-slate-200 text-[11px] hover:text-amber-400 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer select-none"
-                  title="Contact Webmaster"
+              
+              <div className="flex flex-wrap justify-center md:justify-end gap-x-4 gap-y-1.5 text-[11px] text-slate-300">
+                <button 
+                  onClick={() => setActiveLegalModal('about')}
+                  className="hover:text-amber-400 transition cursor-pointer font-sans underline decoration-dotted underline-offset-2"
                 >
-                  {emailCopied ? "Address copied to clipboard" : "Contact Webmaster"}
-                </a>
-              </p>
+                  About & Contact
+                </button>
+                <span className="text-slate-500 hidden sm:inline">•</span>
+                <button 
+                  onClick={() => setActiveLegalModal('privacy')}
+                  className="hover:text-amber-400 transition cursor-pointer font-sans underline decoration-dotted underline-offset-2"
+                >
+                  Privacy & Cookies
+                </button>
+                <span className="text-slate-500 hidden sm:inline">•</span>
+                <button 
+                  onClick={() => {
+                    localStorage.removeItem('br_cookie_consent');
+                    setCookieBannerKey(prev => prev + 1);
+                  }}
+                  className="hover:text-amber-400 transition cursor-pointer font-sans underline decoration-dotted underline-offset-2"
+                >
+                  Manage Cookies
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Cookie Consent Banner */}
+      <CookieBanner 
+        consentTrigger={cookieBannerKey} 
+        onOpenPrivacy={() => setActiveLegalModal('privacy')} 
+      />
+
+      {/* Legal Overlay Modals */}
+      <LegalModals 
+        activeModal={activeLegalModal} 
+        onClose={() => setActiveLegalModal(null)} 
+      />
 
     </div>
   );

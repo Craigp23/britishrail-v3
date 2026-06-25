@@ -4076,7 +4076,7 @@ export default function RailAlphabetTypewriter() {
 
             {/* Universal Pagination Dots / Active State Indicators under the Control Cards Carousel */}
             <div className="flex items-center justify-center select-none pb-1 pt-0.5">
-              <div className="flex items-center gap-1.5 bg-slate-100/60 px-3 py-1 rounded-lg border border-slate-200/50 shadow-sm">
+              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
                 {/* Scroll Left */}
                 <button
                   type="button"

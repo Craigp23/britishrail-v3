@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { HelpCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import ClairePanel from './ClairePanel';
 
 interface ObscureFact {
@@ -18,6 +18,30 @@ interface DidYouKnowProps {
 
 export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculator }: DidYouKnowProps) {
   const [activeFactId, setActiveFactId] = useState<string | null>(null);
+  const [activeFactIndex, setActiveFactIndex] = useState(0);
+  const [factTouchStart, setFactTouchStart] = useState<number | null>(null);
+  const [factTouchEnd, setFactTouchEnd] = useState<number | null>(null);
+
+  const handleFactTouchStart = (e: React.TouchEvent) => {
+    setFactTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleFactTouchMove = (e: React.TouchEvent) => {
+    setFactTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleFactTouchEnd = () => {
+    if (!factTouchStart || !factTouchEnd) return;
+    const distance = factTouchStart - factTouchEnd;
+    const minSwipeDistance = 50;
+    if (distance > minSwipeDistance) {
+      setActiveFactIndex((prev) => (prev === facts.length - 1 ? 0 : prev + 1));
+    } else if (distance < -minSwipeDistance) {
+      setActiveFactIndex((prev) => (prev === 0 ? facts.length - 1 : prev - 1));
+    }
+    setFactTouchStart(null);
+    setFactTouchEnd(null);
+  };
 
   const facts: ObscureFact[] = [
     {
@@ -94,8 +118,8 @@ export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculato
         
         {/* Left Side: Facts Bento/Accordion Grid (7 columns) */}
         <div className="lg:col-span-7 flex flex-col justify-between space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
+          {/* Tablet & Desktop Grid */}
+          <div className="hidden sm:grid grid-cols-2 gap-4">
             {facts.map((fact, index) => {
               const isActive = activeFactId === fact.id;
               
@@ -138,7 +162,88 @@ export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculato
                 </div>
               );
             })}
+          </div>
 
+          {/* Mobile Swipeable/Interactive Carousel */}
+          <div className="sm:hidden relative">
+            <div 
+              onTouchStart={handleFactTouchStart}
+              onTouchMove={handleFactTouchMove}
+              onTouchEnd={handleFactTouchEnd}
+              className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-5 flex flex-col justify-between min-h-[220px]"
+            >
+              <AnimatePresence mode="wait">
+                {facts.map((fact, index) => {
+                  if (index !== activeFactIndex) return null;
+                  
+                  return (
+                    <motion.div
+                      key={fact.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex flex-col justify-between h-full flex-1 touch-pan-y select-none"
+                    >
+                      <div>
+                        {/* Badge */}
+                        <div className="flex justify-between items-center mb-2.5">
+                          <span className={`text-[9px] font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded border ${fact.badgeColor}`}>
+                            {fact.badge}
+                          </span>
+                          <span className="text-[10px] text-slate-350 font-mono">0{index + 1} / 0{facts.length}</span>
+                        </div>
+
+                        {/* Headline */}
+                        <h4 className="font-display font-bold text-slate-900 text-sm tracking-tight mb-2">
+                          {fact.title}
+                        </h4>
+
+                        {/* Fact Text */}
+                        <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                          {fact.text}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+
+            {/* Integrated Carousel Navigation Pill */}
+            <div className="flex items-center justify-center mt-4">
+              <div className="inline-flex items-center space-x-3 bg-white border border-slate-200 shadow-sm rounded-xl py-1.5 px-3">
+                <button
+                  onClick={() => setActiveFactIndex((prev) => (prev === 0 ? facts.length - 1 : prev - 1))}
+                  className="text-slate-500 hover:text-[#012169] active:scale-95 transition cursor-pointer p-0.5"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Dots Indicators */}
+                <div className="flex space-x-1.5">
+                  {facts.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveFactIndex(idx)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                        idx === activeFactIndex ? 'w-4 bg-[#012169]' : 'bg-slate-200 hover:bg-slate-350'
+                      }`}
+                      aria-label={`Go to slide ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setActiveFactIndex((prev) => (prev === facts.length - 1 ? 0 : prev + 1))}
+                  className="text-slate-500 hover:text-[#012169] active:scale-95 transition cursor-pointer p-0.5"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

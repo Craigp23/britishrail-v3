@@ -47,7 +47,7 @@ export default function AdvanceTracker() {
     const eventTimeEnd = `${formattedReleaseDate}T100000Z`;
     
     const title = encodeURIComponent('Book Cheap British Rail Advance Fares!');
-    const details = encodeURIComponent('Your 12-week advance window has opened! Navigate to BritishRail.co.uk to find cheap split train tickets and secure up to 60% savings on standard UK rail fares.');
+    const details = encodeURIComponent('Your 12-week advance window has opened. Navigate to BritishRail.co.uk to find cheap split train tickets and secure up to 60% savings on standard UK rail fares.');
     const location = encodeURIComponent('BritishRail.co.uk portal');
 
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${eventTimeStart}/${eventTimeEnd}&details=${details}&location=${location}&sf=true&output=xml`;

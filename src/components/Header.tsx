@@ -107,7 +107,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1">
+        <div className="lg:hidden bg-white border-b border-slate-200/80 shadow-sm px-4 pt-2 pb-4 space-y-1">
           <button
             onClick={() => { setTab('home'); setMobileMenuOpen(false); }}
             className={`w-full text-left px-4 py-3 rounded-md font-sans font-medium text-sm ${

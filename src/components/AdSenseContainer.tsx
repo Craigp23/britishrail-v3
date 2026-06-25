@@ -22,9 +22,18 @@ export default function AdSenseContainer({ slotIndex = 1 }: AdSenseContainerProp
   }
 
   const [adError, setAdError] = useState(false);
+  const [isProdDomain, setIsProdDomain] = useState(false);
 
   useEffect(() => {
-    if (adClientId && adSlotId) {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const isProd = hostname === 'britishrail.co.uk' || hostname === 'www.britishrail.co.uk';
+      setIsProdDomain(isProd);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isProdDomain && adClientId && adSlotId) {
       try {
         // Ensure script is injected
         const scriptId = 'google-adsense-script';
@@ -46,10 +55,10 @@ export default function AdSenseContainer({ slotIndex = 1 }: AdSenseContainerProp
         setAdError(true);
       }
     }
-  }, [adClientId, adSlotId, slotIndex]);
+  }, [adClientId, adSlotId, slotIndex, isProdDomain]);
 
-  // If Google AdSense is fully configured, render the real ad code
-  if (adClientId && adSlotId && !adError) {
+  // If Google AdSense is fully configured and on the live domain, render the real ad code
+  if (isProdDomain && adClientId && adSlotId && !adError) {
     return (
       <div className="max-w-4xl mx-auto my-6 px-4" id={`real-adsense-unit-${slotIndex}`}>
         <div className="text-center text-[9px] font-mono text-slate-400 uppercase tracking-widest mb-1.5">
@@ -82,6 +91,12 @@ export default function AdSenseContainer({ slotIndex = 1 }: AdSenseContainerProp
           {slotIndex === 2 && "Need travel insurance? Keep your split journeys covered with comprehensive transit protection."}
           {slotIndex === 3 && "Looking for car rentals? Seamlessly rent vehicles at your destination for total travel flexibility."}
         </div>
+
+        {!isProdDomain && adClientId && adSlotId && (
+          <div className="mt-3.5 pt-3 border-t border-dashed border-slate-200 text-[10px] text-emerald-600 font-mono flex flex-col sm:flex-row justify-center items-center gap-1 sm:gap-3">
+            <span>🔒 <strong>AdSense Safety Guard Active:</strong> IDs are successfully recognized, but live ads are restricted to the production domain to prevent invalid impressions during testing.</span>
+          </div>
+        )}
       </div>
     </div>
   );
