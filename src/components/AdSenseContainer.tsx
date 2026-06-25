@@ -69,18 +69,10 @@ export default function AdSenseContainer({ slotIndex = 1 }: AdSenseContainerProp
     );
   }
 
-  const variableName = slotIndex === 1 
-    ? 'VITE_ADSENSE_SLOT_ID' 
-    : `VITE_ADSENSE_SLOT_${slotIndex}`;
-
   // Elegant fallback explaining setup details
   return (
     <div className="max-w-4xl mx-auto my-6 px-4" id={`adsense-setup-container-${slotIndex}`}>
       <div className="bg-slate-50 hover:bg-slate-100/80 transition p-4 sm:p-5 rounded-2xl border border-slate-200/80 text-center relative overflow-hidden group">
-        <div className="absolute top-2 right-3 text-[8px] font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">
-          Slot {slotIndex} Ready
-        </div>
-        
         <div className="text-[9px] font-mono text-slate-400 uppercase tracking-widest">
           Advertisement Placeholder
         </div>
@@ -89,13 +81,6 @@ export default function AdSenseContainer({ slotIndex = 1 }: AdSenseContainerProp
           {slotIndex === 1 && "Looking for accommodations? Plan hotel stays simultaneously to save more bundle travel values."}
           {slotIndex === 2 && "Need travel insurance? Keep your split journeys covered with comprehensive transit protection."}
           {slotIndex === 3 && "Looking for car rentals? Seamlessly rent vehicles at your destination for total travel flexibility."}
-        </div>
-
-        <div className="mt-3.5 pt-3 border-t border-dashed border-slate-200 text-[10px] text-slate-500 font-mono flex flex-col sm:flex-row justify-center items-center gap-1 sm:gap-3">
-          <span>💡 <strong>Real AdSense Integration Available:</strong></span>
-          <span className="text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-sm text-[9px]">
-            Set <code className="font-bold text-slate-800 font-mono">VITE_ADSENSE_CLIENT_ID</code> and <code className="font-bold text-slate-800 font-mono">{variableName}</code> to show live ads.
-          </span>
         </div>
       </div>
     </div>
