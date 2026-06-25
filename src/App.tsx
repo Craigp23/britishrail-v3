@@ -25,8 +25,21 @@ export default function App() {
   const [pendingScroll, setPendingScroll] = useState(false);
   const [pendingCalculatorScroll, setPendingCalculatorScroll] = useState(false);
   const [pendingStrategiesScroll, setPendingStrategiesScroll] = useState(false);
+  const [contactHref, setContactHref] = useState('#');
+  const [emailCopied, setEmailCopied] = useState(false);
 
   const prevTabRef = useRef<Page>(currentTab);
+
+  // Safely construct obfuscated contact email address to prevent scrapers while maintaining native behavior
+  useEffect(() => {
+    const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
+    const domain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 46, 117, 107); // 23healing@gmail.co.uk? No, wait!
+    // Let's check the previous user message: "mailto:23healing@gmail.com?subject=To%20webmaster%20of%20britishrail.co.uk"
+    // String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109) is "gmail.com". Yes! Let's make sure it is exactly "23healing@gmail.com".
+    const gmailDomain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
+    const subject = String.fromCharCode(84, 111, 32, 119, 101, 98, 109, 97, 115, 116, 101, 114, 32, 111, 102, 32, 98, 114, 105, 116, 105, 115, 104, 114, 97, 105, 108, 46, 99, 111, 46, 117, 107);
+    setContactHref(`mailto:${user}@${gmailDomain}?subject=${encodeURIComponent(subject)}`);
+  }, []);
 
   // Bilateral synchronization between URL hash and application state
   useEffect(() => {
@@ -795,23 +808,21 @@ export default function App() {
               </p>
               <p className="text-[10px] text-slate-300 mt-1">
                 <a 
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
+                  href={contactHref}
+                  target="_top"
+                  onClick={() => {
                     const user = String.fromCharCode(50, 51, 104, 101, 97, 108, 105, 110, 103);
-                    const domain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
-                    const subject = String.fromCharCode(84, 111, 32, 119, 101, 98, 109, 97, 115, 116, 101, 114, 32, 111, 102, 32, 98, 114, 105, 116, 105, 115, 104, 114, 97, 105, 108, 46, 99, 111, 46, 117, 107);
-                    
-                    const tempLink = document.createElement('a');
-                    tempLink.href = `mailto:${user}@${domain}?subject=${encodeURIComponent(subject)}`;
-                    document.body.appendChild(tempLink);
-                    tempLink.click();
-                    document.body.removeChild(tempLink);
+                    const gmailDomain = String.fromCharCode(103, 109, 97, 105, 108, 46, 99, 111, 109);
+                    const email = `${user}@${gmailDomain}`;
+                    navigator.clipboard.writeText(email).then(() => {
+                      setEmailCopied(true);
+                      setTimeout(() => setEmailCopied(false), 2500);
+                    }).catch(() => {});
                   }}
                   className="font-sans text-slate-200 text-[11px] hover:text-amber-400 transition-colors duration-150 underline decoration-dotted underline-offset-2 cursor-pointer select-none"
                   title="Contact Webmaster"
                 >
-                  Contact Webmaster
+                  {emailCopied ? "Address copied to clipboard" : "Contact Webmaster"}
                 </a>
               </p>
             </div>
