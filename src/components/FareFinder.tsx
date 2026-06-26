@@ -302,7 +302,7 @@ export default function FareFinder() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            className="mt-8 border-t border-slate-150 pt-6"
+            className="mt-4 pt-6"
           >
             {/* Core Fare Cards and Booking Link highlighted container */}
             <div className={`pt-4 pb-2 px-4 sm:pt-6 sm:pb-3 sm:px-6 rounded-2xl transition-all duration-500 relative ${
@@ -354,7 +354,7 @@ export default function FareFinder() {
                   
                   <div>
                     <h4 className="text-xs font-mono text-emerald-800 uppercase tracking-widest font-bold flex items-center space-x-1">
-                      <span>Smart Fare</span>
+                      <span>{fareResult.railcard !== 'none' ? 'Smart Fare - With Railcard' : 'Smart Fare'}</span>
                     </h4>
                     <p className="text-xs text-emerald-700/80 mt-0.5">Save by splitting at intermediate stations. No train transfers necessary</p>
                   </div>
@@ -402,6 +402,9 @@ export default function FareFinder() {
                 </a>
               </div>
             </div>
+
+            {/* Horizontal divider moved below the 'Navigate...' button */}
+            <div className="border-t border-slate-150 my-6" />
 
             {/* Retro Orange Cardboard Train Ticket Design Mockup */}
             <div className="mt-8 max-w-full sm:max-w-md md:max-w-lg mx-auto w-full px-1 sm:px-0">

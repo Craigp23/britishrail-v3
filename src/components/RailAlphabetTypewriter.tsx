@@ -935,7 +935,7 @@ const LOGO_TYPES = [
 const COLOUR_STOPS_GEOMETRY = [
   { id: 'flame-red', name: 'Flame Red', value: '#FF3300' },
   { id: 'rail-blue', name: 'Rail Blue', value: '#00a9cc' },
-  { id: 'electric-teal', name: 'Electric Teal', value: '#007f99' },
+  { id: 'electric-teal', name: 'Arrow Teal', value: '#35769C' },
   { id: 'rail-grey', name: 'Rail Grey', value: '#C0C2B5' },
   { id: 'white', name: 'White', value: '#FFFFFF' },
   { id: 'black', name: 'Black', value: '#000000' }
@@ -1835,7 +1835,7 @@ export default function RailAlphabetTypewriter() {
     let plankBg = "#FFFFFF";
     let borderStroke = "#000000";
     let contentColor = "#000000";
-    let activeArrowColor = arrowColor === 'teal' ? '#007f99' : '#000000';
+    let activeArrowColor = arrowColor === 'teal' ? '#35769C' : '#000000';
 
     if (boardTheme === 'green') {
       plankBg = "#00994c";
@@ -2274,7 +2274,7 @@ export default function RailAlphabetTypewriter() {
     let plankBg = "#FFFFFF";
     let borderStroke = "#000000";
     let contentColor = "#000000";
-    let activeArrowColor = arrowColor === 'teal' ? '#007f99' : '#000000';
+    let activeArrowColor = arrowColor === 'teal' ? '#35769C' : '#000000';
 
     if (boardTheme === 'green') {
       plankBg = "#00994c";
