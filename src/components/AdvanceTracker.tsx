@@ -25,7 +25,7 @@ function StationClock() {
   const minStep = sec >= 30 ? 0.5 : 0;
   const minAngle = (min + minStep) * 6;
   
-  // Hour hand moves in 5-minute impulses (every 5-minute mark)
+  // Hour hand moves in 5-minute impulses (at every 5-minute mark on the minute hand)
   const impulseMinForHr = Math.floor(min / 5) * 5;
   const hrAngle = ((hr % 12) * 30) + (impulseMinForHr * 0.5);
 
@@ -41,7 +41,7 @@ function StationClock() {
         id="id4" 
         fill="none" 
         stroke="rgb(0,0,0)" 
-        strokeWidth="150" 
+        strokeWidth="75" 
         strokeLinejoin="miter" 
         d="M 16625,10625 C 16625,11810 16313,12974 15720,14000 15128,15026 14276,15878 13250,16470 12224,17063 11060,17375 9875,17375 8690,17375 7526,17063 6500,16470 5474,15878 4622,15026 4030,14000 3437,12974 3125,11810 3125,10625 3125,9440 3437,8277 4030,7250 4622,6224 5474,5372 6500,4780 7526,4187 8690,3875 9875,3875 11060,3875 12224,4187 13250,4780 14276,5372 15128,6224 15720,7250 16313,8277 16625,9440 16625,10625 Z" 
       />
@@ -111,8 +111,8 @@ function StationClock() {
         <path id="id67" fill="none" stroke="rgb(0,0,0)" strokeWidth="370" strokeLinejoin="miter" d="M 9886,5825 L 9886,4238" />
       </g>
 
-      {/* HOUR HAND (id3) - Rotated dynamically around (9886, 10614) with precise base angle of 307.4 degrees */}
-      <g transform={`rotate(${hrAngle - 307.4}, 9886, 10614)`}>
+      {/* HOUR HAND (id3) - Rotated dynamically around (9886, 10614) with precise base angle of 305.32 degrees */}
+      <g transform={`rotate(${hrAngle - 305.32}, 9886, 10614)`}>
         <path fill="rgb(0,0,0)" stroke="none" d="M 10932,11861 L 11403,11205 6637,7955 6378,8119 6296,8447 9300,10652 10932,11861 Z" />
         <path fill="none" stroke="rgb(0,0,0)" strokeWidth="20" d="M 10932,11861 L 11403,11205 6637,7955 6378,8119 6296,8447 9300,10652 10932,11861 Z" />
       </g>
