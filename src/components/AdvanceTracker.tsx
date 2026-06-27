@@ -135,7 +135,11 @@ function StationClock() {
   );
 }
 
-export default function AdvanceTracker() {
+interface AdvanceTrackerProps {
+  onNavigateToSplitter?: () => void;
+}
+
+export default function AdvanceTracker({ onNavigateToSplitter }: AdvanceTrackerProps) {
   const [travelDate, setTravelDate] = useState(() => {
     // default to 14 weeks from now
     const d = new Date();
@@ -257,7 +261,20 @@ export default function AdvanceTracker() {
               ) : daysRemaining === 0 ? (
                 <span className="text-xs font-bold text-emerald-600">Tickets go on sale TODAY!</span>
               ) : (
-                <span className="text-xs text-slate-500">Tickets are already released and active for booking!</span>
+                <span className="text-xs text-slate-500">
+                  Tickets are already released and active for booking.{" "}
+                  <button
+                    onClick={(e) => {
+                      if (onNavigateToSplitter) {
+                        e.preventDefault();
+                        onNavigateToSplitter();
+                      }
+                    }}
+                    className="font-bold text-[#012169] hover:text-[#a8081b] underline cursor-pointer bg-transparent border-0 p-0 inline font-semibold transition-colors"
+                  >
+                    Cheap ticket finder
+                  </button>
+                </span>
               )}
             </div>
           </div>
@@ -289,6 +306,22 @@ export default function AdvanceTracker() {
             <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
             <span><strong>First Class Upgrades:</strong> During the initial 12-week window, First Class advance prices are sometimes as cheap as standard fares!</span>
           </div>
+        </div>
+
+        {/* Check Ticket Prices Button (Style & Function matches 'Go to Ticket Splitter' in Claire panel) */}
+        <div className="pt-2">
+          <a
+            href="#fare-finder-section"
+            onClick={(e) => {
+              if (onNavigateToSplitter) {
+                e.preventDefault();
+                onNavigateToSplitter();
+              }
+            }}
+            className="w-full inline-flex items-center justify-center bg-[#012169] hover:bg-opacity-95 text-white font-sans font-semibold text-xs py-3 rounded-xl shadow-sm cursor-pointer transition-all text-center"
+          >
+            Check Ticket Prices
+          </a>
         </div>
 
       </div>

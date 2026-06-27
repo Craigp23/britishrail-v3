@@ -9,10 +9,10 @@ interface ColourStop {
 }
 
 const COLOUR_STOPS: ColourStop[] = [
-  { id: 'flame-red', name: 'Flame Red', value: '#FF3300' },
-  { id: 'rail-blue', name: 'Rail Blue', value: '#00a9cc' },
-  { id: 'electric-teal', name: 'Arrow Teal', value: '#35769C' },
-  { id: 'rail-grey', name: 'Rail Grey', value: '#C0C2B5' },
+  { id: 'flame-red', name: 'Rail Red', value: '#CB4734' },
+  { id: 'rail-blue', name: 'Rail Blue', value: '#0A415A' },
+  { id: 'electric-teal', name: 'Golden Yellow', value: '#F8C000' },
+  { id: 'rail-grey', name: 'Rail Grey', value: '#B2AFA6' },
   { id: 'white', name: 'White', value: '#FFFFFF' },
   { id: 'black', name: 'Black', value: '#000000' }
 ];
@@ -20,7 +20,7 @@ const COLOUR_STOPS: ColourStop[] = [
 const BUTTON_NAMES: Record<string, string> = {
   'flame-red': 'Red',
   'rail-blue': 'Blue',
-  'electric-teal': 'Teal',
+  'electric-teal': 'Yellow',
   'rail-grey': 'Grey',
   'white': 'White',
   'black': 'Black'
@@ -316,7 +316,7 @@ export default function DoubleArrowGeometry() {
   const activeTaperWidth_top = activeTaperWidth_top_base * (multiplier_arm_top / multiplier_arm_top_default);
   const activeTaperWidth_bottom = activeTaperWidth_bottom_base * (multiplier_arm_bottom / multiplier_arm_bottom_default);
 
-  const isDarkBg = ['black', 'rail-blue', 'electric-teal'].includes(COLOUR_STOPS[backgroundColourIndex].id);
+  const isDarkBg = ['black', 'rail-blue'].includes(COLOUR_STOPS[backgroundColourIndex].id);
 
   // Graph paper graticule colors with 100% saturation (25% increase from original 76-85%)
   const opacity = (gridOpacity * 1.23) / 100;

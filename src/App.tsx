@@ -731,7 +731,8 @@ export default function App() {
                           rel="noopener noreferrer"
                           className="px-6 py-3 bg-[#a8081b] hover:bg-opacity-95 text-white rounded-xl font-bold text-center text-sm shadow-md transition-all flex items-center justify-center space-x-2 cursor-pointer"
                         >
-                          <span>Check Fares Live ↗</span>
+                          <span>Check Fares Live on Trainline</span>
+                          <ExternalLink className="w-4 h-4" />
                         </a>
                         <a 
                           href="#strategies-guide"
@@ -780,7 +781,7 @@ export default function App() {
               {/* DYNAMIC 12-WEEK BOOKING WINDOW TRACKER REMINDER CALCULATOR */}
               <section id="advance-tracker-section" className="py-12 bg-slate-50 scroll-mt-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <AdvanceTracker />
+                  <AdvanceTracker onNavigateToSplitter={navigateToSplitter} />
                 </div>
               </section>
 

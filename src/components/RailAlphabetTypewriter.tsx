@@ -108,7 +108,7 @@ export const WayOutIcon = ({
 const DoubleArrowLogo = ({ type, textSize = 52 }: { type: string; textSize?: number }) => {
   if (type === 'none') return null;
 
-  const symbolColor = type === 'white-reversed-on-red' ? '#FFFFFF' : '#FF3300';
+  const symbolColor = type === 'white-reversed-on-red' ? '#FFFFFF' : '#CB4734';
 
   // Using the authentic BR double arrow (character 200) in the signage builder
   const symbolElement = (
@@ -144,13 +144,13 @@ const DoubleArrowLogo = ({ type, textSize = 52 }: { type: string; textSize?: num
       );
     case 'white-reversed-on-red':
       return (
-        <div className="flex items-center justify-center bg-[#FF3300] h-full flex-shrink-0 animate-fade-in" style={paddingStyle}>
+        <div className="flex items-center justify-center bg-[#CB4734] h-full flex-shrink-0 animate-fade-in" style={paddingStyle}>
           {symbolElement}
         </div>
       );
     case 'red-ruled-red':
       return (
-        <div className="flex items-center justify-center bg-white border-[3px] border-[#FF3300] h-full flex-shrink-0 animate-fade-in" style={paddingStyle}>
+        <div className="flex items-center justify-center bg-white border-[3px] border-[#CB4734] h-full flex-shrink-0 animate-fade-in" style={paddingStyle}>
           {symbolElement}
         </div>
       );
@@ -933,10 +933,10 @@ const LOGO_TYPES = [
 ];
 
 const COLOUR_STOPS_GEOMETRY = [
-  { id: 'flame-red', name: 'Flame Red', value: '#FF3300' },
-  { id: 'rail-blue', name: 'Rail Blue', value: '#00a9cc' },
-  { id: 'electric-teal', name: 'Arrow Teal', value: '#35769C' },
-  { id: 'rail-grey', name: 'Rail Grey', value: '#C0C2B5' },
+  { id: 'flame-red', name: 'Rail Red', value: '#CB4734' },
+  { id: 'rail-blue', name: 'Rail Blue', value: '#0A415A' },
+  { id: 'electric-teal', name: 'Golden Yellow', value: '#F8C000' },
+  { id: 'rail-grey', name: 'Rail Grey', value: '#B2AFA6' },
   { id: 'white', name: 'White', value: '#FFFFFF' },
   { id: 'black', name: 'Black', value: '#000000' }
 ];
@@ -1096,8 +1096,8 @@ export default function RailAlphabetTypewriter() {
   const [plankLogoY, setPlankLogoY] = useState<number>(11.5);
   const [plankPicY, setPlankPicY] = useState<number>(11.5);
   const [plankArrowY, setPlankArrowY] = useState<number>(11.5);
-  const [separatorY1, setSeparatorY1] = useState<number>(0.5);
-  const [separatorY2, setSeparatorY2] = useState<number>(23.5);
+  const [separatorY1, setSeparatorY1] = useState<number>(0);
+  const [separatorY2, setSeparatorY2] = useState<number>(24);
 
   const [customDasSizeMultiplier, setCustomDasSizeMultiplier] = useState<number>(0.96);
   const [customDasSizeMultiplierNonWhite, setCustomDasSizeMultiplierNonWhite] = useState<number>(1.00);
@@ -1777,7 +1777,7 @@ export default function RailAlphabetTypewriter() {
     switch (boardTheme) {
       case 'green':
         return {
-          bgClass: 'bg-[#00994c]',
+          bgClass: 'bg-[#388860]',
           borderClass: 'border-[#005c36]',
           textColorHex: '#FFFFFF',
           picColor: '#FFFFFF',
@@ -1785,7 +1785,7 @@ export default function RailAlphabetTypewriter() {
         };
       case 'red':
         return {
-          bgClass: 'bg-[#FF3300]',
+          bgClass: 'bg-[#B73D37]',
           borderClass: 'border-[#9c0010]',
           textColorHex: '#FFFFFF',
           picColor: '#FFFFFF',
@@ -1835,15 +1835,15 @@ export default function RailAlphabetTypewriter() {
     let plankBg = "#FFFFFF";
     let borderStroke = "#000000";
     let contentColor = "#000000";
-    let activeArrowColor = arrowColor === 'teal' ? '#35769C' : '#000000';
+    let activeArrowColor = arrowColor === 'teal' ? '#2868A0' : '#000000';
 
     if (boardTheme === 'green') {
-      plankBg = "#00994c";
+      plankBg = "#388860";
       borderStroke = "#005c36";
       contentColor = "#FFFFFF";
       activeArrowColor = "#FFFFFF";
     } else if (boardTheme === 'red') {
-      plankBg = "#FF3300";
+      plankBg = "#B73D37";
       borderStroke = "#9c0010";
       contentColor = "#FFFFFF";
       activeArrowColor = "#FFFFFF";
@@ -1888,15 +1888,6 @@ export default function RailAlphabetTypewriter() {
           color: contentColor,
         }}
       >
-        <rect
-          x="0.25"
-          y="0.25"
-          width={W - 0.5}
-          height="23.5"
-          fill="none"
-          stroke={borderStroke}
-          strokeWidth="0.5"
-        />
 
         {layout.isPicActive && (
           <text
@@ -1923,7 +1914,7 @@ export default function RailAlphabetTypewriter() {
             y1={separatorY1}
             x2={layout.sepX}
             y2={separatorY2}
-            stroke={borderStroke}
+            stroke={plankBg !== "#FFFFFF" ? "#FFFFFF" : borderStroke}
             strokeWidth="1"
             style={{
               opacity: targetPicScale
@@ -2007,26 +1998,26 @@ export default function RailAlphabetTypewriter() {
       
       let bgFill = "#FFFFFF";
       let strokeColor = "none";
-      let textFill = "#FF3300";
+      let textFill = "#CB4734";
       
       if (logoType === 'white-reversed-on-red') {
-        bgFill = "#FF3300";
+        bgFill = "#CB4734";
         textFill = "#FFFFFF";
       } else if (logoType === 'red-ruled-red') {
         bgFill = "#FFFFFF";
-        strokeColor = "#FF3300";
-        textFill = "#FF3300";
+        strokeColor = "#CB4734";
+        textFill = "#CB4734";
       } else if (logoType === 'red-ruled-black') {
         bgFill = "#FFFFFF";
         strokeColor = "#000000";
-        textFill = "#FF3300";
+        textFill = "#CB4734";
       } else if (logoType === 'red-on-white') {
         bgFill = "transparent";
-        textFill = "#FF3300";
+        textFill = "#CB4734";
       } else if (logoType === 'custom-geometry') {
         const foreIndex = customDasParams?.foregroundColourIndex ?? 0;
         const backIndex = customDasParams?.backgroundColourIndex ?? 4;
-        textFill = COLOUR_STOPS_GEOMETRY[foreIndex]?.value ?? "#FF3300";
+        textFill = COLOUR_STOPS_GEOMETRY[foreIndex]?.value ?? "#CB4734";
         bgFill = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
         if (bgFill.toLowerCase() === '#ffffff') {
           bgFill = "transparent";
@@ -2274,15 +2265,15 @@ export default function RailAlphabetTypewriter() {
     let plankBg = "#FFFFFF";
     let borderStroke = "#000000";
     let contentColor = "#000000";
-    let activeArrowColor = arrowColor === 'teal' ? '#35769C' : '#000000';
+    let activeArrowColor = arrowColor === 'teal' ? '#2868A0' : '#000000';
 
     if (boardTheme === 'green') {
-      plankBg = "#00994c";
+      plankBg = "#388860";
       borderStroke = "#005c36";
       contentColor = "#FFFFFF";
       activeArrowColor = "#FFFFFF";
     } else if (boardTheme === 'red') {
-      plankBg = "#FF3300";
+      plankBg = "#B73D37";
       borderStroke = "#9c0010";
       contentColor = "#FFFFFF";
       activeArrowColor = "#FFFFFF";
@@ -2330,7 +2321,7 @@ export default function RailAlphabetTypewriter() {
         `;
         if (layout.isSepActive) {
           elementsSvg += `
-            <line x1="${layout.sepX}" y1="${separatorY1}" x2="${layout.sepX}" y2="${separatorY2}" stroke="${borderStroke}" stroke-width="1" />
+            <line x1="${layout.sepX}" y1="${separatorY1}" x2="${layout.sepX}" y2="${separatorY2}" stroke="${plankBg !== '#FFFFFF' ? '#FFFFFF' : borderStroke}" stroke-width="1" />
           `;
         }
       }
@@ -2355,8 +2346,8 @@ export default function RailAlphabetTypewriter() {
               <rect x="${layout.leftBound}" y="0" width="${clipWidth}" height="24" />
             </clipPath>
           </defs>
-          <!-- Background and Border -->
-          <rect x="0.25" y="0.25" width="${W - 0.5}" height="23.5" fill="${plankBg}" stroke="${borderStroke}" stroke-width="0.5" />
+          <!-- Background -->
+          <rect x="0" y="0" width="${W}" height="24" fill="${plankBg}" stroke="none" />
           
           ${elementsSvg}
 
@@ -2389,26 +2380,26 @@ export default function RailAlphabetTypewriter() {
         
         let bgFill = "#FFFFFF";
         let strokeColor = "none";
-        let textFill = "#FF3300";
+        let textFill = "#CB4734";
         
         if (logoType === 'white-reversed-on-red') {
-          bgFill = "#FF3300";
+          bgFill = "#CB4734";
           textFill = "#FFFFFF";
         } else if (logoType === 'red-ruled-red') {
           bgFill = "#FFFFFF";
-          strokeColor = "#FF3300";
-          textFill = "#FF3300";
+          strokeColor = "#CB4734";
+          textFill = "#CB4734";
         } else if (logoType === 'red-ruled-black') {
           bgFill = "#FFFFFF";
           strokeColor = "#000000";
-          textFill = "#FF3300";
+          textFill = "#CB4734";
         } else if (logoType === 'red-on-white') {
           bgFill = "none";
-          textFill = "#FF3300";
+          textFill = "#CB4734";
         } else if (logoType === 'custom-geometry') {
           const foreIndex = customDasParams?.foregroundColourIndex ?? 0;
           const backIndex = customDasParams?.backgroundColourIndex ?? 4;
-          textFill = COLOUR_STOPS_GEOMETRY[foreIndex]?.value ?? "#FF3300";
+          textFill = COLOUR_STOPS_GEOMETRY[foreIndex]?.value ?? "#CB4734";
           bgFill = COLOUR_STOPS_GEOMETRY[backIndex]?.value ?? "#FFFFFF";
           if (bgFill.toLowerCase() === '#ffffff') {
             bgFill = "none";
@@ -2793,8 +2784,8 @@ export default function RailAlphabetTypewriter() {
                           }}
                           className={`h-8.5 text-[11px] font-bold uppercase rounded-lg cursor-pointer transition flex items-center justify-center px-2 ${
                             boardTheme === 'green' 
-                              ? 'bg-[#00994c] text-white border-2 border-[#012169] ring-2 ring-[#012169]/30 font-black shadow-md scale-102' 
-                              : 'bg-[#00994c] text-white opacity-80 hover:opacity-100 font-semibold'
+                              ? 'bg-[#388860] text-white border-2 border-[#012169] ring-2 ring-[#012169]/30 font-black shadow-md scale-102' 
+                              : 'bg-[#388860] text-white opacity-80 hover:opacity-100 font-semibold'
                           }`}
                         >
                           Green
@@ -2807,8 +2798,8 @@ export default function RailAlphabetTypewriter() {
                           }}
                           className={`h-8.5 text-[11px] font-bold uppercase rounded-lg cursor-pointer transition flex items-center justify-center px-2 ${
                             boardTheme === 'red' 
-                              ? 'bg-[#FF3300] text-white border-2 border-[#012169] ring-2 ring-[#012169]/30 font-black shadow-md scale-102' 
-                              : 'bg-[#FF3300] text-white opacity-80 hover:opacity-100 font-semibold'
+                              ? 'bg-[#B73D37] text-white border-2 border-[#012169] ring-2 ring-[#012169]/30 font-black shadow-md scale-102' 
+                              : 'bg-[#B73D37] text-white opacity-80 hover:opacity-100 font-semibold'
                           }`}
                         >
                           Red
@@ -2992,7 +2983,7 @@ export default function RailAlphabetTypewriter() {
                                       fontFamily: "'Brsign', 'Geist', sans-serif",
                                       fontWeight: 'normal',
                                     }}
-                                    fill="#FF3300"
+                                    fill="#CB4734"
                                     className="select-none"
                                   >
                                     {String.fromCharCode(200)}
@@ -3007,7 +2998,7 @@ export default function RailAlphabetTypewriter() {
                                     width: '67.5px',
                                     height: '42px',
                                     display: 'block',
-                                    backgroundColor: '#FF3300',
+                                    backgroundColor: '#CB4734',
                                   }}
                                   className="shadow-sm"
                                 >
@@ -3046,7 +3037,7 @@ export default function RailAlphabetTypewriter() {
                                     width="22.0" 
                                     height="13.5" 
                                     fill="none" 
-                                    stroke="#FF3300" 
+                                    stroke="#CB4734" 
                                     strokeWidth="0.5" 
                                   />
                                   <text 
@@ -3059,7 +3050,7 @@ export default function RailAlphabetTypewriter() {
                                       fontFamily: "'Brsign', 'Geist', sans-serif",
                                       fontWeight: 'normal',
                                     }}
-                                    fill="#FF3300"
+                                    fill="#CB4734"
                                     className="select-none"
                                   >
                                     {String.fromCharCode(200)}
@@ -3097,7 +3088,7 @@ export default function RailAlphabetTypewriter() {
                                       fontFamily: "'Brsign', 'Geist', sans-serif",
                                       fontWeight: 'normal',
                                     }}
-                                    fill="#FF3300"
+                                    fill="#CB4734"
                                     className="select-none"
                                   >
                                     {String.fromCharCode(200)}
@@ -3337,11 +3328,11 @@ export default function RailAlphabetTypewriter() {
                             }}
                             className={`h-8 text-[10.5px] font-bold uppercase rounded-lg cursor-pointer transition flex items-center justify-center ${
                               arrowColor === 'teal'
-                                ? 'bg-[#012169] text-white font-bold shadow-sm'
+                                ? 'bg-[#2868A0] text-white font-bold shadow-sm'
                                 : 'bg-transparent text-slate-500 hover:bg-slate-100/60'
                             }`}
                           >
-                            TEAL
+                            Blue
                           </button>
                           <button
                             type="button"
