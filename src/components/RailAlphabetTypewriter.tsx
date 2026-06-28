@@ -2551,7 +2551,7 @@ export default function RailAlphabetTypewriter() {
           The Art of Clear Typography and Signage 
         </h3>
         <p className="text-xs text-slate-500 font-sans mt-0.5">
-          Create your own station signage to the design style crafted by Margaret Calvert and Jock Kinneir over 60 years ago.
+          Create your own station signage to the design style crafted by Jock Kinneir and Margaret Calvert over 60 years ago.
         </p>
       </div>
 
@@ -4067,20 +4067,20 @@ export default function RailAlphabetTypewriter() {
 
             {/* Universal Pagination Dots / Active State Indicators under the Control Cards Carousel */}
             <div className="flex items-center justify-center select-none pb-1 pt-0.5">
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+              <div className="inline-flex items-center space-x-3 bg-white border border-slate-200 shadow-sm rounded-xl py-1.5 px-3">
                 {/* Scroll Left */}
                 <button
                   type="button"
                   onClick={() => handleScroll('left')}
                   disabled={!canScrollLeft}
-                  className="flex items-center justify-center w-6 h-6 text-slate-600 hover:text-[#a8081b] hover:scale-115 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                  className="text-slate-500 hover:text-[#a8081b] disabled:opacity-20 disabled:pointer-events-none active:scale-95 transition cursor-pointer p-0.5 flex items-center justify-center"
                   title="Scroll Left"
                 >
                   <Lucide.ChevronLeft className="w-4 h-4 shrink-0" />
                 </button>
 
                 {/* 9 Dots */}
-                <div className="flex items-center gap-1.5 mx-1">
+                <div className="flex space-x-1.5">
                   {[...Array(9)].map((_, idx) => {
                     const isActive = idx === activeCardIndex;
                     const cardNames = [
@@ -4101,8 +4101,8 @@ export default function RailAlphabetTypewriter() {
                         onClick={() => scrollToCard(idx)}
                         className={`h-2 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
                           isActive 
-                            ? 'w-5 bg-[#012169]' 
-                            : 'w-2 bg-slate-300 hover:bg-[#a8081b]/75'
+                            ? 'w-4 bg-[#012169]' 
+                            : 'w-2 bg-slate-200 hover:bg-slate-350'
                         }`}
                         title={`Go to Card ${idx + 1}: ${cardNames[idx]}`}
                       />
@@ -4115,7 +4115,7 @@ export default function RailAlphabetTypewriter() {
                   type="button"
                   onClick={() => handleScroll('right')}
                   disabled={!canScrollRight}
-                  className="flex items-center justify-center w-6 h-6 text-slate-600 hover:text-[#a8081b] hover:scale-115 disabled:opacity-20 disabled:pointer-events-none transition-all cursor-pointer"
+                  className="text-slate-500 hover:text-[#a8081b] disabled:opacity-20 disabled:pointer-events-none active:scale-95 transition cursor-pointer p-0.5 flex items-center justify-center"
                   title="Scroll Right"
                 >
                   <Lucide.ChevronRight className="w-4 h-4 shrink-0" />

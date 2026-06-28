@@ -78,6 +78,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
             >
               Smart Travel Guide
             </button>
+
           </nav>
 
 
@@ -138,6 +139,7 @@ export default function Header({ currentTab, setTab }: HeaderProps) {
           >
             Smart Travel Guide
           </button>
+
           
 
           <div className="pt-3 border-t border-slate-100 flex items-center space-x-2 px-4 justify-between">

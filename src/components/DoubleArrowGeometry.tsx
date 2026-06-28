@@ -188,11 +188,15 @@ export default function DoubleArrowGeometry() {
   });
   const [sliderTopOffset, setSliderTopOffset] = useState<number>(() => {
     const saved = localStorage.getItem('slider-dev-top-v4');
-    return saved ? Number(saved) : 44;
+    if (saved) return Number(saved);
+    const mobileInit = typeof window !== 'undefined' && window.innerWidth < 640;
+    return mobileInit ? 53 : 44;
   });
   const [sliderHeightPct, setSliderHeightPct] = useState<number>(() => {
     const saved = localStorage.getItem('slider-dev-height-v4');
-    return saved ? Number(saved) : 52;
+    if (saved) return Number(saved);
+    const mobileInit = typeof window !== 'undefined' && window.innerWidth < 640;
+    return mobileInit ? 88 : 52;
   });
   const [sliderMaxHeightPx, setSliderMaxHeightPx] = useState<number>(() => {
     const saved = localStorage.getItem('slider-dev-max-height-v4');
@@ -242,8 +246,8 @@ export default function DoubleArrowGeometry() {
   // Dynamic responsive values for the vertical grid slider positioning
   // When dev controls are closed, we apply the precise user-requested values automatically
   const activeSliderRight = showDevControls ? sliderRight : 16;
-  const activeSliderTopOffset = showDevControls ? sliderTopOffset : 50;
-  const activeSliderHeightPct = showDevControls ? sliderHeightPct : 70;
+  const activeSliderTopOffset = showDevControls ? sliderTopOffset : (isMobile ? 53 : 50);
+  const activeSliderHeightPct = showDevControls ? sliderHeightPct : (isMobile ? 88 : 70);
 
   const handleReset = () => {
     setStrokeWidth(13);
@@ -253,8 +257,8 @@ export default function DoubleArrowGeometry() {
     setGridOpacity(60);
     setTaperAngle(2.3);
     setSliderRight(11);
-    setSliderTopOffset(44);
-    setSliderHeightPct(52);
+    setSliderTopOffset(window.innerWidth < 640 ? 53 : 44);
+    setSliderHeightPct(window.innerWidth < 640 ? 88 : 52);
     setSliderMaxHeightPx(260);
   };
 
@@ -339,7 +343,7 @@ export default function DoubleArrowGeometry() {
               <span>Geometry of the double arrow icon</span>
             </h3>
             <p className="text-[11px] sm:text-xs text-slate-500 font-sans mt-0.5">
-              Create your own double arrow logo inspired by the iconic railway symbol forged in 1965 by Gerry Barney.
+              Play with the geometry of the iconic double arrow symbol, forged in 1965 by Gerry Barney.
             </p>
           </div>
         </div>

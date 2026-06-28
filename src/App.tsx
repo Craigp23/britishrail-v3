@@ -58,21 +58,68 @@ export default function App() {
 
   const prevTabRef = useRef<Page>(currentTab);
 
-  // Bilateral synchronization between URL hash and application state
+  // Bilateral synchronization between URL hash and application state (supporting tabs + deep-linking to modals)
   useEffect(() => {
-    const getTabFromHash = (): Page => {
+    const parseHashAndSyncState = () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash === 'home' || hash === 'history' || hash === 'guide') {
-        return hash as Page;
+      
+      let tabToSet: Page | null = null;
+      let modalToSet: 'about' | 'privacy' | null = null;
+      let triggerCookieBanner = false;
+
+      // Extract parts (e.g., "history/privacy" or "about")
+      const parts = hash.split('/');
+      const firstPart = parts[0] || '';
+      const secondPart = parts[1] || '';
+
+      // Determine page tab
+      if (firstPart === 'home' || firstPart === 'history' || firstPart === 'guide') {
+        tabToSet = firstPart as Page;
       }
-      return 'home';
+
+      // Check if first part or second part targets a modal/banner
+      const checkModalValue = (val: string) => {
+        if (val === 'about' || val === 'modal-about') {
+          modalToSet = 'about';
+        } else if (val === 'privacy' || val === 'modal-privacy' || val === 'privacy-policy') {
+          modalToSet = 'privacy';
+        } else if (val === 'cookies' || val === 'modal-cookies' || val === 'manage-cookies') {
+          triggerCookieBanner = true;
+        }
+      };
+
+      if (secondPart) {
+        checkModalValue(secondPart);
+      } else {
+        checkModalValue(firstPart);
+      }
+
+      // Apply tab updates (default to current set tab if hash doesn't specify tab)
+      if (tabToSet) {
+        setTab(tabToSet);
+      } else if (!hash) {
+        setTab('home');
+      }
+
+      // Apply modal updates
+      if (modalToSet) {
+        setActiveLegalModal(modalToSet);
+      } else {
+        setActiveLegalModal(null);
+      }
+
+      // Trigger cookie banner open
+      if (triggerCookieBanner) {
+        localStorage.removeItem('br_cookie_consent');
+        setCookieBannerKey(prev => prev + 1);
+      }
     };
 
     // Initialize on mount
-    setTab(getTabFromHash());
+    parseHashAndSyncState();
 
     const handleHashChange = () => {
-      setTab(getTabFromHash());
+      parseHashAndSyncState();
     };
 
     window.addEventListener('hashchange', handleHashChange);
@@ -81,13 +128,23 @@ export default function App() {
     };
   }, []);
 
-  // Update hash when local tab shifts
+  // Update hash when local tab shifts or modals open/close
   useEffect(() => {
     const currentHash = window.location.hash.replace('#', '');
-    if (currentHash !== currentTab) {
-      window.location.hash = currentTab;
+    
+    let expectedHash = currentTab;
+    if (activeLegalModal === 'about') {
+      expectedHash = `${currentTab}/about`;
+    } else if (activeLegalModal === 'privacy') {
+      expectedHash = `${currentTab}/privacy`;
     }
-  }, [currentTab]);
+    
+    // We only update the hash if it actually changed and isn't a standalone temporary cookies action
+    const isCookiesAction = ['cookies', 'modal-cookies', 'manage-cookies'].some(h => currentHash.includes(h));
+    if (currentHash !== expectedHash && !isCookiesAction) {
+      window.location.hash = expectedHash;
+    }
+  }, [currentTab, activeLegalModal]);
 
   // Reset scroll to top of viewport ONLY on authentic tab switch to prevent scroll clamping issues
   // but only if we are not coordinating a pending scroll navigation to the splitter
@@ -226,6 +283,7 @@ export default function App() {
       {/* Global Brand Header with custom Double Arrow logo */}
       <Header currentTab={currentTab} setTab={setTab} />
 
+
       {/* Main Single Page Tab Router with Motion Transitions */}
       <main className="flex-grow">
         <AnimatePresence mode="wait">
@@ -255,7 +313,7 @@ export default function App() {
                       </h1>
                       
                       <p className="text-lg text-slate-200 font-normal leading-relaxed max-w-2xl max-lg:order-3">
-                        Find cheap fares, master split-ticketing, and explore the glorious design history of British railways.
+                        Save money on rail travel, master split-ticketing and explore Britain's iconic railway design heritage with our collection of free, interactive tools.
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
@@ -290,6 +348,7 @@ export default function App() {
                     </div>
 
                   </div>
+
                 </div>
               </section>
 
@@ -379,49 +438,73 @@ export default function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition">
-                      <div>
-                        <div className="text-xl mb-3">🏛️</div>
-                        <h4 className="font-display font-bold text-slate-800">Historic Graphic Legacy</h4>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Discover Gerry Barney's mathematical grid logo design and the legendary Rail Alphabet typography crafted by Jock Kinneir & Margaret Calvert.
-                        </p>
+                    <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
+                      {/* Left Accent Bar */}
+                      <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-display font-bold text-slate-800">Free Interactive Tools</h4>
+                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Discover Gerry Barney's iconic Double Arrow logo design and the legendary Rail Alphabet typography crafted by Jock Kinneir & Margaret Calvert.
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: '39px', lineHeight: '1' }} className="font-normal text-rail-red select-none">
+                            {String.fromCharCode(200)}
+                          </span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => setTab('history')}
-                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
+                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer font-sans self-start"
                       >
-                        Explore Design Archive ➔
+                        Explore the Design Archive ➔
                       </button>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition">
-                      <div>
-                        <div className="text-xl mb-3">🎫</div>
-                        <h4 className="font-display font-bold text-slate-800">Split Ticket Mastery</h4>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Learn how breaking up your rail trips into sequential segments can cut 40%+ off the cost of your journey.
-                        </p>
+                    <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
+                      {/* Left Accent Bar */}
+                      <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-display font-bold text-slate-800">Split Ticket Mastery</h4>
+                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Learn how breaking up your rail trips into sequential segments can cut 40%+ off the cost of your journey.
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: 'xxx-large', lineHeight: '1' }} className="font-normal text-[#00bc7d] select-none">
+                            {String.fromCharCode(219)}
+                          </span>
+                        </div>
                       </div>
                       <button 
                         onClick={navigateToStrategies}
-                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
+                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer font-sans self-start"
                       >
                         Read Travel Strategies ➔
                       </button>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:shadow-md transition">
-                      <div>
-                        <div className="text-xl mb-3">📅</div>
-                        <h4 className="font-display font-bold text-slate-800">The 12-Week Release Cycle</h4>
-                        <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                          Train companies release their cheapest advance inventory 12 weeks ahead. Track release dates using our easy reminder tool.
-                        </p>
+                    <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
+                      {/* Left Accent Bar */}
+                      <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-display font-bold text-slate-800">The 12-Week Release Cycle</h4>
+                          <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Train companies release their cheapest advance inventory 12 weeks ahead. Track release dates using our easy reminder tool.
+                          </p>
+                        </div>
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: 'xxx-large', lineHeight: '1' }} className="font-normal text-slate-900 select-none">
+                            {String.fromCharCode(224)}
+                          </span>
+                        </div>
                       </div>
                       <button 
                         onClick={navigateToCalculator}
-                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer"
+                        className="text-xs font-bold text-[#a8081b] hover:text-rail-blue transition mt-5 flex items-center space-x-1 cursor-pointer font-sans self-start"
                       >
                         Release Calculator & Reminder Tool ➔
                       </button>
@@ -463,17 +546,17 @@ export default function App() {
 
                       <div className="flex flex-col sm:flex-row gap-4 pt-1 max-lg:order-5 max-lg:w-full max-lg:justify-center">
                         <a 
-                          href="#exhibit"
+                          href="#timeline-section"
                           onClick={(e) => {
                             e.preventDefault();
-                            const el = document.getElementById('exhibit');
+                            const el = document.getElementById('timeline-section');
                             if (el) {
                               el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }
                           }}
                           className="px-6 py-3 bg-[#a8081b] hover:bg-opacity-95 text-white rounded-xl font-bold text-center text-sm shadow-md transition-all cursor-pointer"
                         >
-                          Explore Interactive Exhibit
+                          Free Interactive Tools
                         </a>
                         <button 
                           onClick={() => setTab('home')}
@@ -502,6 +585,7 @@ export default function App() {
                     </div>
 
                   </div>
+
                 </div>
               </section>
 
@@ -532,7 +616,7 @@ export default function App() {
                         <div key={elem.id} className="bg-slate-50 rounded-xl border border-slate-200/50 p-5 flex flex-col justify-between hover:shadow-md transition">
                           <div>
                             <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
-                              <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">ELEMENT {elem.number}</span>
+                              <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">EXHIBIT {elem.number}</span>
                               {targetId ? (
                                 <button
                                   onClick={(e) => {
@@ -590,7 +674,7 @@ export default function App() {
                               <div>
                                 <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-3">
                                   <span className="text-xs font-mono font-black text-[#a8081b] bg-red-100/80 px-2 py-1 rounded">
-                                    ELEMENT {elem.number}
+                                    EXHIBIT {elem.number}
                                   </span>
                                   {targetId ? (
                                     <button
@@ -775,6 +859,7 @@ export default function App() {
                     </div>
 
                   </div>
+
                 </div>
               </section>
 
@@ -894,6 +979,8 @@ export default function App() {
             </motion.div>
           )}
 
+
+
         </AnimatePresence>
       </main>
 
@@ -912,7 +999,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[10px] text-slate-300 mt-2 max-w-xl leading-relaxed">
-                An independent home for British railway design heritage and travel ticket tips. The site funds itself through ethical travel partnerships and is not affiliated with National Rail, Great British Railways, or the Department for Transport. ❤️🙏
+                An independent site celebrating Britain's railway heritage and helping people travel smarter. The site funds itself through ethical travel partnerships and is not affiliated with National Rail, Great British Railways, or the Department for Transport. ❤️🙏
               </p>
             </div>
 
@@ -940,6 +1027,7 @@ export default function App() {
                   onClick={() => {
                     localStorage.removeItem('br_cookie_consent');
                     setCookieBannerKey(prev => prev + 1);
+                    window.location.hash = `${currentTab}/manage-cookies`;
                   }}
                   className="hover:text-amber-400 transition cursor-pointer font-sans underline decoration-dotted underline-offset-2"
                 >
@@ -955,6 +1043,12 @@ export default function App() {
       <CookieBanner 
         consentTrigger={cookieBannerKey} 
         onOpenPrivacy={() => setActiveLegalModal('privacy')} 
+        onClose={() => {
+          const currentHash = window.location.hash.replace('#', '');
+          if (currentHash.includes('cookies') || currentHash.includes('manage-cookies')) {
+            window.location.hash = currentTab;
+          }
+        }}
       />
 
       {/* Legal Overlay Modals */}

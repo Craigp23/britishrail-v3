@@ -359,14 +359,18 @@ export default function FareFinder() {
                     <p className="text-xs text-emerald-700/80 mt-0.5">Save by splitting at intermediate stations. No train transfers necessary</p>
                   </div>
 
-                  <div className="my-4 flex items-baseline space-x-2">
-                    <span className="text-3xl font-display font-bold text-emerald-700">
-                      £{fareResult.splitPrice.toFixed(2)}
-                    </span>
-                    <span className="text-xs text-emerald-600/70 font-mono">one-way</span>
-                    <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold ml-auto font-mono">
-                      Save £{(fareResult.standardPrice - fareResult.splitPrice).toFixed(2)}!
-                    </span>
+                  <div className="my-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-3xl font-display font-bold text-emerald-700 leading-none">
+                        £{fareResult.splitPrice.toFixed(2)}
+                      </span>
+                      <span className="text-xs text-emerald-600/70 font-mono">one-way</span>
+                    </div>
+                    <div className="flex sm:justify-end">
+                      <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded font-bold font-mono whitespace-nowrap">
+                        Save £{(fareResult.standardPrice - fareResult.splitPrice).toFixed(2)}!
+                      </span>
+                    </div>
                   </div>
 
                   <div className="text-xs text-emerald-800 bg-white/95 p-3 rounded-lg border border-emerald-100 flex flex-col space-y-1">
@@ -397,7 +401,7 @@ export default function FareFinder() {
                   }}
                   className="inline-flex items-center justify-center space-x-2 bg-rail-red text-white hover:bg-opacity-95 font-sans font-bold text-sm py-2.5 px-6 rounded-xl transition duration-150 shadow-md transform hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <span>Navigate to Secure Booking on Trainline</span>
+                  <span>Take me to Secure Booking on Trainline</span>
                   <ExternalLink className="w-4 h-4" />
                 </a>
               </div>

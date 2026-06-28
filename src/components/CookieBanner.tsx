@@ -5,9 +5,10 @@ import { Shield, Cookie, X, ArrowRight } from 'lucide-react';
 interface CookieBannerProps {
   onOpenPrivacy: () => void;
   consentTrigger?: number;
+  onClose?: () => void;
 }
 
-export default function CookieBanner({ onOpenPrivacy, consentTrigger }: CookieBannerProps) {
+export default function CookieBanner({ onOpenPrivacy, consentTrigger, onClose }: CookieBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -27,11 +28,13 @@ export default function CookieBanner({ onOpenPrivacy, consentTrigger }: CookieBa
   const handleAcceptAll = () => {
     localStorage.setItem('br_cookie_consent', 'accepted');
     setIsVisible(false);
+    if (onClose) onClose();
   };
 
   const handleDeclineAll = () => {
     localStorage.setItem('br_cookie_consent', 'declined');
     setIsVisible(false);
+    if (onClose) onClose();
   };
 
   return (
