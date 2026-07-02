@@ -250,6 +250,7 @@ export default function DidYouKnow({ onNavigateToSplitter, onNavigateToCalculato
         {/* Right Side: Satisfied Passenger Card Column with our Reusable ClairePanel */}
         <div className="lg:col-span-5 flex flex-col justify-between">
           <ClairePanel 
+            type="history"
             onNavigateToSplitter={onNavigateToSplitter} 
             onNavigateToCalculator={onNavigateToCalculator} 
           />

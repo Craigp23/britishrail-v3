@@ -29,6 +29,7 @@ export default function App() {
   const [pendingScroll, setPendingScroll] = useState(false);
   const [pendingCalculatorScroll, setPendingCalculatorScroll] = useState(false);
   const [pendingStrategiesScroll, setPendingStrategiesScroll] = useState(false);
+  const [pendingTypewriterScroll, setPendingTypewriterScroll] = useState(false);
   const [activeLegalModal, setActiveLegalModal] = useState<'about' | 'privacy' | null>(null);
   const [cookieBannerKey, setCookieBannerKey] = useState(0);
   const [activeDesignIndex, setActiveDesignIndex] = useState(0);
@@ -232,6 +233,31 @@ export default function App() {
     }
   }, [currentTab, pendingStrategiesScroll]);
 
+  // Robust pending typewriter scroll handler that runs after History tab enters the DOM
+  useEffect(() => {
+    if (currentTab === 'history' && pendingTypewriterScroll) {
+      const scrollTimes = [0, 50, 150, 300, 500, 800, 1200];
+      const timers: NodeJS.Timeout[] = [];
+
+      scrollTimes.forEach((delay) => {
+        const t = setTimeout(() => {
+          const el = document.getElementById('rail-alphabet-typewriter-section');
+          if (el) {
+            el.scrollIntoView({ behavior: 'auto', block: 'start' });
+            if (delay === scrollTimes[scrollTimes.length - 1]) {
+              setPendingTypewriterScroll(false);
+            }
+          }
+        }, delay);
+        timers.push(t);
+      });
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
+    }
+  }, [currentTab, pendingTypewriterScroll]);
+
   // Precision custom inline SVG representing the double arrow logo
   const doubleArrowLogo = (
     <svg viewBox="0 0 100 60" className="w-12 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="square">
@@ -274,6 +300,18 @@ export default function App() {
     } else {
       setPendingStrategiesScroll(true);
       setTab('guide');
+    }
+  };
+
+  const navigateToTypewriter = () => {
+    if (currentTab === 'history') {
+      const el = document.getElementById('rail-alphabet-typewriter-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      setPendingTypewriterScroll(true);
+      setTab('history');
     }
   };
 
@@ -420,6 +458,7 @@ export default function App() {
                     {/* Right Column: Claire Panel */}
                     <div className="lg:col-span-4" id="home-claire-panel-container">
                       <ClairePanel 
+                        type="home"
                         compact={true} 
                         onNavigateToSplitter={navigateToSplitter} 
                         onNavigateToCalculator={navigateToCalculator} 
@@ -436,22 +475,22 @@ export default function App() {
               {/* THREE COLUMN INFO GRID */}
               <section className="py-12 bg-slate-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     
                     <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
                       {/* Left Accent Bar */}
                       <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col items-start gap-4">
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none p-2 bg-red-50/60 rounded-xl">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: '29px', lineHeight: '1' }} className="font-normal text-rail-red select-none">
+                            {String.fromCharCode(200)}
+                          </span>
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-bold text-slate-800">Free Interactive Tools</h4>
                           <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                             Discover Gerry Barney's iconic Double Arrow logo design and the legendary Rail Alphabet typography crafted by Jock Kinneir & Margaret Calvert.
                           </p>
-                        </div>
-                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
-                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: '39px', lineHeight: '1' }} className="font-normal text-rail-red select-none">
-                            {String.fromCharCode(200)}
-                          </span>
                         </div>
                       </div>
                       <button 
@@ -465,17 +504,17 @@ export default function App() {
                     <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
                       {/* Left Accent Bar */}
                       <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col items-start gap-4">
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none p-2 bg-[#00bc7d]/10 rounded-xl">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: '36px', lineHeight: '1' }} className="font-normal text-[#00bc7d] select-none">
+                            {String.fromCharCode(219)}
+                          </span>
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-bold text-slate-800">Split Ticket Mastery</h4>
                           <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                             Learn how breaking up your rail trips into sequential segments can cut 40%+ off the cost of your journey.
                           </p>
-                        </div>
-                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
-                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: 'xxx-large', lineHeight: '1' }} className="font-normal text-[#00bc7d] select-none">
-                            {String.fromCharCode(219)}
-                          </span>
                         </div>
                       </div>
                       <button 
@@ -489,17 +528,17 @@ export default function App() {
                     <div className="relative bg-white rounded-2xl border border-slate-200 p-6 pl-8 flex flex-col justify-between hover:shadow-md transition overflow-hidden">
                       {/* Left Accent Bar */}
                       <div className="absolute left-0 top-0 bottom-0 bg-[#012169]" style={{ width: 'calc(var(--spacing) * 1.2)' }} />
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col items-start gap-4">
+                        <div className="flex-shrink-0 flex items-center justify-center leading-none p-2 bg-slate-100 rounded-xl">
+                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: '36px', lineHeight: '1' }} className="font-normal text-slate-900 select-none">
+                            {String.fromCharCode(224)}
+                          </span>
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-display font-bold text-slate-800">The 12-Week Release Cycle</h4>
                           <p className="text-xs text-slate-600 mt-2 leading-relaxed">
                             Train companies release their cheapest advance inventory 12 weeks ahead. Track release dates using our easy reminder tool.
                           </p>
-                        </div>
-                        <div className="flex-shrink-0 flex items-center justify-center leading-none pt-0.5">
-                          <span style={{ fontFamily: "'Brsign', 'Geist', sans-serif", fontSize: 'xxx-large', lineHeight: '1' }} className="font-normal text-slate-900 select-none">
-                            {String.fromCharCode(224)}
-                          </span>
                         </div>
                       </div>
                       <button 
@@ -944,9 +983,11 @@ export default function App() {
                     {/* Right Column: Claire Panel */}
                     <div className="lg:col-span-4" id="guide-claire-panel-container">
                       <ClairePanel 
+                        type="smart"
                         compact={true} 
                         onNavigateToSplitter={navigateToSplitter} 
                         onNavigateToCalculator={navigateToCalculator} 
+                        onNavigateToHistory={navigateToTypewriter}
                       />
                     </div>
 
